@@ -25,7 +25,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\ResetPasswordExample;
 use App\Http\Livewire\UpgradeToPro;
 use App\Http\Livewire\Users;
+use App\Http\Livewire\Customers;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CustomerController;
 
 
 /*
@@ -81,4 +83,18 @@ Route::middleware('auth')->group(function () {
         Route::put('/{user}', [UserController::class, 'update'])->name('update'); // Handle edit
         Route::get('/{uuid}', [UserController::class, 'show'])->name('show');
     });
+
+
+    Route::get('/customers', Customers::class)->name('customers');
+
+    Route::prefix('customers')->name('customers.')->group(function () {
+        Route::get('/create', [CustomerController::class, 'create'])->name('create');
+        Route::post('/', [CustomerController::class, 'store'])->name('store');
+        Route::get('/{customer}/edit', [CustomerController::class, 'edit'])->name('edit');
+        Route::put('/{customer}', [CustomerController::class, 'update'])->name('update');
+        Route::get('/{uuid}', [CustomerController::class, 'show'])->name('show');
+    });
+
+
+
 });
