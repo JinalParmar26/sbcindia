@@ -1,7 +1,7 @@
 <x-layouts.base>
 
 
-    @if(in_array(request()->route()->getName(), ['dashboard', 'customers', 'profile', 'profile-example', 'users', 'bootstrap-tables', 'transactions',
+    @if(in_array(request()->route()->getName(), ['dashboard', 'customers','products', 'profile', 'profile-example', 'users', 'bootstrap-tables', 'transactions',
     'buttons',
     'forms', 'modals', 'notifications', 'typography', 'upgrade-to-pro']))
 

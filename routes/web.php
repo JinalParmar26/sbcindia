@@ -26,8 +26,10 @@ use App\Http\Livewire\ResetPasswordExample;
 use App\Http\Livewire\UpgradeToPro;
 use App\Http\Livewire\Users;
 use App\Http\Livewire\Customers;
+use App\Http\Livewire\Products;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductController;
 
 
 /*
@@ -93,6 +95,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/{customer}/edit', [CustomerController::class, 'edit'])->name('edit');
         Route::put('/{customer}', [CustomerController::class, 'update'])->name('update');
         Route::get('/{uuid}', [CustomerController::class, 'show'])->name('show');
+    });
+
+    Route::get('/products', Products::class)->name('products');
+
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/create', [ProductController::class, 'create'])->name('create');
+        Route::post('/', [ProductController::class, 'store'])->name('store');
+        Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
+        Route::put('/{product}', [ProductController::class, 'update'])->name('update');
+        Route::get('/{uuid}', [ProductController::class, 'show'])->name('show');
     });
 
 

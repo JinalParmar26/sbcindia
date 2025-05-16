@@ -19,28 +19,28 @@
 
                 <!-- Company Name -->
                 <div class="col-md-6 mb-3">
-                    <label>Company Name</label>
+                    <label>Company Name <span class="text-danger">*</span></label>
                     <input type="text" name="company_name" class="form-control" value="{{ old('company_name') }}" required>
                     @error('company_name') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
                 <!-- Email -->
                 <div class="col-md-6 mb-3">
-                    <label>Email</label>
+                    <label>Email <span class="text-danger">*</span></label>
                     <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                     @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
                 <!-- Phone Number -->
                 <div class="col-md-6 mb-3">
-                    <label>Phone Number</label>
+                    <label>Phone Number <span class="text-danger">*</span></label>
                     <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number') }}" required>
                     @error('phone_number') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
                 <!-- Address -->
                 <div class="col-md-12 mb-3">
-                    <label>Address</label>
+                    <label>Address <span class="text-danger">*</span></label>
                     <textarea name="address" class="form-control" rows="3" required>{{ old('address') }}</textarea>
                     @error('address') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
