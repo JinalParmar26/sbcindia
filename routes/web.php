@@ -28,10 +28,12 @@ use App\Http\Livewire\Users;
 use App\Http\Livewire\Customers;
 use App\Http\Livewire\Products;
 use App\Http\Livewire\Orders;
+use App\Http\Livewire\Tickets;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\TicketController;
 
 
 /*
@@ -120,5 +122,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/{order}', [OrderController::class, 'update'])->name('update');
     });
 
+    Route::get('/tickets', Tickets::class)->name('tickets');
+
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/create', [TicketController::class, 'create'])->name('create');
+        Route::post('/', [TicketController::class, 'store'])->name('store');
+        Route::get('/{uuid}', [TicketController::class, 'show'])->name('show');
+        Route::get('/{ticket}/edit', [TicketController::class, 'edit'])->name('edit');
+        Route::put('/{ticket}', [TicketController::class, 'update'])->name('update');
+    });
 
 });
