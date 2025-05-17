@@ -77,7 +77,7 @@
             </a>
         </li>
         <li class="nav-item {{ Request::segment(1) == 'orders' ? 'active' : '' }}">
-            <a href="/orders" target="_blank" class="nav-link d-flex justify-content-between">
+            <a href="/orders" class="nav-link">
           <span>
             <span class="sidebar-icon"><svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg">
