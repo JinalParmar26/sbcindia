@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\CustomerContactPerson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -36,13 +37,34 @@ class CustomerController extends Controller
             'email' => 'required|email|unique:customers',
             'phone_number' => ['required', 'digits:10'],
             'address' => 'required|string|max:1000',
+            'contact_persons.*.name' => 'required|string|max:255',
+            'contact_persons.*.email' => 'nullable|email',
+            'contact_persons.*.phone_number' => 'nullable|string',
+            'contact_persons.*.alternate_phone_number' => 'nullable|string',
         ]);
 
         $validated['uuid'] = Str::uuid()->toString();
 
-        Customer::create($validated);
+        $customer = Customer::create([
+            'uuid' => $validated['uuid'],
+            'name' => $validated['name'],
+            'company_name' => $validated['company_name'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'],
+            'address' => $validated['address'],
+        ]);
 
-        return redirect()->route('customers')->with('success', 'Customer created successfully.');
+        foreach ($request->input('contact_persons', []) as $person) {
+            $customer->contactPersons()->create([
+                'uuid' => Str::uuid(),
+                'name' => $person['name'],
+                'email' => $person['email'] ?? null,
+                'phone_number' => $person['phone_number'] ?? null,
+                'alternate_phone_number' => $person['alternate_phone_number'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('customers.show', $customer->uuid)->with('success', 'Customer created successfully.');
     }
 
     /**
@@ -65,20 +87,56 @@ class CustomerController extends Controller
     /**
      * Update the specified customer in storage.
      */
+
     public function update(Request $request, Customer $customer)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'company_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,' . $customer->id,
-            'phone_number' => ['required', 'digits:10'],
-            'address' => 'required|string|max:1000',
+            'email' => 'required|email',
+            'phone_number' => 'required',
+            'address' => 'required',
+            'contact_persons.*.name' => 'nullable|string|max:255',
+            'contact_persons.*.email' => 'nullable|email|max:255',
+            'contact_persons.*.phone_number' => 'nullable|string|max:20',
+            'contact_persons.*.alternate_phone_number' => 'nullable|string|max:20',
         ]);
 
-        $customer->update($validated);
+        $customer->update($request->only(['name', 'company_name', 'email', 'phone_number', 'address']));
 
-        return redirect()->route('customers')->with('success', 'Customer updated successfully.');
+        // Handle Contact Persons
+        $existingIds = $customer->contactPersons()->pluck('id')->toArray();
+        $submittedIds = [];
+
+        foreach ($request->contact_persons ?? [] as $person) {
+            if (!empty($person['name'])) {
+                if (!empty($person['id'])) {
+                    $submittedIds[] = $person['id'];
+                    $customer->contactPersons()->where('id', $person['id'])->update([
+                        'name' => $person['name'],
+                        'email' => $person['email'] ?? null,
+                        'phone_number' => $person['phone_number'] ?? null,
+                        'alternate_phone_number' => $person['alternate_phone_number'] ?? null,
+                    ]);
+                } else {
+                    $customer->contactPersons()->create([
+                        'uuid' => Str::uuid(),
+                        'name' => $person['name'],
+                        'email' => $person['email'] ?? null,
+                        'phone_number' => $person['phone_number'] ?? null,
+                        'alternate_phone_number' => $person['alternate_phone_number'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        // Delete removed contacts
+        $toDelete = array_diff($existingIds, $submittedIds);
+        CustomerContactPerson::whereIn('id', $toDelete)->delete();
+
+        return redirect()->route('customers.show', $customer->uuid)->with('success', 'Customer updated successfully.');
     }
+
 
     /**
      * Remove the specified customer from storage.

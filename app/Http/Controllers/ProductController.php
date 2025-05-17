@@ -30,9 +30,9 @@ class ProductController extends Controller
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        Product::create($validated);
+        $product = Product::create($validated);
 
-        return redirect()->route('products')->with('success', 'Product created successfully.');
+        return redirect()->route('products.show', $product->uuid)->with('success', 'Product created successfully.');
     }
 
     public function show($uuid)
@@ -71,7 +71,7 @@ class ProductController extends Controller
         }
         $product->update($validated);
 
-        return redirect()->route('products')->with('success', 'Product updated successfully.');
+        return redirect()->route('products.show', $product->uuid)->with('success', 'Product updated successfully.');
     }
 
     public function destroy(Product $product)

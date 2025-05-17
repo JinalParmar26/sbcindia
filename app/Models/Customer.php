@@ -27,4 +27,9 @@ class Customer extends Model
             $customer->uuid = Str::uuid();
         });
     }
+
+    public function contactPersons()
+    {
+        return $this->hasMany(CustomerContactPerson::class);
+    }
 }

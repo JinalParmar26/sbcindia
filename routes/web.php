@@ -27,9 +27,11 @@ use App\Http\Livewire\UpgradeToPro;
 use App\Http\Livewire\Users;
 use App\Http\Livewire\Customers;
 use App\Http\Livewire\Products;
+use App\Http\Livewire\Orders;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 
 
 /*
@@ -107,6 +109,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/{uuid}', [ProductController::class, 'show'])->name('show');
     });
 
+
+    Route::get('/orders', Orders::class)->name('orders');
+
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/create', [OrderController::class, 'create'])->name('create');
+        Route::post('/', [OrderController::class, 'store'])->name('store');
+        Route::get('/{uuid}', [OrderController::class, 'show'])->name('show');
+        Route::get('/{order}/edit', [OrderController::class, 'edit'])->name('edit');
+        Route::put('/{order}', [OrderController::class, 'update'])->name('update');
+    });
 
 
 });

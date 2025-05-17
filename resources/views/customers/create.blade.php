@@ -45,6 +45,28 @@
                     @error('address') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
             </div>
+            <!-- Contact Persons -->
+            <div class="col-md-12 mb-3">
+                <label>Contact Persons</label>
+                <div id="contact-persons-wrapper">
+                    <div class="contact-person-item row mb-3">
+                        <div class="col-md-3">
+                            <input type="text" name="contact_persons[0][name]" class="form-control" placeholder="Name" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="email" name="contact_persons[0][email]" class="form-control" placeholder="Email">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="contact_persons[0][phone_number]" class="form-control" placeholder="Phone">
+                        </div>
+                        <div class="col-md-3 d-flex">
+                            <input type="text" name="contact_persons[0][alternate_phone_number]" class="form-control me-2" placeholder="Alternate Phone">
+                            <button type="button" class="btn btn-danger btn-sm remove-contact d-none">✕</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="add-contact-person" class="btn btn-outline-primary btn-sm mt-2">+ Add Contact Person</button>
+            </div>
 
             <div class="mt-4 d-flex justify-content-end">
                 <a href="{{ route('customers') }}" class="btn btn-secondary me-2">Cancel</a>
@@ -53,4 +75,33 @@
         </form>
     </div>
 </div>
+
+<script>
+    let contactIndex = 1;
+
+    document.getElementById('add-contact-person').addEventListener('click', function () {
+        const wrapper = document.getElementById('contact-persons-wrapper');
+        const item = document.querySelector('.contact-person-item').cloneNode(true);
+
+        // Update input names
+        item.querySelectorAll('input').forEach((input) => {
+            const nameAttr = input.getAttribute('name');
+            const newNameAttr = nameAttr.replace(/\d+/, contactIndex);
+            input.setAttribute('name', newNameAttr);
+            input.value = '';
+        });
+
+        item.querySelector('.remove-contact').classList.remove('d-none');
+        item.querySelector('.remove-contact').addEventListener('click', function () {
+            item.remove();
+        });
+
+        wrapper.appendChild(item);
+        contactIndex++;
+    });
+
+    document.querySelector('.remove-contact')?.addEventListener('click', function () {
+        this.closest('.contact-person-item').remove();
+    });
+</script>
 @endsection

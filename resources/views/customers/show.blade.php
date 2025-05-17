@@ -50,6 +50,19 @@
             </div>
         </div>
 
+        <hr>
+        <h5>Contact Persons</h5>
+        @forelse($customer->contactPersons as $person)
+        <div class="border p-3 mb-3">
+            <div><strong>Name:</strong> {{ $person->name }}</div>
+            <div><strong>Email:</strong> {{ $person->email }}</div>
+            <div><strong>Phone:</strong> {{ $person->phone_number }}</div>
+            <div><strong>Alternate:</strong> {{ $person->alternate_phone_number }}</div>
+        </div>
+        @empty
+        <p>No contact persons added.</p>
+        @endforelse
+
         <div class="mt-4 d-flex justify-content-end">
             <a href="{{ route('customers') }}" class="btn btn-secondary me-2">Back to List</a>
             <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-primary">Edit Customer</a>

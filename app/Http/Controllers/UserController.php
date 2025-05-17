@@ -63,7 +63,7 @@ class UserController extends Controller
         // Assign role
         $user->assignRole($request->input('role'));
 
-        return redirect()->route('users')->with('success', 'User created successfully.');
+        return redirect()->route('users.show', $user->uuid)->with('success', 'User created successfully.');
     }
 
     /**
@@ -138,7 +138,7 @@ class UserController extends Controller
         $user->syncRoles($request->input('role'));
         $user->update($validated);
 
-        return redirect()->route('users')->with('success', 'User updated successfully.');
+        return redirect()->route('users.show', $user->uuid)->with('success', 'User updated successfully.');
     }
 
     /**
