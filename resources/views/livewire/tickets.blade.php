@@ -90,7 +90,6 @@
                 <th class="border-bottom">Customer</th>
                 <th class="border-bottom">Assigned Staff</th>
                 <th class="border-bottom">Created</th>
-                <th class="border-bottom">Status</th>
                 <th class="border-bottom">Action</th>
             </tr>
             </thead>
@@ -123,18 +122,6 @@
                 </td>
                 <td>
                     <span class="fw-normal">{{ $ticket->created_at->format('M d, Y') }}</span>
-                </td>
-                <td>
-                    @php
-                    $badgeClass = match($ticket->status) {
-                    'open' => 'bg-warning',
-                    'in_progress' => 'bg-info',
-                    'resolved' => 'bg-success',
-                    'closed' => 'bg-secondary',
-                    default => 'bg-light text-dark'
-                    };
-                    @endphp
-                    <span class="badge {{ $badgeClass }}">{{ ucfirst(str_replace('_', ' ', $ticket->status)) }}</span>
                 </td>
                 <td>
                     <div class="dropdown">

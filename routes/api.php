@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Customer;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,5 +35,13 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::post('/logout', [AuthController::class, 'logout']);
+
+
+        Route::get('/tickets', [TicketController::class, 'assignedTickets']);
+        Route::get('tickets/{uuid}', [TicketController::class, 'show']);
+        Route::post('/tickets/{ticket}', [TicketController::class, 'storeTicketEntry']);
+
     });
+
+
 });

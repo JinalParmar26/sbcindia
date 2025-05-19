@@ -37,9 +37,6 @@
                 @endif
             </dd>
 
-            <dt class="col-md-3">Description</dt>
-            <dd class="col-md-9">{{ $ticket->description ?? '-' }}</dd>
-
             <dt class="col-md-3">Created At</dt>
             <dd class="col-md-9">{{ $ticket->created_at->format('Y-m-d H:i') }}</dd>
 
