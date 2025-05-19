@@ -39,7 +39,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/tickets', [TicketController::class, 'assignedTickets']);
         Route::get('tickets/{uuid}', [TicketController::class, 'show']);
-        Route::post('/tickets/{ticket}', [TicketController::class, 'storeTicketEntry']);
+        Route::post('/tickets/{uuid}', [TicketController::class, 'storeTicketEntry']);
 
     });
 

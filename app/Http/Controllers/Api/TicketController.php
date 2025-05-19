@@ -37,49 +37,79 @@ class TicketController extends Controller
         ]);
     }
 
-    public function storeTicketEntry(Request $request, Ticket $ticket)
+    public function storeTicketEntry(Request $request, $uuid)
     {
-        $validator = Validator::make($request->all(), [
+        try {
+            $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'No ticket found for the provided UUID.',
+            ], 404);
+        }
+
+        $data = json_decode($request->input('data'), true);
+
+
+        $validator = Validator::make([
+            'type' => $request->type,
+            'start' => $request->start,
+            'end' => $request->end,
+            'log' => $request->log,
+            'data' => $data,
+        ], [
             'type' => 'required|in:delivery,service',
-            'start' => 'required',
-            'end' => 'nullable',
-            'items' => 'nullable|array'
+            'start' => 'required|date',
+            'end' => 'nullable|date',
+            'log' => 'nullable|string',
+            'data' => 'required|array',
+            'data.items' => 'nullable|array',
+            'data.items.*.item' => 'required_with:data.items|string',
+            'data.items.*.qty' => 'required_with:data.items|numeric',
+            'data.items.*.rate' => 'required_with:data.items|numeric',
+            'data.items.*.amount' => 'required_with:data.items|numeric',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $type = $request->type;
-        $data = $request->data;
-        $items = $request->items ?? [];
+        $type = $request->input('type');
+        $items = $data['items'] ?? [];
+
+        $ticket->update([
+            'start' => $request->input('start'),
+            'end' => $request->input('end'),
+            'log' => $data['log'] ?? null,
+        ]);
 
         if ($type === 'service') {
-            $service = Service::create([
+            // Remove items before inserting service record
+            unset($data['items']);
+
+            $service = Service::create(array_merge($data, [
                 'ticket_id' => $ticket->id,
-                ...$data
-            ]);
+            ]));
+
             foreach ($items as $item) {
-                ServiceItem::create([
-                    'service_type' => 'service',
-                    'service_id' => $service->id,
-                    ...$item
-                ]);
+                $service->serviceItems()->create($item);
             }
+
         } elseif ($type === 'delivery') {
-            $delivery = Delivery::create([
+            unset($data['items']);
+
+            $delivery = Delivery::create(array_merge($data, [
                 'ticket_id' => $ticket->id,
-                ...$data
-            ]);
+            ]));
+
+
+
             foreach ($items as $item) {
-                ServiceItem::create([
-                    'service_type' => 'delivery',
-                    'service_id' => $delivery->id,
-                    ...$item
-                ]);
+                $delivery->serviceItems()->create($item);
             }
         }
 
-        return response()->json(['message' => ucfirst($type) . ' entry saved.']);
+        return response()->json([
+            'message' => ucfirst($type) . ' entry saved successfully.'
+        ]);
     }
 }
