@@ -49,6 +49,17 @@ class Ticket extends Model
         return $this->belongsToMany(User::class, 'ticket_additional_staff', 'ticket_id', 'user_id');
     }
 
+    public function delivery()
+    {
+        return $this->hasOne(Delivery::class);
+    }
+
+    public function service()
+    {
+        return $this->hasOne(Service::class);
+    }
+
+
     protected static function boot()
     {
         parent::boot();
