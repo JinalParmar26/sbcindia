@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Customer;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,4 +23,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/customers/{customer}/contacts', function (Customer $customer) {
     return $customer->contactPersons()->select('id', 'name', 'email')->get();
+});
+
+
+Route::prefix('v1')->group(function () {
+    // Public routes
+    Route::post('/login', [AuthController::class, 'login']);
+
+    // Protected routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/profile', [AuthController::class, 'profile']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
 });
