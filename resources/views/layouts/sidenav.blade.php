@@ -33,10 +33,10 @@
       <li class="nav-item">
         <a href="/dashboard" class="nav-link d-flex align-items-center">
           <span class="sidebar-icon me-3">
-            <img src="/assets/img/brand/light.svg" height="20" width="20" alt="Volt Logo">
+            <img src="https://sbccindia.com/assets/img/logo/sbc-logo.webp" height="15" width="60" alt="SBC Logo">
           </span>
           <span class="mt-1 ms-1 sidebar-text">
-            Volt Laravel
+            SBC
           </span>
         </a>
       </li>
@@ -103,7 +103,7 @@
           </span>
             </a>
         </li>
-<!--      <li class="nav-item">-->
+     <li class="nav-item">
 <!--        <span class="nav-link collapsed d-flex justify-content-between align-items-center" data-bs-toggle="collapse"-->
 <!--          data-bs-target="#submenu-laravel" aria-expanded="true">-->
 <!--          <span>-->
@@ -132,7 +132,8 @@
 <!--          </ul>-->
 <!--        </div>-->
 <!--      </li>-->
-      <li class="nav-item">
+
+      <!--<li class="nav-item">
         <a href="https://themesberg.com/product/laravel/volt-pro-admin-dashboard-template" target="_blank" class="nav-link d-flex justify-content-between">
           <span>
             <span class="sidebar-icon"><svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20"
@@ -342,7 +343,7 @@
           </ul>
         </div>
       </li>
-      <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
+      <!-- <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
       <li class="nav-item">
         <a href="/documentation/getting-started/overview/index.html" target="_blank"
           class="nav-link d-flex align-items-center">
@@ -371,20 +372,7 @@
           </span>
           <span class="sidebar-text">Updivision</span>
         </a>
-      </li>
-      <li class="nav-item">
-        <a href="/upgrade-to-pro"
-          class="btn btn-secondary d-flex align-items-center justify-content-center btn-upgrade-pro">
-          <span class="sidebar-icon d-inline-flex align-items-center justify-content-center">
-            <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd"
-                d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
-                clip-rule="evenodd"></path>
-            </svg>
-          </span>
-          <span>Upgrade to Pro</span>
-        </a>
-      </li>
+      </li> -->
     </ul>
   </div>
 </nav>
