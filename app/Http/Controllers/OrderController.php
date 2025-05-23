@@ -22,7 +22,6 @@ class OrderController extends Controller
     {
 
         $request->validate([
-            'title' => 'required|string|max:255',
             'customer_id' => 'required|exists:customers,id',
             'products' => 'required|array',
             'products.*.product_id' => 'required|exists:products,id',
@@ -48,12 +47,12 @@ class OrderController extends Controller
                     }
                 }
             }
-
+            $serial_number="SBC".date("YmdHis").rand(1,99);
             OrderProduct::create([
                 'uuid' => Str::uuid(),
                 'order_id' => $order->id,
                 'product_id' => $productData['product_id'],
-                'serial_number' => $productData['serial_number'],
+                'serial_number' => $serial_number,
                 'configurations' => json_encode($configurations),
             ]);
         }

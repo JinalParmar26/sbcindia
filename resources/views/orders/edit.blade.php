@@ -12,9 +12,8 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label>Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" class="form-control" value="{{ old('title', $order->title ?? '') }}" required>
-                    @error('title') <small class="text-danger">{{ $message }}</small> @enderror
+                    <label>Title</label>
+                    <input type="text" name="title" class="form-control" value="{{ old('title', $order->title ?? '') }}" >
                 </div>
 
                 <div class="col-md-6">

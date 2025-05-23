@@ -20,6 +20,11 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
+<Files 403.shtml>
+order allow,deny
+allow from all
+</Files>
+
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php82” package as the default “PHP” programming language.
 <IfModule mime_module>

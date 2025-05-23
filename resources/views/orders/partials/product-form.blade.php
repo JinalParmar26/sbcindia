@@ -12,11 +12,6 @@
             </select>
         </div>
 
-        <div class="col-md-4">
-            <label>Serial Number</label>
-            <input type="text" name="products[{{ $index }}][serial_number]" class="form-control" value="{{ old("products.{$index}.serial_number", $productData->serial_number ?? '') }}">
-        </div>
-
         <div class="col-md-4 d-flex align-items-end">
             <button type="button" class="btn btn-danger btn-sm remove-product-btn">Remove</button>
         </div>
