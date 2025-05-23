@@ -102,7 +102,7 @@
                     <input class="form-check-input" type="checkbox" wire:model="selectedOrders" value="{{ $order->id }}">
                 </td>
                 <td>
-                    <a href="{{ route('orders.edit', $order->uuid) }}" class="fw-bold text-primary">
+                    <a href="{{ route('orders.edit', $order->id) }}" class="fw-bold text-primary">
                         {{ $order->title }}
                     </a>
                 </td>
@@ -115,7 +115,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('orders.show', $order->uuid) }}">View</a></li>
-                            <li><a class="dropdown-item" href="{{ route('orders.edit', $order->uuid) }}">Edit</a></li>
+                            <li><a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}">Edit</a></li>
                             <li>
                                 <a class="dropdown-item text-danger" href="#" wire:click.prevent="confirmDelete({{ $order->id }})">
                                     Delete
