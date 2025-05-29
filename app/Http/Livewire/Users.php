@@ -13,11 +13,13 @@ class Users extends Component
     public $perPage = 10;
     public $search = '';
     public $statusFilter = 'all';
+    public $approvalFilter = 'all';
+    public $roleFilter = 'all';
     protected $paginationTheme = 'bootstrap';
     public $confirmingUserDeletionId = null;
     public $selectedUsers = [];
 
-    protected $updatesQueryString = ['search', 'perPage', 'statusFilter'];
+    protected $updatesQueryString = ['search', 'perPage', 'statusFilter','approvalFilter', 'roleFilter'];
 
     public function updatingSearch()
     {
@@ -50,9 +52,24 @@ class Users extends Component
             });
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        if ($this->approvalFilter !== 'all') {
+            if ($this->approvalFilter === 'require_approval') {
+                $query->where('approval_required', 'yes');
+            } elseif ($this->approvalFilter === 'approved') {
+                $query->where('approval_required', 'no');
+            }
+        }
 
-        return view('livewire.users', compact('users'));
+        if ($this->roleFilter !== 'all') {
+            $query->whereHas('roles', function ($q) {
+                $q->where('name', $this->roleFilter);
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        $rolesList = \Spatie\Permission\Models\Role::pluck('name', 'name'); // optional for dropdown
+
+        return view('livewire.users', compact('users','rolesList'));
     }
 
 
@@ -70,6 +87,31 @@ class Users extends Component
         $this->confirmingUserDeletionId = null;
         $this->dispatchBrowserEvent('hide-delete-modal');
     }
+
+    public function approveUser($userId)
+{
+    $user = User::findOrFail($userId);
+
+    if (!$user->hasRole(['marketing', 'staff'])) {
+        $this->dispatchBrowserEvent('alert', [
+            'type' => 'error',
+            'message' => 'This user does not require approval.',
+        ]);
+        return;
+    }
+
+    $user->approval_required = 'no';
+    $user->save();
+
+    $this->dispatchBrowserEvent('alert', [
+        'type' => 'success',
+        'message' => 'User approved successfully.',
+    ]);
+
+    // Optional: refresh user list
+    $this->resetPage(); // if using pagination
+}
+
 
 
 

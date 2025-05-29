@@ -48,7 +48,7 @@ class OrderController extends Controller
                 }
             }
             $serial_number="SBC".date("YmdHis").rand(1,99);
-            OrderProduct::create([
+            $orderProduct = OrderProduct::create([
                 'uuid' => Str::uuid(),
                 'order_id' => $order->id,
                 'product_id' => $productData['product_id'],

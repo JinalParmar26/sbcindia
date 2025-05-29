@@ -49,13 +49,28 @@
                     </span>
                     <input type="text" wire:model.debounce.300ms="search" class="form-control" placeholder="Search users">
                 </div>
-                <select wire:model="statusFilter" class="form-select fmxw-200 d-none d-md-inline" aria-label="Status filter">
-                    <option value="all" selected>All</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="pending">Pending</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
+                <div class="input-group me-2 me-lg-3 fmxw-300">
+                    <select wire:model="statusFilter" class="form-select fmxw-200 d-none d-md-inline" aria-label="Status filter">
+                        <option value="all" selected>All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="input-group me-2 me-lg-3 fmxw-300">
+                    <select wire:model="approvalFilter" class="form-control">
+                        <option value="all">Login Approved </option>
+                        <option value="require_approval">Require Login Approval</option>
+                        <option value="approved">Approved Login</option>
+                    </select>
+                </div>
+                 <div class="input-group me-2 me-lg-3 fmxw-300">
+                    <select wire:model="roleFilter" class="form-control">
+                        <option value="all">All Roles</option>
+                        @foreach($rolesList as $role)
+                            <option value="{{ $role }}">{{ ucfirst($role) }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="col-3 col-lg-4 d-flex justify-content-end">
                 <div class="btn-group">
@@ -102,6 +117,7 @@
                 <th class="border-bottom">Role</th>
                 <th class="border-bottom">Date Created</th>
                 <th class="border-bottom">Status</th>
+                <th class="border-bottom">Approve Login</th>
                 <th class="border-bottom">Action</th>
             </tr>
             </thead>
@@ -141,6 +157,16 @@
                     };
                     @endphp
                     <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span>
+                </td>
+                 <td>
+                   @if($user->approval_required == "yes")
+                    <button type="button" class="btn btn-secondary" wire:click="approveUser({{ $user->id }})">
+                        Approve
+                    </button>
+                   @endif
+                    @if($user->approval_required == "no")
+                   <span class="text-dark">Approved</span>
+                   @endif
                 </td>
                 <td>
                     <div class="dropdown">
@@ -194,5 +220,8 @@
     window.addEventListener('hide-delete-modal', event => {
         var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
         deleteModal.hide();
+    });
+    window.addEventListener('alert', event => {
+        alert(event.detail.message); // Replace with toast or SweetAlert if needed
     });
 </script>

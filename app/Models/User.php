@@ -19,11 +19,11 @@ class User extends Authenticatable
      *
      * @var array
      */
- /*    protected $fillable = [
+     protected $fillable = [
         'name',
         'email',
         'password',
-    ]; */
+    ]; 
     protected $guarded=[];
 
     /**
@@ -47,6 +47,6 @@ class User extends Authenticatable
 
     public function requiresApproval(): bool
     {
-        return in_array($this->role, ['staff', 'marketing']) && $this->approval_required !== 'no';
+        return in_array($this->role, ['staff', 'marketing']) && $this->approval_required == 'yes';
     }
 }
