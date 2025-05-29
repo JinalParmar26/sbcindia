@@ -13,7 +13,7 @@ class CheckUserApproval
         $user = $request->user();
 
         // Only block staff/marketing if approval_required is not "no"
-        if ($user && method_exists($user, 'requiresApproval') && $user->requiresApproval()) {
+        if ($user && $user->approval_required == 'yes') {
             return response()->json([
                 'message' => 'Your account requires admin approval before accessing this resource.'
             ], 403);
