@@ -44,4 +44,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function requiresApproval(): bool
+    {
+        return in_array($this->role, ['staff', 'marketing']) && $this->approval_required !== 'no';
+    }
 }

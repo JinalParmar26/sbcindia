@@ -34,7 +34,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     // Protected routes
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('auth:sanctum', 'approval.check')->group(function () {
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::post('/logout', [AuthController::class, 'logout']);
 

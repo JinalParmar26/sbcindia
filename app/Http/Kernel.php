@@ -43,6 +43,7 @@ class Kernel extends HttpKernel
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, // for SPA if needed
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'approval.check' => \App\Http\Middleware\CheckUserApproval::class,
         ],
 
     ];

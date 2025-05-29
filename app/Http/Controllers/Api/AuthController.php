@@ -34,9 +34,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
+        $user->approval_required = 'yes';
+        $user->save();
+
         return response()->json([
             'token' => $token,
             'token_type' => 'Bearer',
+            'message' => 'Login successful, waiting for admin approval'
         ]);
     }
 
