@@ -3,19 +3,17 @@
         <div class="row">
             <div class="col-md-4">
                 <label>Product</label>
-                <select name="products[__INDEX__][product_id]" class="form-control">
+                <select name="products[__INDEX__][product_id]" class="form-control product-select">
                     <option value="">Select</option>
                     @foreach($products as $product)
                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                     @endforeach
+                    @if(!request()->routeIs('orders.edit'))
+    <option value="other">Other (Add New Product)</option>
+@endif
+                
                 </select>
             </div>
-
-            <div class="col-md-4">
-                <label>Serial Number</label>
-                <input type="text" name="products[__INDEX__][serial_number]" class="form-control">
-            </div>
-
             <div class="col-md-4 d-flex align-items-end">
                 <button type="button" class="btn btn-danger btn-sm remove-product-btn">Remove</button>
             </div>

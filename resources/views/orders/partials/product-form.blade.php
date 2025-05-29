@@ -2,13 +2,16 @@
     <div class="row">
         <div class="col-md-4">
             <label>Product <span class="text-danger">*</span></label>
-            <select name="products[{{ $index }}][product_id]" class="form-control" required>
+            <select name="products[{{ $index }}][product_id]" class="form-control product-select" required>
                 <option value="">Select</option>
                 @foreach($products as $product)
                 <option value="{{ $product->id }}" {{ (old("products.{$index}.product_id", $productData->product_id ?? '') == $product->id) ? 'selected' : '' }}>
                 {{ $product->name }}
                 </option>
                 @endforeach
+                 @if(!request()->routeIs('orders.edit'))
+    <option value="other">Other (Add New Product)</option>
+@endif
             </select>
         </div>
 

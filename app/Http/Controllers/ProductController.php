@@ -16,9 +16,10 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp',
             'model_number' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
@@ -26,11 +27,19 @@ class ProductController extends Controller
         $validated['uuid'] = Str::uuid();
         $validated['created_by'] = Auth::id();
 
+
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
         $product = Product::create($validated);
+
+         if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'id' => $product->id,
+                'name' => $product->name,
+            ]);
+        }
 
         return redirect()->route('products.show', $product->uuid)->with('success', 'Product created successfully.');
     }

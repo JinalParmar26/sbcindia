@@ -54,6 +54,54 @@
 </div>
 
 @include('orders.partials.product-template', ['products' => $products])
+<!-- Modal for adding new product -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form id="addProductForm" enctype="multipart/form-data">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Product Name -->
+          <div class="mb-3">
+            <label>Product Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" id="product_name" class="form-control" required>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <!-- Model Number -->
+          <div class="mb-3">
+            <label>Model Number <span class="text-danger">*</span></label>
+            <input type="text" name="model_number" id="model_number" class="form-control" required>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <!-- Image Upload -->
+          <div class="mb-3">
+            <label>Product Image <span class="text-danger">*</span></label>
+            <input type="file" name="image" id="image" class="form-control" required>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label>Description <span class="text-danger">*</span></label>
+            <textarea name="description" id="description" class="form-control" rows="3" required></textarea>
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Product & Select</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 
 <script>
     let productIndex = {{ count($productsData) }};
@@ -90,5 +138,102 @@
             e.target.closest('.config-pair').remove();
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let currentProductSelectIndex = null;
+
+        // Bootstrap 5 modal instance
+        const addProductModalEl = document.getElementById('addProductModal');
+        const addProductModal = new bootstrap.Modal(addProductModalEl);
+
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.classList.contains('product-select')) {
+                if (e.target.value === 'other') {
+                    currentProductSelectIndex = e.target.dataset.index;
+
+                    // Reset modal form
+                    const form = document.getElementById('addProductForm');
+                    form.reset();
+                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                    form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+
+                    
+                    addProductModal.show();
+                }
+            }
+        });
+        // Handle add product form submit via AJAX
+        document.getElementById('addProductForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            // Clear previous errors
+            this.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            this.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Saving... <span class="spinner-border spinner-border-sm ms-1"></span>';
+
+
+            fetch("{{ route('products.store') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    let data = await response.json();
+                    if (data.errors) {
+                        // Show validation errors
+                        Object.keys(data.errors).forEach(field => {
+                            const input = document.querySelector(`[name="${field}"]`);
+                            if (input) {
+                                input.classList.add('is-invalid');
+                                input.nextElementSibling.textContent = data.errors[field][0];
+                            }
+                        });
+                    } else {
+                        alert('Failed to save product. Try again.');
+                    }
+                    throw new Error('Validation failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+               
+                const currentSelect = document.querySelector(`.product-select[data-index="${currentProductSelectIndex}"]`);
+                if (currentSelect) {
+                    const option = document.createElement('option');
+                    option.value = data.id;
+                    option.text = data.name;
+                    currentSelect.appendChild(option);
+                    currentSelect.value = data.id;
+                }
+
+               setTimeout(() => {
+                   
+                    if (currentSelect) {
+                        currentSelect.value = data.id;
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Save Product & Select';
+                    // Now hide the modal
+                    addProductModal.hide();
+                }, 100); // slight delay ensures .value takes effect
+             })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Save Product & Select';
+                 addProductModal.hide();
+                console.error(err);
+            });
+        });
+    });
+
 </script>
 @endsection
