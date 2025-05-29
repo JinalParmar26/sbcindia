@@ -50,7 +50,24 @@
                     </span>
                     <input type="text" wire:model.debounce.300ms="search" class="form-control" placeholder="Search orders">
                 </div>
+                <div class="input-group me-2 me-lg-3 fmxw-300">
+                    <select wire:model="customerFilter" id="customerFilter" class="form-select d-none d-md-inline">
+                        <option value="all">All Customers</option>
+                        @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                 <div class="input-group me-2 me-lg-3 fmxw-300">
+                    <select wire:model="yearFilter" id="yearFilter"  class="form-select d-none d-md-inline">
+                        <option value="all">All Years</option>
+                        @foreach($availableYears as $year)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
+
             <div class="col-3 col-lg-4 d-flex justify-content-end">
                 <div class="btn-group">
                     <div class="dropdown me-1">

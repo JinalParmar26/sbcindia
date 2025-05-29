@@ -58,7 +58,7 @@
                 </div>
                 <div class="input-group me-2 me-lg-3 fmxw-300">
                     <select wire:model="approvalFilter" class="form-control">
-                        <option value="all">Login Approved </option>
+                        <option value="all">Any Login Status</option>
                         <option value="require_approval">Require Login Approval</option>
                         <option value="approved">Approved Login</option>
                     </select>
