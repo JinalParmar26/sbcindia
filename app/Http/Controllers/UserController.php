@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class UserController extends Controller
 {
@@ -83,7 +84,10 @@ class UserController extends Controller
         // Decode working_days JSON to array, or empty array if null
         $user->working_days = $user->working_days ? explode(',', $user->working_days) : [];
 
-        return view('users.show', compact('user', 'days', 'roles'));
+         // Generate QR code with text "Hello, Laravel 11!"
+        $qrCode = QrCode::size(150)->generate(route('showPublicProfile', $user->uuid));
+
+        return view('users.show', compact('user', 'days', 'roles','qrCode'));
     }
 
 
@@ -201,6 +205,26 @@ class UserController extends Controller
         return redirect()->route('profile')->with('success', 'Profile updated successfully.');
     }
 
+     /* Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function showPublicProfile($uuid)
+    {
+        // Fetch user by uuid
+        $user = User::where('uuid', $uuid)->firstOrFail();
+
+        $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $roles = Role::all(); // If needed in view
+
+        // Decode working_days JSON to array, or empty array if null
+        $user->working_days = $user->working_days ? explode(',', $user->working_days) : [];
+
+        return view('users.showPublicProfile', compact('user', 'days', 'roles'));
+    }
+
+
 
 
     /**
@@ -214,4 +238,14 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('users')->with('success', 'User deleted.');
     }
+
+    public function downloadQr($uuid)
+    {
+        $qrCode = QrCode::size(150)->generate(route('showPublicProfile', $uuid));
+
+
+return response($qrCode)->header('Content-Type', 'image/svg+xml');
+    }
+
+
 }

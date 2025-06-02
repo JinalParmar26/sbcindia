@@ -1,6 +1,4 @@
-@extends('layouts.main')
-
-@section('content')
+<x-layouts.base>
 <div class="card">
     <div class="card-header">
         <h4 class="mb-0">{{ $user->name }}</h4>
@@ -28,18 +26,6 @@
                             <div>{{ $user->phone_number ?? '-' }}</div>
                         </div>
 
-                        <!-- Active Status -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Active:</label>
-                            <div>{{ $user->isActive ? 'Yes' : 'No' }}</div>
-                        </div>
-
-                        <!-- Role -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Role:</label>
-                            <div>{{ $user->roles->pluck('name')->join(', ') }}</div>
-                        </div>
-
                         <!-- Working Days -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label fw-bold">Working Days:</label>
@@ -64,11 +50,6 @@
                             <label class="form-label fw-bold">Working Hours End:</label>
                             <div>{{ $user->working_hours_end ? substr($user->working_hours_end, 0, 5) : '-' }}</div>
                         </div>
-
-                        <div class="mt-4 d-flex justify-content-end">
-                            <a href="{{ route('users') }}" class="btn btn-secondary me-2">Back to List</a>
-                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Edit User</a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -84,8 +65,6 @@
                                 <h4 class="h3">
                                     {{ $user->name ? $user->name . ' ' .$user->last_name : 'User Name'}}
                                 </h4>
-                                {!! $qrCode !!}
-                                <a href="{{ route('download-qr', $user->uuid) }}" class="btn btn-primary">Download QR</a>
                             </div>
                         </div>
                     </div>
@@ -95,4 +74,5 @@
         
     </div>
 </div>
-@endsection
+
+</x-layouts.base>

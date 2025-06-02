@@ -61,6 +61,12 @@ Route::get('/404', Err404::class)->name('404');
 Route::get('/500', Err500::class)->name('500');
 Route::get('/upgrade-to-pro', UpgradeToPro::class)->name('upgrade-to-pro');
 
+//user public profile
+Route::get('/user-profile/{uuid}', [UserController::class, 'showPublicProfile'])->name('showPublicProfile');
+Route::get('/download-qr/{uuid}', [UserController::class, 'downloadQr'])->name('download-qr');
+
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', Profile::class)->name('profile');
     Route::get('/profile-example', ProfileExample::class)->name('profile-example');

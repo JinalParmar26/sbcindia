@@ -12,6 +12,7 @@
         "laravel/sanctum": "*",
         "laravel/tinker": "^2.6",
         "livewire/livewire": "^2.8",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.18"
     },
     "require-dev": {
