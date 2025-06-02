@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class Profile extends Component
 {
@@ -30,10 +31,6 @@ class Profile extends Component
 
     public function save()
     {
-        if (env('IS_DEMO')) {
-            $this->showDemoNotification = true;
-            return;
-        }
 
         $this->validate();
 
@@ -44,6 +41,10 @@ class Profile extends Component
 
     public function render()
     {
-        return view('livewire.profile');
+        $user =  auth()->user();
+        $user->working_days = $user->working_days ? explode(',', $user->working_days) : [];
+        $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $roles = Role::all(); // Or apply any filtering logic
+        return view('livewire.profile', compact('user','days','roles'));
     }
 }

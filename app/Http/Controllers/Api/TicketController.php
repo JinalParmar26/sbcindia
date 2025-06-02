@@ -49,25 +49,34 @@ class TicketController extends Controller
 
         $data = json_decode($request->input('data'), true);
 
+        $rules = [];
 
-        $validator = Validator::make([
-            'type' => $request->type,
-            'start' => $request->start,
-            'end' => $request->end,
-            'log' => $request->log,
-            'data' => $data,
-        ], [
-            'type' => 'required|in:delivery,service',
-            'start' => 'required|date',
-            'end' => 'nullable|date',
-            'log' => 'nullable|string',
-            'data' => 'required|array',
-            'data.items' => 'nullable|array',
-            'data.items.*.item' => 'required_with:data.items|string',
-            'data.items.*.qty' => 'required_with:data.items|numeric',
-            'data.items.*.rate' => 'required_with:data.items|numeric',
-            'data.items.*.amount' => 'required_with:data.items|numeric',
-        ]);
+        if ($request->has('type')) {
+            $rules['type'] = 'required|in:delivery,service';
+        }
+        if ($request->has('start')) {
+            $rules['start'] = 'required|date';
+        }
+        if ($request->has('end')) {
+            $rules['end'] = 'nullable|date';
+        }
+        if ($request->has('log')) {
+            $rules['log'] = 'nullable|string';
+        }
+        if ($request->has('data')) {
+            $rules['data'] = 'required|array';
+
+            if (isset($request->data['items'])) {
+                $rules['data.items'] = 'array';
+                $rules['data.items.*.item'] = 'required_with:data.items|string';
+                $rules['data.items.*.qty'] = 'required_with:data.items|numeric';
+                $rules['data.items.*.rate'] = 'required_with:data.items|numeric';
+                $rules['data.items.*.amount'] = 'required_with:data.items|numeric';
+            }
+        }
+
+        $validator = $request->validate($rules);
+
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -76,11 +85,22 @@ class TicketController extends Controller
         $type = $request->input('type');
         $items = $data['items'] ?? [];
 
-        $ticket->update([
-            'start' => $request->input('start'),
-            'end' => $request->input('end'),
-            'log' => $data['log'] ?? null,
-        ]);
+        $updateData = [];
+
+        if ($request->has('start')) {
+            $updateData['start'] = $request->input('start');
+        }
+
+        if ($request->has('end')) {
+            $updateData['end'] = $request->input('end');
+        }
+
+        if (isset($data['log'])) {
+            $updateData['log'] = $data['log'];
+        }
+
+
+        $ticket->update($updateData);
 
         if ($type === 'service') {
             // Remove items before inserting service record

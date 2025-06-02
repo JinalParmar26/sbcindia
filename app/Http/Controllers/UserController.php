@@ -113,6 +113,66 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // dd($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:6|confirmed',
+            'isActive' => 'boolean',
+            'phone_number' => ['nullable', 'digits:10'],
+            'working_days' => 'nullable|array',
+            'working_days.*' => 'in:sunday,monday,tuesday,wednesday,thursday,friday,saturday',
+            'working_hours_start' => 'nullable|date_format:H:i',
+            'working_hours_end' => 'nullable|date_format:H:i|after:working_hours_start',
+        ]);
+
+        if ($validated['password'] ?? false) {
+            $validated['password'] = bcrypt($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+
+        $validated['working_days'] = isset($validated['working_days'])
+            ? implode(',', $validated['working_days'])
+            :  $user->working_days;
+            // dd($validated);
+        $user->syncRoles($request->input('role'));
+        $user->update($validated);
+
+        return redirect()->route('users.show', $user->uuid)->with('success', 'User updated successfully.');
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function editProfile()
+    {
+        $user = auth()->user();// Fetch user or throw 404 if not found
+        $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $roles = Role::all(); // Load all roles, or filter if needed
+
+        $user->working_days = $user->working_days ? explode(',', $user->working_days) : [];
+
+        return view('profile.edit', compact('user', 'days', 'roles'));
+    }
+
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateProfile(Request $request)
+    {
+
+        $user = auth()->user();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -138,8 +198,10 @@ class UserController extends Controller
         $user->syncRoles($request->input('role'));
         $user->update($validated);
 
-        return redirect()->route('users.show', $user->uuid)->with('success', 'User updated successfully.');
+        return redirect()->route('profile')->with('success', 'Profile updated successfully.');
     }
+
+
 
     /**
      * Remove the specified resource from storage.

@@ -80,6 +80,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/typography', Typography::class)->name('typography');
 
 
+     Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/edit', [UserController::class, 'editProfile'])->name('edit');
+        Route::put('/', [UserController::class, 'updateProfile'])->name('update');
+    });
     //developer added routes
 
     Route::prefix('users')->name('users.')->group(function () {
