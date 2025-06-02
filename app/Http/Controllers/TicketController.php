@@ -70,7 +70,6 @@ class TicketController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'customer_contact_person_id' => 'required|exists:customer_contact_person,id',
             'order_product_id' => 'required|exists:order_products,id',
-            'attended_by' => auth()->id(),
             'assigned_to' => 'required|exists:users,id',
             'additional_staff' => 'nullable|array',
             'additional_staff.*' => 'exists:users,id',
