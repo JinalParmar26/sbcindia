@@ -40,6 +40,8 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/attendances', [AttendanceController::class, 'index']);
         Route::post('/attendances', [AttendanceController::class, 'store']);
+        Route::post('/checkin', [AttendanceController::class, 'checkin']);
+        Route::put('/checkout', [AttendanceController::class, 'checkout']);
         Route::get('/attendances/{attendance}', [AttendanceController::class, 'show']);
         Route::put('/attendances/{attendance}', [AttendanceController::class, 'update']);
         Route::delete('/attendances/{attendance}', [AttendanceController::class, 'destroy']);
