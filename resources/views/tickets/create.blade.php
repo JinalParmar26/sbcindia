@@ -22,17 +22,17 @@
                     </div>
 
                     <!-- Ticket Type -->
-                    <div class="col-md-6">
-                        <label for="type" class="form-label">Ticket Type <span class="text-danger">*</span></label>
-                        <select id="type" name="type" class="form-select @error('type') is-invalid @enderror" required>
-                            <option value="" disabled {{ old('type') ? '' : 'selected' }}>Select ticket type</option>
-                            <option value="delivery" {{ old('type') == 'delivery' ? 'selected' : '' }}>Delivery</option>
-                            <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>Service</option>
-                        </select>
-                        @error('type')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+{{--                    <div class="col-md-6">--}}
+{{--                        <label for="type" class="form-label">Ticket Type <span class="text-danger">*</span></label>--}}
+{{--                        <select id="type" name="type" class="form-select @error('type') is-invalid @enderror" required>--}}
+{{--                            <option value="" disabled {{ old('type') ? '' : 'selected' }}>Select ticket type</option>--}}
+{{--                            <option value="delivery" {{ old('type') == 'delivery' ? 'selected' : '' }}>Delivery</option>--}}
+{{--                            <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>Service</option>--}}
+{{--                        </select>--}}
+{{--                        @error('type')--}}
+{{--                        <div class="invalid-feedback">{{ $message }}</div>--}}
+{{--                        @enderror--}}
+{{--                    </div>--}}
 
                     <!-- Customer -->
                     <div class="col-md-6">

@@ -99,7 +99,7 @@
                       clip-rule="evenodd"></path>
               </svg>
             </span>
-            <span class="sidebar-text">Ticket Management</span>
+            <span class="sidebar-text">Maintenance</span>
           </span>
             </a>
         </li>

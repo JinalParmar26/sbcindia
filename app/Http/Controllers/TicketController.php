@@ -28,7 +28,6 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
             'customer_id' => 'required|exists:customers,id',
             'customer_contact_person_id' => 'required|exists:customer_contact_person,id',
             'order_product_id' => 'required|exists:order_products,id',
@@ -39,6 +38,7 @@ class TicketController extends Controller
 
         $validated['attended_by'] = auth()->id();
         $validated['uuid'] = Str::uuid()->toString();
+        $validated['type'] = 'service';
 
         $ticket = Ticket::create($validated);
         $ticket->additionalStaff()->sync($validated['additional_staff'] ?? []);
@@ -66,14 +66,12 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
             'customer_id' => 'required|exists:customers,id',
             'customer_contact_person_id' => 'required|exists:customer_contact_person,id',
             'order_product_id' => 'required|exists:order_products,id',
             'assigned_to' => 'required|exists:users,id',
             'additional_staff' => 'nullable|array',
             'additional_staff.*' => 'exists:users,id',
-            'subject' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 

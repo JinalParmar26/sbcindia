@@ -125,6 +125,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/sanctum" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/laravel-permission" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/bacon/bacon-qr-code" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/dasprid/enum" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/simplesoftwareio/simple-qrcode" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
