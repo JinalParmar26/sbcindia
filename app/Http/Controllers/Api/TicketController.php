@@ -115,25 +115,35 @@ class TicketController extends Controller
                 // Remove items before inserting service record
                 unset($data['items']);
 
-                $service = Service::create(array_merge($data, [
-                    'ticket_id' => $ticket->id,
-                ]));
+                $service = Service::updateOrCreate(
+                    ['ticket_id' => $ticket->id],
+                    array_merge($data, ['ticket_id' => $ticket->id])
+                );
 
-                foreach ($items as $item) {
-                    $service->serviceItems()->create($item);
+                if($items) {
+                    $service->serviceItems()->delete();
+
+
+                    foreach ($items as $item) {
+                        $service->serviceItems()->create($item);
+                    }
                 }
 
             } elseif ($type === 'delivery') {
                 unset($data['items']);
 
-                $delivery = Delivery::create(array_merge($data, [
+                $delivery = Delivery::updateOrCreate(['ticket_id' => $ticket->id],array_merge($data, [
                     'ticket_id' => $ticket->id,
                 ]));
 
 
+                if($items) {
+                    $delivery->serviceItems()->delete();
 
-                foreach ($items as $item) {
-                    $delivery->serviceItems()->create($item);
+
+                    foreach ($items as $item) {
+                        $delivery->serviceItems()->create($item);
+                    }
                 }
             }
 
@@ -143,7 +153,7 @@ class TicketController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-    
+
                 'message' => $e->getMessage(),
             ], 500);
         }
