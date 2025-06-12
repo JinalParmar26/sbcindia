@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
+
 
 class UserController extends Controller
 {
@@ -153,7 +155,7 @@ class UserController extends Controller
         if ($request->hasFile('profile_photo')) {
             // Optionally: delete old photo\
 
-            
+
             if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
