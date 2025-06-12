@@ -60,8 +60,11 @@
                             <div wire:ignore.self class="profile-cover rounded-top"
                                 data-background="../assets/img/profile-cover.jpg"></div>
                             <div class="card-body pb-5">
-                                <img  src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
-                                    class="avatar-xl rounded-circle mx-auto mt-n7 mb-4" alt="Neil Portrait">
+                                <img
+                                    src="{{ $user->profile_photo ? asset('storage/' . $user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
+                                    class="avatar-xl rounded-circle mx-auto mt-n7 mb-4"
+                                    alt="{{ $user->name }} Profile Photo">
+
                                 <h4 class="h3">
                                     {{ $user->name ? $user->name . ' ' .$user->last_name : 'User Name'}}
                                 </h4>
@@ -69,9 +72,9 @@
                         </div>
                     </div>
                 </div>
-            </div>           
+            </div>
         </div>
-        
+
     </div>
 </div>
 

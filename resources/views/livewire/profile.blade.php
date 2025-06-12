@@ -1,6 +1,6 @@
 <title>Volt Laravel Dashboard - Profile</title>
 <div>
-    
+
     <div class="row">
         <div class="col-12 col-xl-8">
             @if($showSavedAlert)
@@ -10,7 +10,7 @@
             @endif
             <div class="card card-body border-0 shadow mb-4">
                 <h2 class="h5 mb-4">General information</h2>
-                   
+
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -18,26 +18,26 @@
                                 <label for="first_name">Name</label>
                                 <div>{{ $user->name }}</div>
                             </div>
-                        </div>                 
+                        </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <div>{{ $user->email }}</div>                               
+                                <div>{{ $user->email }}</div>
                             </div>
-                        </div>                       
+                        </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="number">Number</label>
-                                <div>{{ $user->phone_number }}</div>                                
+                                <div>{{ $user->phone_number }}</div>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="number">Role</label>
-                                <div>{{ $user->roles->pluck('name')->join(', ') }}</div>                       
+                                <div>{{ $user->roles->pluck('name')->join(', ') }}</div>
                             </div>
                         </div>
                     </div>
@@ -53,8 +53,8 @@
                                     <span>-</span>
                                 @endif
                             </div>
-                        </div>                        
-                       
+                        </div>
+
                          <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Working Hours Start:</label>
                             <div>{{ $user->working_hours_start ? substr($user->working_hours_start, 0, 5) : '-' }}</div>
@@ -72,7 +72,7 @@
                             </div>
                         </div>
                     </div>
-                   
+
             </div>
         </div>
         <div class="col-12 col-xl-4">
@@ -82,8 +82,10 @@
                         <div wire:ignore.self class="profile-cover rounded-top"
                             data-background="../assets/img/profile-cover.jpg"></div>
                         <div class="card-body pb-5">
-                            <img  src="{{ auth()->user()->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
-                                class="avatar-xl rounded-circle mx-auto mt-n7 mb-4" alt="Neil Portrait">
+                            <img
+                                src="{{ $user->profile_photo ? asset('storage/' . $user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
+                                class="avatar-xl rounded-circle mx-auto mt-n7 mb-4"
+                                alt="{{ $user->name }} Profile Photo">
                             <h4 class="h3">
                                 {{  auth()->user()->name ? auth()->user()->name . ' ' . auth()->user()->last_name : 'User Name'}}
                             </h4>

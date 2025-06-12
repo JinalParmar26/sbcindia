@@ -51,6 +51,8 @@ class UserController extends Controller
             'working_days.*' => 'in:sunday,monday,tuesday,wednesday,thursday,friday,saturday',
             'working_hours_start' => 'nullable|date_format:H:i',
             'working_hours_end' => 'nullable|date_format:H:i|after:working_hours_start',
+            'profile_photo' => 'nullable|image|max:2048',
+
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
@@ -58,6 +60,13 @@ class UserController extends Controller
         $validated['working_days'] = isset($validated['working_days'])
             ? implode(',', $validated['working_days'])
             : null;
+
+        if ($request->hasFile('profile_photo')) {
+            $file = $request->file('profile_photo');
+            $filename = uniqid('profile_') . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public'); // saves to storage/app/public/profile_photos
+            $validated['profile_photo'] = $path;
+        }
 
         $user = User::create($validated);
 
@@ -140,6 +149,20 @@ class UserController extends Controller
             ? implode(',', $validated['working_days'])
             :  $user->working_days;
             // dd($validated);
+
+        if ($request->hasFile('profile_photo')) {
+            // Optionally: delete old photo
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $file = $request->file('profile_photo');
+            $filename = uniqid('profile_') . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public');
+            $validated['profile_photo'] = $path;
+        }
+
+
         $user->syncRoles($request->input('role'));
         $user->update($validated);
 
@@ -198,6 +221,18 @@ class UserController extends Controller
         $validated['working_days'] = isset($validated['working_days'])
             ? implode(',', $validated['working_days'])
             : null;
+
+        if ($request->hasFile('profile_photo')) {
+            // Optionally: delete old photo
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $file = $request->file('profile_photo');
+            $filename = uniqid('profile_') . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public');
+            $validated['profile_photo'] = $path;
+        }
 
         $user->syncRoles($request->input('role'));
         $user->update($validated);

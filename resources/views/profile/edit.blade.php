@@ -2,13 +2,13 @@
 
 @section('content')
 <div>
-    
+
     <div class="row">
         <div class="col-12 col-xl-8">
-            
+
             <div class="card card-body border-0 shadow mb-4">
                 <h2 class="h5 mb-4">General information</h2>
-                   <form action="{{ route('profile.update') }}" method="POST">
+                   <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -19,7 +19,7 @@
                                 <input wire:model="user.name" name="name" class="form-control" id="name" type="text"
                                     placeholder="Enter your  name" value="{{ $user->name }}" required>
                             </div>
-                        </div>                 
+                        </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="email">Email</label>
@@ -27,13 +27,18 @@
                                     placeholder="name@company.com" value="{{ $user->email }}">
                             </div>
                             @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>                       
+                        </div>
                     </div>
-                    
+
                     <div class="row">
-                        <div class="col-sm-3 mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="profile_photo">Profile Photo</label>
+                            <input type="file" name="profile_photo" class="form-control">
+                            @error('profile_photo') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+                        <div class="col-sm-6 mb-3">
                             <div class="form-group">
-                                <label for="number">Number</label>
+                                <label for="number">Phone Number</label>
                                 <input wire:model="user.phone_number" name="phone_number" class="form-control" id="phone_number" type="number"
                                     placeholder="No." value="{{ $user->phone_number }}">
                             </div>
@@ -83,8 +88,10 @@
                         <div wire:ignore.self class="profile-cover rounded-top"
                             data-background="../assets/img/profile-cover.jpg"></div>
                         <div class="card-body pb-5">
-                            <img  src="{{ auth()->user()->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
-                                class="avatar-xl rounded-circle mx-auto mt-n7 mb-4" alt="Neil Portrait">
+                            <img
+                                src="{{ $user->profile_photo ? asset('storage/' . $user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
+                                class="avatar-xl rounded-circle mx-auto mt-n7 mb-4"
+                                alt="{{ $user->name }} Profile Photo">
                             <h4 class="h3">
                                 {{  auth()->user()->name ? auth()->user()->name . ' ' . auth()->user()->last_name : 'User Name'}}
                             </h4>

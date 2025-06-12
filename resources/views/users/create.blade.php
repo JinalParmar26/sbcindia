@@ -6,7 +6,7 @@
         <h4 class="mb-0">Add User</h4>
     </div>
     <div class="card-body">
-        <form action="{{ route('users.store') }}" method="POST">
+        <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="row">
@@ -37,11 +37,29 @@
                     <input type="password" name="password_confirmation" class="form-control" required>
                 </div>
 
+                <div class="col-md-6 mb-3">
+                    <label for="profile_photo">Profile Photo</label>
+                    <input type="file" name="profile_photo" class="form-control">
+                    @error('profile_photo') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
                 <!-- Phone Number -->
                 <div class="col-md-6 mb-3">
                     <label>Phone Number</label>
                     <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number') }}">
                     @error('phone_number') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Role <span class="text-danger">*</span></label>
+                    <select name="role" class="form-select" required>
+                        <option value="" disabled selected>Select a role</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
+                                {{ ucfirst($role->name) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('role') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
                 <!-- Is Active -->
@@ -52,18 +70,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label>Role <span class="text-danger">*</span></label>
-                    <select name="role" class="form-select" required>
-                        <option value="" disabled selected>Select a role</option>
-                        @foreach ($roles as $role)
-                        <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
-                        {{ ucfirst($role->name) }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @error('role') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
+
 
                 <!-- Working Days -->
                 <div class="col-md-12 mb-3">
