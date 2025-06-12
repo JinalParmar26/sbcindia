@@ -75,6 +75,24 @@ class AuthController extends Controller
         }
 
         $user = $request->user();
+        $profile_photo_url = $user->profile_photo;
+        if ($request->filled('profile_photo')) {
+            $imageData = $request->input('profile_photo');
+
+            // Match base64 with data URI scheme (optional but safer)
+            if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
+                $image = substr($imageData, strpos($imageData, ',') + 1);
+                $image = base64_decode($image);
+                $extension = strtolower($type[1]); // jpg, png, etc.
+
+                $filename = uniqid('profile_', true) . '.' . $extension;
+                $path = storage_path("app/public/profile_photos/{$filename}");
+
+                file_put_contents($path, $image);
+
+                $profile_photo_url = "profile_photos/{$filename}";
+            }
+        }
 
         $user->update([
             'name' => $request->input('name'),
@@ -83,6 +101,7 @@ class AuthController extends Controller
             'working_days' => $request->input('working_days'),
             'working_hours_start' => $request->input('working_hours_start'),
             'working_hours_end' => $request->input('working_hours_end'),
+            'profile_photo' => $profile_photo_url
         ]);
 
         return response()->json([
