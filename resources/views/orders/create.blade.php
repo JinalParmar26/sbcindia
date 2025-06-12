@@ -122,22 +122,78 @@
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('add-config-btn')) {
             const wrapper = e.target.closest('.config-wrapper').querySelector('.config-items');
-            const configIndex = wrapper.children.length;
             const index = e.target.dataset.index;
-            const configHTML = `
-                <div class="row mb-2 config-pair">
-                    <div class="col-md-5"><input name="products[${index}][config_keys][]" class="form-control" placeholder="Key"></div>
-                    <div class="col-md-5"><input name="products[${index}][config_values][]" class="form-control" placeholder="Value"></div>
-                    <div class="col-md-2"><button type="button" class="btn btn-danger btn-sm remove-config-btn">✕</button></div>
-                </div>
-            `;
-            wrapper.insertAdjacentHTML('beforeend', configHTML);
+            const select = document.querySelector(`select[name="products[${index}][product_id]"]`);
+            const productId = select ? select.value : null;
+
+            if (!productId) {
+                alert("Please select a product first.");
+                return;
+            }
+
+            // Fetch categories for the selected product
+            fetch(`/products/${productId}/specs`)
+                .then(res => res.json())
+                .then(categories => {
+                    let categoryOptions = '<option value="">Select Key</option>';
+                    categories.forEach(cat => {
+                        categoryOptions += `<option value="${cat.key}">${cat.value}</option>`;
+                    });
+
+                    const configHTML = `
+                    <div class="row mb-2 config-pair">
+                        <div class="col-md-5">
+                            <select name="products[${index}][config_keys][]" class="form-control category-select">
+                                ${categoryOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <select name="products[${index}][config_values][]" class="form-control option-select">
+                                <option value="">Select Category First</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm remove-config-btn">✕</button>
+                        </div>
+                    </div>
+                `;
+
+                    wrapper.insertAdjacentHTML('beforeend', configHTML);
+
+                    const newPair = wrapper.lastElementChild;
+                    const categorySelect = newPair.querySelector('.category-select');
+                    const optionSelect = newPair.querySelector('.option-select');
+
+                    // Add change listener to the new category dropdown
+                    categorySelect.addEventListener('change', function () {
+                        const categoryId = this.value;
+
+                        optionSelect.innerHTML = '<option value="">Loading...</option>';
+
+                        fetch(`/products/${categoryId}/options`)
+                            .then(res => res.json())
+                            .then(options => {
+                                let optionHTML = '<option value="">Select Option</option>';
+                                options.forEach(opt => {
+                                    optionHTML += `<option value="${opt.cat_option}">${opt.cat_option}</option>`;
+                                });
+                                optionSelect.innerHTML = optionHTML;
+                            })
+                            .catch(() => {
+                                optionSelect.innerHTML = '<option value="">Error loading options</option>';
+                            });
+                    });
+                })
+                .catch(() => {
+                    alert('Failed to load categories.');
+                });
         }
 
         if (e.target.classList.contains('remove-config-btn')) {
             e.target.closest('.config-pair').remove();
         }
     });
+
 
     document.addEventListener('DOMContentLoaded', function () {
         let currentProductSelectIndex = null;
@@ -157,7 +213,7 @@
                     form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
                     form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
 
-                    
+
                     addProductModal.show();
                 }
             }
@@ -205,7 +261,7 @@
                 return response.json();
             })
             .then(data => {
-               
+
                 const currentSelect = document.querySelector(`.product-select[data-index="${currentProductSelectIndex}"]`);
                 if (currentSelect) {
                     const option = document.createElement('option');
@@ -216,7 +272,7 @@
                 }
 
                setTimeout(() => {
-                   
+
                     if (currentSelect) {
                         currentSelect.value = data.id;
                     }

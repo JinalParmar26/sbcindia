@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductSpecCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -88,4 +89,27 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products')->with('success', 'Product deleted successfully.');
     }
+
+    // app/Http/Controllers/ProductController.php
+    public function getSpecs($id)
+    {
+        $product = Product::with(['specs.category'])->findOrFail($id);
+
+        $data = $product->specs->map(function ($spec) {
+            return [
+                'key' => $spec->category->id,
+                'value' => $spec->category->category
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    public function getCategoryOptions($categoryId)
+    {
+        $category = ProductSpecCategory::with('options')->findOrFail($categoryId);
+        return response()->json($category->options);
+    }
+
+
 }

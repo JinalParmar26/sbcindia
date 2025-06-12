@@ -10,7 +10,7 @@ class OrderProduct extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'order_id', 'product_id', 'serial_number', 'configurations'];
+    protected $fillable = ['uuid', 'order_id', 'product_id', 'serial_number', 'model_number', 'configurations'];
 
     public function order()
     {

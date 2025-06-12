@@ -81,6 +81,23 @@ class AttendanceController extends Controller
 
     public function update(Request $request, UserAttendance $attendance)
     {
+        //dd($request->all());
+
+        $validator = Validator::make($request->all(), [
+            'check_in' => 'nullable|date_format:Y-m-d\TH:i:s',
+            'check_in_latitude' => 'nullable|numeric',
+            'check_in_longitude' => 'nullable|numeric',
+            'check_in_location_name' => 'nullable|string',
+            'check_out' => 'nullable|date_format:Y-m-d\TH:i:s',
+            'check_out_latitude' => 'nullable|numeric',
+            'check_out_longitude' => 'nullable|numeric',
+            'check_out_location_name' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         if (!$attendance) {
             return response()->json(['message' => 'Attendance record not found'], 404);
         }
@@ -88,8 +105,19 @@ class AttendanceController extends Controller
         if ($attendance->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        $fieldsToUpdate = $request->only([
+            'check_in',
+            'check_in_latitude',
+            'check_in_longitude',
+            'check_in_location_name',
+            'check_out',
+            'check_out_latitude',
+            'check_out_longitude',
+            'check_out_location_name',
+        ]);
 
-        $attendance->update($request->all());
+
+        $attendance->update($fieldsToUpdate);
 
         return response()->json(['message' => 'Attendance updated', 'data' => $attendance]);
     }

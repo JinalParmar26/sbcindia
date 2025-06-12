@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\OrderProduct;
+use App\Models\ProductSpecCategory;
+use App\Models\ProductSpecOption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -20,7 +22,6 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'products' => 'required|array',
@@ -38,12 +39,24 @@ class OrderController extends Controller
 
         foreach ($request->products as $productData) {
             $configurations = [];
-
+            $orderProductModelNumber= 'S - ';
             if (!empty($productData['config_keys']) && is_array($productData['config_keys'])) {
                 foreach ($productData['config_keys'] as $idx => $key) {
                     $val = $productData['config_values'][$idx] ?? null;
                     if ($key !== null && $key !== '') {
-                        $configurations[$key] = $val;
+                        $categoryName = ProductSpecCategory::where('id', $key)
+                            ->value('category');
+
+                        $configurations[$categoryName] = $val;
+
+                        $optionVal = ProductSpecOption::where('spec_category', $key)
+                            ->where('cat_option', $val)
+                            ->where('cat_option', '!=', '')
+                            ->value('option_val');
+                        if($optionVal) {
+                            $orderProductModelNumber .= strtoupper($optionVal);
+                        }
+
                     }
                 }
             }
@@ -53,6 +66,7 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'product_id' => $productData['product_id'],
                 'serial_number' => $serial_number,
+                'model_number' => $orderProductModelNumber,
                 'configurations' => json_encode($configurations),
             ]);
         }
@@ -93,24 +107,36 @@ class OrderController extends Controller
 
         $order->orderProducts()->delete();
 
-        // Add updated order products
         foreach ($request->products as $productData) {
             $configurations = [];
-
+            $orderProductModelNumber= 'S - ';
             if (!empty($productData['config_keys']) && is_array($productData['config_keys'])) {
                 foreach ($productData['config_keys'] as $idx => $key) {
                     $val = $productData['config_values'][$idx] ?? null;
                     if ($key !== null && $key !== '') {
-                        $configurations[$key] = $val;
+                        $categoryName = ProductSpecCategory::where('id', $key)
+                            ->value('category');
+
+                        $configurations[$categoryName] = $val;
+
+                        $optionVal = ProductSpecOption::where('spec_category', $key)
+                            ->where('cat_option', $val)
+                            ->where('cat_option', '!=', '')
+                            ->value('option_val');
+                        if($optionVal) {
+                            $orderProductModelNumber .= strtoupper($optionVal);
+                        }
+
                     }
                 }
             }
-
-            OrderProduct::create([
+            $serial_number="SBC".date("YmdHis").rand(1,99);
+            $orderProduct = OrderProduct::create([
                 'uuid' => Str::uuid(),
                 'order_id' => $order->id,
                 'product_id' => $productData['product_id'],
-                'serial_number' => $productData['serial_number'],
+                'serial_number' => $serial_number,
+                'model_number' => $orderProductModelNumber,
                 'configurations' => json_encode($configurations),
             ]);
         }

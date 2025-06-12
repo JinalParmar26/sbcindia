@@ -67,6 +67,8 @@ Route::get('/download-qr/{uuid}', [UserController::class, 'downloadQr'])->name('
 
 
 
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', Profile::class)->name('profile');
     Route::get('/profile-example', ProfileExample::class)->name('profile-example');
@@ -119,6 +121,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('update');
         Route::get('/{uuid}', [ProductController::class, 'show'])->name('show');
+        Route::get('/{product}/specs', [ProductController::class, 'getSpecs'])->name('specs');
+        Route::get('/{category}/options', [ProductController::class, 'getCategoryOptions']);
     });
 
 
