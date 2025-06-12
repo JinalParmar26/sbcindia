@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\OrderProduct;
+use App\Models\Ticket;
 use App\Models\ProductSpecCategory;
 use App\Models\ProductSpecOption;
 use Illuminate\Http\Request;
@@ -69,8 +70,20 @@ class OrderController extends Controller
                 'model_number' => $orderProductModelNumber,
                 'configurations' => json_encode($configurations),
             ]);
-        }
 
+            $userid =  auth()->id();
+            $ticket = Ticket::create([
+                'subject' => '',
+                'uuid' => Str::uuid(),
+                'attended_by' => $userid,
+                'type' => 'delivery',
+                'customer_id' => $order->customer_id,
+                'customer_contact_person_id' =>null,
+                'order_product_id' => $orderProduct->id,
+                'assigned_to' => null,
+                'additional_staff' => null,
+            ]);
+        }
         return redirect()->route('orders.show', $order->uuid)->with('success', 'Order created successfully.');
     }
 

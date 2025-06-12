@@ -1,5 +1,7 @@
 @php
-    $configs = $productData->configurations ? json_decode($productData->configurations, true) : null;
+    if($productData){
+        $configs = $productData->configurations ? json_decode($productData->configurations, true) : null ;
+        }
 //    print_r($configs);exit;
 @endphp
 
@@ -16,7 +18,7 @@
                 @endforeach
                 <option value="other">+ Add New Product</option>
             </select>
-        </div>s
+        </div>
     </div>
 
     <div class="config-wrapper">
