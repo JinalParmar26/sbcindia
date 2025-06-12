@@ -133,7 +133,7 @@
                 <td>
                     <a href="{{ route('users.edit', $user) }}" class="d-flex align-items-center">
                         <div class="avatar avatar-md me-3">
-                            <img alt="user-avatar" src="{{ $user->profile_photo ? asset($user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}" class="rounded-circle">
+                            <img alt="user-avatar" src="{{ $user->profile_photo ? asset('storage/'.$user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}" class="rounded-circle">
                         </div>
                         <div class="d-block">
                             <span class="fw-bold">{{ $user->name }}</span>
