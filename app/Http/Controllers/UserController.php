@@ -151,7 +151,9 @@ class UserController extends Controller
             // dd($validated);
 
         if ($request->hasFile('profile_photo')) {
-            // Optionally: delete old photo
+            // Optionally: delete old photo\
+
+            
             if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
