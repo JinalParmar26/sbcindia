@@ -85,29 +85,54 @@
         <table class="table user-table table-hover align-items-center">
             <thead>
             <tr>
-                <th class="border-bottom">
-                    <div class="form-check dashboard-check">
-                        <input class="form-check-input" type="checkbox" id="selectAllCustomers" wire:click="$toggle('selectAll')">
-                        <label class="form-check-label" for="selectAllCustomers"></label>
-                    </div>
+{{--                <th class="border-bottom">--}}
+{{--                    <div class="form-check dashboard-check">--}}
+{{--                        <input class="form-check-input" type="checkbox" id="selectAllCustomers" wire:click="$toggle('selectAll')">--}}
+{{--                        <label class="form-check-label" for="selectAllCustomers"></label>--}}
+{{--                    </div>--}}
+{{--                </th>--}}
+                <th wire:click="sortBy('name')" style="cursor: pointer;">
+                    Name
+                    @if ($sortField === 'name')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
                 </th>
-                <th wire:click="sortBy('name')" style="cursor: pointer;">Name</th>
-                <th wire:click="sortBy('company_name')" style="cursor: pointer;">Company</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Created</th>
+                <th wire:click="sortBy('company_name')" style="cursor: pointer;">
+                    Company
+                    @if ($sortField === 'company_name')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+                <th wire:click="sortBy('email')" style="cursor: pointer;">
+                    Email
+                    @if ($sortField === 'email')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+                <th wire:click="sortBy('phone_number')" style="cursor: pointer;">
+                    Phone
+                    @if ($sortField === 'phone_number')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+                <th wire:click="sortBy('created_at')" style="cursor: pointer;">
+                    Created
+                    @if ($sortField === 'created_at')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             @forelse($customers as $customer)
             <tr>
-                <td>
-                    <div class="form-check dashboard-check">
-                        <input class="form-check-input" type="checkbox" id="userCheck{{ $customer->id }}" wire:model="$selectedCustomers" value="{{ $customer->id }}">
-                        <label class="form-check-label" for="userCheck{{ $customer->id }}"></label>
-                    </div>
-                </td>
+{{--                <td>--}}
+{{--                    <div class="form-check dashboard-check">--}}
+{{--                        <input class="form-check-input" type="checkbox" id="userCheck{{ $customer->id }}" wire:model="$selectedCustomers" value="{{ $customer->id }}">--}}
+{{--                        <label class="form-check-label" for="userCheck{{ $customer->id }}"></label>--}}
+{{--                    </div>--}}
+{{--                </td>--}}
                 <td>
                     <a href="{{ route('customers.edit', $customer) }}" class="d-flex align-items-center">
                         <div class="avatar avatar-md me-3">

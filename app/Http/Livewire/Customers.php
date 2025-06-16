@@ -15,6 +15,8 @@ class Customers extends Component
     protected $paginationTheme = 'bootstrap';
     public $confirmingCustomerDeletionId = null;
     public $selectedCustomers = [];
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
 
     protected $updatesQueryString = ['search', 'perPage'];
 
@@ -42,7 +44,9 @@ class Customers extends Component
             });
         }
 
-        $customers = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        $customers = $query
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate($this->perPage);
 
         return view('livewire.customers', compact('customers'));
     }
@@ -61,5 +65,15 @@ class Customers extends Component
         Customer::findOrFail($this->confirmingCustomerDeletionId)->delete();
         $this->confirmingUserDeletionId = null;
         $this->dispatchBrowserEvent('hide-delete-modal');
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+            $this->sortField = $field;
+        }
     }
 }

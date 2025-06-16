@@ -17,13 +17,19 @@ class Orders extends Component
     protected $paginationTheme = 'bootstrap';
     public $confirmingOrderDeletionId = null;
 
-    protected $updatesQueryString = ['search', 'perPage', 'customerFilter'];
+    protected $updatesQueryString = ['search', 'perPage', 'customerFilter', 'monthFilter'];
 
     public $customerFilter = 'all';
     public $customers = [];
 
     public $yearFilter = 'all';
     public $availableYears = [];
+
+
+    public $monthFilter = 'all';
+
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
 
 
     public function updatingSearch()
@@ -35,30 +41,39 @@ class Orders extends Component
     {
         $this->resetPage();
     }
+    public function updatingMonthFilter() {
+        $this->resetPage();
+    }
 
     public function render()
     {
-        $query = Order::with('customer');
+        $query = Order::query()
+            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->select('orders.*') // important to keep only order columns
+            ->with('customer');
 
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('title', 'like', "%{$this->search}%")
-                    ->orWhereHas('customer', function ($q2) {
-                        $q2->where('name', 'like', "%{$this->search}%");
-                    });
+                $q->where('orders.title', 'like', "%{$this->search}%")
+                    ->orWhere('customers.name', 'like', "%{$this->search}%");
             });
         }
 
         if ($this->customerFilter !== 'all') {
-            $query->where('customer_id', $this->customerFilter);
+            $query->where('orders.customer_id', $this->customerFilter);
         }
 
         if ($this->yearFilter !== 'all') {
-            $query->whereYear('created_at', $this->yearFilter);
+            $query->whereYear('orders.created_at', $this->yearFilter);
         }
 
+        if ($this->monthFilter !== 'all') {
+            $query->whereMonth('orders.created_at', $this->monthFilter);
+        }
 
-        $orders = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        $orders = $query
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate($this->perPage);
 
         return view('livewire.orders', compact('orders'));
     }
@@ -84,5 +99,15 @@ class Orders extends Component
         ->orderByDesc('year')
         ->pluck('year')
         ->toArray();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+            $this->sortField = $field;
+        }
     }
 }

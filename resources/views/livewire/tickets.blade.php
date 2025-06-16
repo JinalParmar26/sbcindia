@@ -32,93 +32,146 @@
     </div>
 
     <div class="table-settings mb-4">
-        <div class="row justify-content-between align-items-center">
-            <div class="col-9 col-lg-8 d-md-flex">
-                <div class="input-group me-2 me-lg-3 fmxw-300">
-                    <span class="input-group-text">
-                        <svg class="icon icon-xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                  clip-rule="evenodd"></path>
-                        </svg>
-                    </span>
+        <div class="row gy-2 gx-3 align-items-center">
+            <!-- Search box -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="input-group">
+                <span class="input-group-text">
+                    <svg class="icon icon-xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                </span>
                     <input type="text" wire:model.debounce.300ms="search" class="form-control" placeholder="Search tickets">
                 </div>
-                <select wire:model="statusFilter" class="form-select fmxw-200 d-none d-md-inline" aria-label="Status filter">
-                    <option value="all">All</option>
-                    <option value="open">Open</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="closed">Closed</option>
+            </div>
+
+            <!-- Customer Filter -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <select wire:model="customerFilter" class="form-select">
+                    <option value="all">All Customers</option>
+                    @foreach($customers as $customer)
+                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                    @endforeach
                 </select>
             </div>
-            <div class="col-3 col-lg-4 d-flex justify-content-end">
-                <div class="btn-group">
-                    <div class="dropdown me-1">
-                        <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-1"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path>
-                            </svg>
-                            <span class="visually-hidden">Toggle Dropdown</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end pb-0">
-                            <span class="small ps-3 fw-bold text-dark">Show</span>
-                            <a class="dropdown-item d-flex align-items-center fw-bold" href="#" wire:click.prevent="$set('perPage', 10)">10</a>
-                            <a class="dropdown-item fw-bold" href="#" wire:click.prevent="$set('perPage', 20)">20</a>
-                            <a class="dropdown-item fw-bold rounded-bottom" href="#" wire:click.prevent="$set('perPage', 30)">30</a>
-                        </div>
+
+            <!-- Staff Filter -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <select wire:model="assignedStaffFilter" class="form-select">
+                    <option value="all">All Staff</option>
+                    @foreach($staffList as $staff)
+                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Year Filter -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <select wire:model="yearFilter" class="form-select">
+                    <option value="all">All Years</option>
+                    @foreach($availableYears as $year)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Month Filter -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <select wire:model="monthFilter" class="form-select">
+                    <option value="all">All Months</option>
+                    @for($m = 1; $m <= 12; $m++)
+                        <option value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                    @endfor
+                </select>
+            </div>
+
+            <!-- Pagination dropdown -->
+            <div class="col-12 col-md-auto ms-auto text-end">
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-1"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path>
+                        </svg>
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end pb-0">
+                        <span class="small ps-3 fw-bold text-dark">Show</span>
+                        <a class="dropdown-item fw-bold" href="#" wire:click.prevent="$set('perPage', 10)">10</a>
+                        <a class="dropdown-item fw-bold" href="#" wire:click.prevent="$set('perPage', 20)">20</a>
+                        <a class="dropdown-item fw-bold rounded-bottom" href="#" wire:click.prevent="$set('perPage', 30)">30</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+
     <div class="card card-body shadow border-0 table-wrapper table-responsive">
         <table class="table user-table table-hover align-items-center">
             <thead>
             <tr>
-                <th class="border-bottom">
-                    <div class="form-check dashboard-check">
-                        <input class="form-check-input" type="checkbox" id="selectAllTickets" wire:click="$toggle('selectAll')">
-                        <label class="form-check-label" for="selectAllTickets"></label>
-                    </div>
+{{--                <th class="border-bottom">--}}
+{{--                    <div class="form-check dashboard-check">--}}
+{{--                        <input class="form-check-input" type="checkbox" id="selectAllTickets" wire:click="$toggle('selectAll')">--}}
+{{--                        <label class="form-check-label" for="selectAllTickets"></label>--}}
+{{--                    </div>--}}
+{{--                </th>--}}
+                <th wire:click="sortBy('subject')" style="cursor: pointer;">
+                    Subject
+                    @if ($sortField === 'subject')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
                 </th>
-                <th class="border-bottom">Ticket Title</th>
-                <th class="border-bottom">Ticket Type</th>
-                <th class="border-bottom">Customer</th>
-                <th class="border-bottom">Assigned Staff</th>
-                <th class="border-bottom">Created</th>
-                <th class="border-bottom">Action</th>
+                <th wire:click="sortBy('customer_name')" style="cursor: pointer;">
+                    Customer
+                    @if ($sortField === 'customer_name')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+
+                <th wire:click="sortBy('assigned_staff_name')" style="cursor: pointer;">
+                    Assigned Staff
+                    @if ($sortField === 'assigned_staff_name')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+
+
+                <th wire:click="sortBy('created_at')" style="cursor: pointer;">
+                    Created At
+                    @if ($sortField === 'created_at')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
             @forelse ($tickets as $ticket)
             <tr>
-                <td>
-                    <div class="form-check dashboard-check">
-                        <input class="form-check-input" type="checkbox" id="ticketCheck{{ $ticket->id }}" wire:model="selectedTickets" value="{{ $ticket->id }}">
-                        <label class="form-check-label" for="ticketCheck{{ $ticket->id }}"></label>
-                    </div>
-                </td>
+{{--                <td>--}}
+{{--                    <div class="form-check dashboard-check">--}}
+{{--                        <input class="form-check-input" type="checkbox" id="ticketCheck{{ $ticket->id }}" wire:model="selectedTickets" value="{{ $ticket->id }}">--}}
+{{--                        <label class="form-check-label" for="ticketCheck{{ $ticket->id }}"></label>--}}
+{{--                    </div>--}}
+{{--                </td>--}}
                 <td>
                     <a href="{{ route('tickets.edit', $ticket) }}" class="fw-bold text-dark">
                         {{ $ticket->subject }}
                     </a>
                 </td>
-
                 <td>
-                    <a href="{{ route('tickets.edit', $ticket) }}" class="fw-bold text-dark">
-                        {{ $ticket->type }}
-                    </a>
-                </td>                <td>
                     <span class="fw-normal">{{ $ticket->customer->name ?? '-' }}</span>
                 </td>
                 <td>
-                            <span class="fw-normal">
-                                {{ $ticket->assignedTo->name ?? '-' }}
-                            </span>
+                    <span class="fw-normal">
+                        {{ $ticket->assignedTo->name ?? '-' }}
+                    </span>
                 </td>
                 <td>
                     <span class="fw-normal">{{ $ticket->created_at->format('M d, Y') }}</span>

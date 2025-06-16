@@ -66,6 +66,17 @@
                         @endforeach
                     </select>
                 </div>
+
+                <!-- Month Filter -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <select wire:model="monthFilter" class="form-select">
+                        <option value="all">All Months</option>
+                        @for($m = 1; $m <= 12; $m++)
+                            <option value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                        @endfor
+                    </select>
+                </div>
+
             </div>
 
             <div class="col-3 col-lg-4 d-flex justify-content-end">
@@ -103,21 +114,36 @@
         <table class="table table-hover align-items-center">
             <thead>
             <tr>
-                <th class="border-bottom">
-                    <input class="form-check-input" type="checkbox" wire:click="$toggle('selectAll')">
+{{--                <th>--}}
+{{--                    <input class="form-check-input" type="checkbox" wire:click="$toggle('selectAll')">--}}
+{{--                </th>--}}
+                <th wire:click="sortBy('title')" style="cursor: pointer;">
+                    Order Title
+                    @if ($sortField === 'title')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
                 </th>
-                <th class="border-bottom">Order Name</th>
-                <th class="border-bottom">Customer</th>
-                <th class="border-bottom">Date</th>
-                <th class="border-bottom">Action</th>
+                <th wire:click="sortBy('customers.name')" style="cursor: pointer;">
+                    Customer
+                    @if ($sortField === 'customers.name')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+                <th wire:click="sortBy('created_at')" style="cursor: pointer;">
+                    Date
+                    @if ($sortField === 'created_at')
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
+                    @endif
+                </th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
             @forelse ($orders as $order)
             <tr>
-                <td>
-                    <input class="form-check-input" type="checkbox" wire:model="selectedOrders" value="{{ $order->id }}">
-                </td>
+{{--                <td>--}}
+{{--                    <input class="form-check-input" type="checkbox" wire:model="selectedOrders" value="{{ $order->id }}">--}}
+{{--                </td>--}}
                 <td>
                     <a href="{{ route('orders.edit', $order->id) }}" class="fw-bold text-primary">
                         {{ $order->title }}

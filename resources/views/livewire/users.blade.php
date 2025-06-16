@@ -107,29 +107,31 @@
         <table class="table user-table table-hover align-items-center">
             <thead>
             <tr>
-                <th class="border-bottom">
-                    <div class="form-check dashboard-check">
-                        <input class="form-check-input" type="checkbox" id="selectAllUsers" wire:click="$toggle('selectAll')">
-                        <label class="form-check-label" for="selectAllUsers"></label>
-                    </div>
-                </th>
+{{--                <th class="border-bottom">--}}
+{{--                    <div class="form-check dashboard-check">--}}
+{{--                        <input class="form-check-input" type="checkbox" id="selectAllUsers" wire:click="$toggle('selectAll')">--}}
+{{--                        <label class="form-check-label" for="selectAllUsers"></label>--}}
+{{--                    </div>--}}
+{{--                </th>--}}
                 <th class="border-bottom" wire:click="sortBy('name')" style="cursor: pointer;">
                     Name
                     @if ($sortField === 'name')
-                        <x-icon-sort :direction="$sortDirection" />
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
                     @endif
                 </th>
-                <th class="border-bottom">Role</th>
+                <th class="border-bottom">
+                    Role
+                </th>
                 <th class="border-bottom" wire:click="sortBy('created_at')" style="cursor: pointer;">
                     Date Created
                     @if ($sortField === 'created_at')
-                        <x-icon-sort :direction="$sortDirection" />
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
                     @endif
                 </th>
                 <th class="border-bottom" wire:click="sortBy('isActive')" style="cursor: pointer;">
                     Status
                     @if ($sortField === 'isActive')
-                        <x-icon-sort :direction="$sortDirection" />
+                        @if ($sortDirection === 'asc') ↑ @else ↓ @endif
                     @endif
                 </th>
                 <th class="border-bottom">Approve Login</th>
@@ -139,12 +141,12 @@
             <tbody>
             @forelse ($users as $user)
             <tr>
-                <td>
-                    <div class="form-check dashboard-check">
-                        <input class="form-check-input" type="checkbox" id="userCheck{{ $user->id }}" wire:model="selectedUsers" value="{{ $user->id }}">
-                        <label class="form-check-label" for="userCheck{{ $user->id }}"></label>
-                    </div>
-                </td>
+{{--                <td>--}}
+{{--                    <div class="form-check dashboard-check">--}}
+{{--                        <input class="form-check-input" type="checkbox" id="userCheck{{ $user->id }}" wire:model="selectedUsers" value="{{ $user->id }}">--}}
+{{--                        <label class="form-check-label" for="userCheck{{ $user->id }}"></label>--}}
+{{--                    </div>--}}
+{{--                </td>--}}
                 <td>
                     <a href="{{ route('users.edit', $user) }}" class="d-flex align-items-center">
                         <div class="avatar avatar-md me-3">
