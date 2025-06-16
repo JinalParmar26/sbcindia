@@ -32,4 +32,12 @@ class Customer extends Model
     {
         return $this->hasMany(CustomerContactPerson::class);
     }
+
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
+
+    public function tickets() {
+        return $this->hasMany(Ticket::class);
+    }
 }

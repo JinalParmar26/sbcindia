@@ -113,10 +113,25 @@
                         <label class="form-check-label" for="selectAllUsers"></label>
                     </div>
                 </th>
-                <th class="border-bottom">Name</th>
+                <th class="border-bottom" wire:click="sortBy('name')" style="cursor: pointer;">
+                    Name
+                    @if ($sortField === 'name')
+                        <x-icon-sort :direction="$sortDirection" />
+                    @endif
+                </th>
                 <th class="border-bottom">Role</th>
-                <th class="border-bottom">Date Created</th>
-                <th class="border-bottom">Status</th>
+                <th class="border-bottom" wire:click="sortBy('created_at')" style="cursor: pointer;">
+                    Date Created
+                    @if ($sortField === 'created_at')
+                        <x-icon-sort :direction="$sortDirection" />
+                    @endif
+                </th>
+                <th class="border-bottom" wire:click="sortBy('isActive')" style="cursor: pointer;">
+                    Status
+                    @if ($sortField === 'isActive')
+                        <x-icon-sort :direction="$sortDirection" />
+                    @endif
+                </th>
                 <th class="border-bottom">Approve Login</th>
                 <th class="border-bottom">Action</th>
             </tr>

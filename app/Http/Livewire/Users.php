@@ -18,6 +18,8 @@ class Users extends Component
     protected $paginationTheme = 'bootstrap';
     public $confirmingUserDeletionId = null;
     public $selectedUsers = [];
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
 
     protected $updatesQueryString = ['search', 'perPage', 'statusFilter','approvalFilter', 'roleFilter'];
 
@@ -66,7 +68,7 @@ class Users extends Component
             });
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        $users = $query->orderBy($this->sortField, $this->sortDirection)->paginate($this->perPage);
         $rolesList = \Spatie\Permission\Models\Role::pluck('name', 'name'); // optional for dropdown
 
         return view('livewire.users', compact('users','rolesList'));
@@ -89,28 +91,39 @@ class Users extends Component
     }
 
     public function approveUser($userId)
-{
-    $user = User::findOrFail($userId);
+    {
+        $user = User::findOrFail($userId);
 
-    if (!$user->hasRole(['marketing', 'staff'])) {
+        if (!$user->hasRole(['marketing', 'staff'])) {
+            $this->dispatchBrowserEvent('alert', [
+                'type' => 'error',
+                'message' => 'This user does not require approval.',
+            ]);
+            return;
+        }
+
+        $user->approval_required = 'no';
+        $user->save();
+
         $this->dispatchBrowserEvent('alert', [
-            'type' => 'error',
-            'message' => 'This user does not require approval.',
+            'type' => 'success',
+            'message' => 'User approved successfully.',
         ]);
-        return;
+
+        // Optional: refresh user list
+        $this->resetPage(); // if using pagination
     }
 
-    $user->approval_required = 'no';
-    $user->save();
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
 
-    $this->dispatchBrowserEvent('alert', [
-        'type' => 'success',
-        'message' => 'User approved successfully.',
-    ]);
-
-    // Optional: refresh user list
-    $this->resetPage(); // if using pagination
-}
+        $this->sortField = $field;
+    }
 
 
 
