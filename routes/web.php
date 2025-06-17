@@ -65,6 +65,8 @@ Route::get('/upgrade-to-pro', UpgradeToPro::class)->name('upgrade-to-pro');
 Route::get('/user-profile/{uuid}', [UserController::class, 'showPublicProfile'])->name('showPublicProfile');
 Route::get('/download-qr/{uuid}', [UserController::class, 'downloadQr'])->name('download-qr');
 
+Route::get('/qr/{uuid}', [UserController::class, 'showQr'])->name('showQr');
+
 
 
 

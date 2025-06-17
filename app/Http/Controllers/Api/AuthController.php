@@ -113,7 +113,9 @@ class AuthController extends Controller
     public function getQR(Request $request)
     {
         $user = $request->user();
-        $qrCode = QrCode::size(150)->generate(route('showPublicProfile', $user->uuid));
-        return response($qrCode)->header('Content-Type', 'image/svg+xml');
+        $imageUrl = route('showQr', $user->uuid);
+        return response()->json([
+            'qr_image_url' => $imageUrl,
+        ]);
     }
 }
