@@ -33,8 +33,12 @@ Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('/login', [AuthController::class, 'login']);
 
+    Route::middleware('auth:sanctum')->get('/approval-status', [AuthController::class, 'checkApprovalStatus']);
+
+
     // Protected routes
     Route::middleware('auth:sanctum', 'approval.check')->group(function () {
+
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::post('/logout', [AuthController::class, 'logout']);

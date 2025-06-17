@@ -118,4 +118,17 @@ class AuthController extends Controller
             'qr_image_url' => $imageUrl,
         ]);
     }
+
+    public function checkApprovalStatus(Request $request)
+    {
+        $user = $request->user(); // get currently authenticated user
+
+        $isApproved = !($user->approval_required === 'yes');
+
+        return response()->json([
+            'approved' => $isApproved,
+            'status' => $isApproved ? 'approved' : 'Waiting for approval',
+        ]);
+    }
+
 }
