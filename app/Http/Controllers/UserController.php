@@ -280,16 +280,16 @@ class UserController extends Controller
 
     public function downloadQr($uuid)
     {
-        $qrCode = QrCode::size(150)->generate(route('showPublicProfile', $uuid));
-        return response($qrCode)->header('Content-Type', 'image/svg+xml')
+        $qrCode = QrCode::format('png')->size(150)->generate(route('showPublicProfile', $uuid));
+        return response($qrCode)->header('Content-Type', 'image/png')
             ->header('Content-Disposition', 'attachment;');
     }
 
 
     public function showQr($uuid)
     {
-        $qrCode = QrCode::size(150)->generate(route('showPublicProfile', $uuid));
-        return response($qrCode)->header('Content-Type', 'image/svg+xml');
+        $qrCode = QrCode::format('png')->size(150)->generate(route('showPublicProfile', $uuid));
+        return response($qrCode)->header('Content-Type', 'image/png');
     }
 
 
