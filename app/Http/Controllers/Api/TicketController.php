@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Delivery;
 use App\Models\ServiceItem;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class TicketController extends Controller
 {
@@ -18,6 +19,20 @@ class TicketController extends Controller
         $tickets = Ticket::with(['customer', 'orderProduct.product'])
             ->where('assigned_to', $request->user()->id)
             ->latest()
+            ->get();
+
+        return response()->json(['tickets' => $tickets]);
+    }
+
+    public function recentCompletedTickets(Request $request)
+    {
+        $thirtyDaysAgo = Carbon::now()->subDays(30);
+
+        $tickets = Ticket::with(['customer', 'orderProduct.product'])
+            ->where('assigned_to', $request->user()->id)
+            ->whereNotNull('end') // Only completed tickets
+            ->where('end', '>=', $thirtyDaysAgo)
+            ->latest('end') // Order by end date, not created_at
             ->get();
 
         return response()->json(['tickets' => $tickets]);

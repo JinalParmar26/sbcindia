@@ -53,6 +53,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('/attendances/{attendance}', [AttendanceController::class, 'destroy']);
 
         Route::get('/tickets', [TicketController::class, 'assignedTickets']);
+        Route::get('/recentcompletedtickets', [TicketController::class, 'recentCompletedTickets']);
         Route::get('tickets/{uuid}', [TicketController::class, 'show']);
         Route::post('/tickets/{uuid}', [TicketController::class, 'storeTicketEntry']);
 
