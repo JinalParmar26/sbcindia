@@ -10,6 +10,8 @@ class Tickets extends Component
 {
     use WithPagination;
 
+    protected $layout = 'layouts.app';
+
     public $perPage = 10;
     public $search = '';
     protected $paginationTheme = 'bootstrap';

@@ -56,10 +56,22 @@
                 <span class="sidebar-text">User management</span>
             </a>
         </li>
+        <li class="nav-item {{ Request::segment(1) == 'roles' ? 'active' : '' }}">
+            <a href="/roles" class="nav-link">
+                <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="sidebar-text">Role Management</span>
+            </a>
+        </li>
         <li class="nav-item {{ Request::segment(1) == 'customers' ? 'active' : '' }}">
             <a href="/customers" class="nav-link">
                 <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
                 <span class="sidebar-text">Customer management</span>
+            </a>
+        </li>
+        <li class="nav-item {{ Request::segment(1) == 'leads' ? 'active' : '' }}">
+            <a href="/leads" class="nav-link">
+                <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path><path d="M8 5a2 2 0 012-2h4a2 2 0 012 2v4H8V5z"></path></svg>
+                <span class="sidebar-text">Lead Management</span>
             </a>
         </li>
 {{--        <li class="nav-item {{ Request::segment(1) == 'products' ? 'active' : '' }}">--}}
@@ -102,6 +114,49 @@
             <span class="sidebar-text">Maintenance</span>
           </span>
             </a>
+        </li>
+        <li class="nav-item">
+            <span class="nav-link collapsed d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+              data-bs-target="#submenu-staff" aria-expanded="false">
+              <span>
+                <span class="sidebar-icon">
+                    <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-text">Staff Management</span>
+              </span>
+              <span class="link-arrow"><svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg></span>
+            </span>
+            <div class="multi-level collapse {{ Request::segment(1) == 'staff' ? 'show' : '' }}" role="list" id="submenu-staff" aria-expanded="false">
+              <ul class="flex-column nav">
+                <li class="nav-item {{ Request::url() == url('/staff') ? 'active' : '' }}">
+                  <a href="/staff" class="nav-link">
+                    <span class="sidebar-text">Attendance Overview</span>
+                  </a>
+                </li>
+                <li class="nav-item {{ Request::segment(2) == 'tickets' ? 'active' : '' }}">
+                  <a href="/staff/tickets" class="nav-link">
+                    <span class="sidebar-text">Staff Tickets</span>
+                  </a>
+                </li>
+                <li class="nav-item {{ Request::segment(2) == 'locations' ? 'active' : '' }}">
+                  <a href="/staff/locations" class="nav-link">
+                    <span class="sidebar-text">Live Tracking</span>
+                  </a>
+                </li>
+                <li class="nav-item {{ Request::segment(2) == 'actions' ? 'active' : '' }}">
+                  <a href="/staff/actions" class="nav-link">
+                    <span class="sidebar-text">Attendance Actions</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
         </li>
      <li class="nav-item">
 <!--        <span class="nav-link collapsed d-flex justify-content-between align-items-center" data-bs-toggle="collapse"-->

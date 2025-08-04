@@ -11,6 +11,8 @@ class Orders extends Component
 {
     use WithPagination;
 
+    protected $layout = 'layouts.app';
+
     public $perPage = 10;
     public $search = '';
     public $statusFilter = 'all';
@@ -50,7 +52,7 @@ class Orders extends Component
         $query = Order::query()
             ->join('customers', 'orders.customer_id', '=', 'customers.id')
             ->select('orders.*') // important to keep only order columns
-            ->with('customer');
+            ->with(['customer', 'orderProducts.product']);
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -75,7 +77,11 @@ class Orders extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
-        return view('livewire.orders', compact('orders'));
+        return view('livewire.orders', [
+            'orders' => $orders,
+            'customers' => $this->customers,
+            'availableYears' => $this->availableYears
+        ]);
     }
 
     public function confirmDelete($orderId)

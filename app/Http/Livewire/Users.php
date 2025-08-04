@@ -10,6 +10,8 @@ class Users extends Component
 {
     use WithPagination;
 
+    protected $layout = 'layouts.app';
+
     public $perPage = 10;
     public $search = '';
     public $statusFilter = 'all';

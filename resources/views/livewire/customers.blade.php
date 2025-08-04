@@ -29,10 +29,20 @@
                 </svg>
                 New Customer
             </a>
-            <!--            <div class="btn-group ms-2 ms-lg-3">-->
-            <!--                <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>-->
-            <!--                <button type="button" class="btn btn-sm btn-outline-gray-600">Export</button>-->
-            <!--            </div>-->
+            <div class="btn-group ms-2 ms-lg-3">
+                <button type="button" class="btn btn-sm btn-outline-gray-600" onclick="exportCustomersCsv()">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export CSV
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-gray-600" onclick="exportCustomersPdf()">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Download PDF
+                </button>
+            </div>
         </div>
     </div>
 
@@ -134,7 +144,7 @@
 {{--                    </div>--}}
 {{--                </td>--}}
                 <td>
-                    <a href="{{ route('customers.edit', $customer) }}" class="d-flex align-items-center">
+                    <a href="{{ route('customers.show', $customer->uuid) }}" class="d-flex align-items-center">
                         <div class="avatar avatar-md me-3">
                             <img alt="user-avatar" src="{{ $customer->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($customer->name) }}" class="rounded-circle">
                         </div>
@@ -201,4 +211,44 @@
         var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
         deleteModal.hide();
     });
+
+    // CSV Export function for Customers
+    function exportCustomersCsv() {
+        const currentFilters = {
+            search: @this.get('search') || ''
+        };
+
+        // Build URL with current filters
+        const params = new URLSearchParams();
+        Object.keys(currentFilters).forEach(key => {
+            if (currentFilters[key]) {
+                params.append(key, currentFilters[key]);
+            }
+        });
+
+        const url = '{{ route("customers.export.csv") }}' + (params.toString() ? '?' + params.toString() : '');
+        window.open(url, '_blank');
+    }
+
+    // PDF Export function for Customers
+    function exportCustomersPdf() {
+        const currentFilters = {
+            search: @this.get('search') || ''
+        };
+
+        // Build URL with current filters
+        const params = new URLSearchParams();
+        Object.keys(currentFilters).forEach(key => {
+            if (currentFilters[key]) {
+                params.append(key, currentFilters[key]);
+            }
+        });
+
+        const url = '{{ route("customers.export.pdf") }}' + (params.toString() ? '?' + params.toString() : '');
+        window.open(url, '_blank');
+    }
+
+    // Make functions globally available
+    window.exportCustomersCsv = exportCustomersCsv;
+    window.exportCustomersPdf = exportCustomersPdf;
 </script>

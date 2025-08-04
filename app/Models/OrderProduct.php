@@ -22,6 +22,11 @@ class OrderProduct extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -1,0 +1,12 @@
+[09-Jul-2025 07:41:07 UTC] PHP Fatal error:  Uncaught BadMethodCallException: Method Illuminate\Foundation\Application::configure does not exist. in /home1/sbccindia/public_html/erp/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:87
+Stack trace:
+#0 /home1/sbccindia/public_html/erp/bootstrap/app.php(7): Illuminate\Foundation\Application::__callStatic('configure', Array, basePath: '/home1/sbccindi...')
+#1 /home1/sbccindia/public_html/erp/artisan(20): require_once('/home1/sbccindi...')
+#2 {main}
+  thrown in /home1/sbccindia/public_html/erp/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php on line 87
+[09-Jul-2025 07:43:14 UTC] PHP Fatal error:  Uncaught BadMethodCallException: Method Illuminate\Foundation\Application::configure does not exist. in /home1/sbccindia/public_html/erp/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:87
+Stack trace:
+#0 /home1/sbccindia/public_html/erp/bootstrap/app.php(7): Illuminate\Foundation\Application::__callStatic('configure', Array, basePath: '/home1/sbccindi...')
+#1 /home1/sbccindia/public_html/erp/artisan(20): require_once('/home1/sbccindi...')
+#2 {main}
+  thrown in /home1/sbccindia/public_html/erp/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php on line 87

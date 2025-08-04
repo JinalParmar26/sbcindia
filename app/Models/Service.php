@@ -10,6 +10,8 @@ class Service extends Model
 {
     use HasFactory;
 
+    protected $table = 'services';
+
     protected $fillable = [
         'uuid',
         'ticket_id',
@@ -55,7 +57,11 @@ class Service extends Model
         'thermostat_setting',
     ];
 
-    // Relationships
+    protected $casts = [
+        'start_date_time' => 'datetime',
+        'end_date_time' => 'datetime',
+    ];
+
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);
@@ -66,12 +72,10 @@ class Service extends Model
         return $this->morphMany(ServiceItem::class, 'serviceable');
     }
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
         static::creating(function ($service) {
-            $service->uuid = Str::uuid();
+            $service->uuid = (string) Str::uuid();
         });
     }
 }

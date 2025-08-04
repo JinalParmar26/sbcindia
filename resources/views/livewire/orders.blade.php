@@ -22,18 +22,38 @@
             <p class="mb-0">Your web analytics dashboard template.</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('orders.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
-                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
-                    </path>
-                </svg>
-                New Order
-            </a>
-            <!--            <div class="btn-group ms-2 ms-lg-3">-->
-            <!--                <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>-->
-            <!--                <button type="button" class="btn btn-sm btn-outline-gray-600">Export</button>-->
-            <!--            </div>-->
+            <div class="btn-group me-2">
+                <a href="{{ route('orders.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                        </path>
+                    </svg>
+                    New Order
+                </a>
+                <a href="{{ route('customers.create') }}" class="btn btn-sm btn-outline-gray-600 d-inline-flex align-items-center">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                        </path>
+                    </svg>
+                    Add Customer
+                </a>
+            </div>
+            <div class="btn-group ms-2 ms-lg-3">
+                <button type="button" class="btn btn-sm btn-outline-gray-600" onclick="exportToCsv()">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export CSV
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="exportOrdersPdf()">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Download PDF
+                </button>
+            </div>
         </div>
     </div>
 
@@ -51,12 +71,24 @@
                     <input type="text" wire:model.debounce.300ms="search" class="form-control" placeholder="Search orders">
                 </div>
                 <div class="input-group me-2 me-lg-3 fmxw-300">
-                    <select wire:model="customerFilter" id="customerFilter" class="form-select d-none d-md-inline">
-                        <option value="all">All Customers</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="searchable-dropdown">
+                        <input type="text" 
+                               id="customerSearchInput" 
+                               class="form-control" 
+                               placeholder="Search customers..." 
+                               autocomplete="off">
+                        <div class="dropdown-menu" id="customerDropdown" style="display: none;">
+                            <div class="dropdown-item" data-value="all">All Customers</div>
+                            @if(isset($customers) && count($customers) > 0)
+                                @foreach($customers as $customer)
+                                    <div class="dropdown-item" data-value="{{ $customer->id }}">{{ $customer->name }}</div>
+                                @endforeach
+                            @else
+                                <div class="dropdown-item" data-value="">No customers found</div>
+                            @endif
+                        </div>
+                        <input type="hidden" wire:model="customerFilter" id="customerFilterHidden" value="{{ $customerFilter }}">
+                    </div>
                 </div>
                  <div class="input-group me-2 me-lg-3 fmxw-300">
                     <select wire:model="yearFilter" id="yearFilter"  class="form-select d-none d-md-inline">
@@ -129,6 +161,8 @@
                         @if ($sortDirection === 'asc') ↑ @else ↓ @endif
                     @endif
                 </th>
+                <th>Model Number</th>
+                <th>Serial Number</th>
                 <th wire:click="sortBy('created_at')" style="cursor: pointer;">
                     Date
                     @if ($sortField === 'created_at')
@@ -145,11 +179,25 @@
 {{--                    <input class="form-check-input" type="checkbox" wire:model="selectedOrders" value="{{ $order->id }}">--}}
 {{--                </td>--}}
                 <td>
-                    <a href="{{ route('orders.edit', $order->id) }}" class="fw-bold text-primary">
+                    <a href="{{ route('orders.show', $order->uuid) }}" class="fw-bold text-primary">
                         {{ $order->title }}
                     </a>
                 </td>
                 <td>{{ $order->customer->name ?? 'N/A' }}</td>
+                <td>
+                    @if($order->orderProducts && $order->orderProducts->count() > 0)
+                        {{ $order->orderProducts->first()->model_number ?? $order->orderProducts->first()->product->name ?? '-' }}
+                    @else
+                        -
+                    @endif
+                </td>
+                <td>
+                    @if($order->orderProducts && $order->orderProducts->count() > 0)
+                        {{ $order->orderProducts->first()->serial_number ?? '-' }}
+                    @else
+                        -
+                    @endif
+                </td>
                 <td>{{ $order->created_at->format('M d, Y') }}</td>
                 <td>
                     <div class="dropdown">
@@ -170,7 +218,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="5" class="text-center">No orders found.</td>
+                <td colspan="7" class="text-center">No orders found.</td>
             </tr>
             @endforelse
             </tbody>
@@ -198,15 +246,214 @@
             {{ $orders->links() }}
         </div>
     </div>
-</div>
 
-<script>
-    window.addEventListener('show-delete-modal', () => {
-        const modal = new bootstrap.Modal(document.getElementById('deleteOrderModal'));
-        modal.show();
-    });
-    window.addEventListener('hide-delete-modal', () => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteOrderModal'));
-        modal.hide();
-    });
-</script>
+    {{-- Inline styles to avoid multiple root elements --}}
+    <style>
+    .searchable-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .searchable-dropdown .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        background: white;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        margin-top: 1px;
+    }
+
+    .searchable-dropdown .dropdown-item {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f8f9fa;
+        color: #212529;
+        text-decoration: none;
+        display: block;
+        clear: both;
+        font-weight: 400;
+        white-space: nowrap;
+        background-color: transparent;
+        transition: background-color 0.15s ease-in-out;
+    }
+
+    .searchable-dropdown .dropdown-item:hover {
+        background-color: #e9ecef;
+        color: #16181b;
+    }
+
+    .searchable-dropdown .dropdown-item.selected {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 500;
+    }
+
+    .searchable-dropdown .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .searchable-dropdown .dropdown-item:first-child {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+    }
+
+    .searchable-dropdown .dropdown-item:last-child {
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+    }
+
+    .searchable-dropdown input[type="text"] {
+        cursor: pointer;
+    }
+
+    .searchable-dropdown input[type="text"]:focus {
+        cursor: text;
+    }
+    </style>
+
+    {{-- Inline scripts to avoid multiple root elements --}}
+    <script>
+        document.addEventListener('livewire:load', function () {
+            initializeSearchableDropdown();
+        });
+
+        document.addEventListener('livewire:update', function () {
+            setTimeout(() => {
+                initializeSearchableDropdown();
+            }, 100);
+        });
+
+        function initializeSearchableDropdown() {
+            const searchInput = document.getElementById('customerSearchInput');
+            const dropdown = document.getElementById('customerDropdown');
+            const hiddenInput = document.getElementById('customerFilterHidden');
+            
+            if (!searchInput || !dropdown || !hiddenInput) {
+                return;
+            }
+            
+            const dropdownItems = dropdown.querySelectorAll('.dropdown-item');
+            
+            // Set initial display value
+            const currentValue = hiddenInput.value || 'all';
+            const currentItem = dropdown.querySelector(`[data-value="${currentValue}"]`);
+            if (currentItem) {
+                searchInput.value = currentItem.textContent.trim();
+                currentItem.classList.add('selected');
+            } else {
+                searchInput.value = 'All Customers';
+            }
+            
+            // Remove existing event listeners to prevent duplicates
+            searchInput.replaceWith(searchInput.cloneNode(true));
+            const newSearchInput = document.getElementById('customerSearchInput');
+            
+            // Show dropdown on input focus
+            newSearchInput.addEventListener('focus', function() {
+                dropdown.style.display = 'block';
+                filterItems();
+            });
+            
+            // Filter items based on search input
+            newSearchInput.addEventListener('input', function() {
+                filterItems();
+            });
+            
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!newSearchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+            
+            // Handle item selection
+            dropdownItems.forEach(item => {
+                item.replaceWith(item.cloneNode(true));
+            });
+            
+            dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent.trim();
+                    
+                    // Update input and hidden field
+                    newSearchInput.value = text;
+                    hiddenInput.value = value;
+                    
+                    // Update selected state
+                    dropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Hide dropdown
+                    dropdown.style.display = 'none';
+                    
+                    // Trigger Livewire update
+                    @this.set('customerFilter', value);
+                });
+            });
+            
+            function filterItems() {
+                const searchTerm = newSearchInput.value.toLowerCase();
+                let hasVisibleItems = false;
+                
+                dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        item.style.display = 'block';
+                        hasVisibleItems = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                if (hasVisibleItems) {
+                    dropdown.style.display = 'block';
+                }
+            }
+        }
+
+        // Modal events
+        window.addEventListener('show-delete-modal', () => {
+            const modal = new bootstrap.Modal(document.getElementById('deleteOrderModal'));
+            modal.show();
+        });
+        
+        window.addEventListener('hide-delete-modal', () => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteOrderModal'));
+            if (modal) modal.hide();
+        });
+
+        // CSV Export function
+        function exportToCsv() {
+            const currentFilters = {
+                search: @this.get('search') || '',
+                customer_filter: @this.get('customerFilter') || 'all',
+                year_filter: @this.get('yearFilter') || 'all',
+                month_filter: @this.get('monthFilter') || 'all'
+            };
+
+            // Build URL with current filters
+            const params = new URLSearchParams();
+            Object.keys(currentFilters).forEach(key => {
+                if (currentFilters[key] && currentFilters[key] !== 'all') {
+                    params.append(key, currentFilters[key]);
+                }
+            });
+
+            const url = '{{ route("orders.export.pdf") }}' + (params.toString() ? '?' + params.toString() : '');
+            window.open(url, '_blank');
+        }
+
+        // Make function globally available
+        window.exportToCsv = exportToCsv;
+    </script>
+</div>

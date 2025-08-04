@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use App\Models\User;
 
 class Ticket extends Model
 {
     use HasFactory;
+
+    protected $table = 'tickets';
 
     protected $fillable = [
         'uuid',
@@ -24,6 +25,12 @@ class Ticket extends Model
         'end',
     ];
 
+    protected $casts = [
+        'start' => 'datetime',
+        'end' => 'datetime',
+    ];
+
+    // Relationships
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -44,6 +51,11 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
+    public function attendedBy()
+    {
+        return $this->belongsTo(User::class, 'attended_by');
+    }
+
     public function additionalStaff()
     {
         return $this->belongsToMany(User::class, 'ticket_additional_staff', 'ticket_id', 'user_id');
@@ -56,16 +68,23 @@ class Ticket extends Model
 
     public function service()
     {
-        return $this->hasOne(Service::class);
+        return $this->hasMany(Service::class); // changed from hasOne, since multiple services per ticket is logical
+    }
+    
+    public function services()
+    {
+        return $this->hasMany(Service::class);
     }
 
-
-    protected static function boot()
+    public function ticketImages()
     {
-        parent::boot();
-
+        return $this->hasMany(TicketImage::class);
+    }
+    
+    protected static function booted()
+    {
         static::creating(function ($ticket) {
-            $ticket->uuid = Str::uuid();
+            $ticket->uuid = (string) Str::uuid();
         });
     }
 }

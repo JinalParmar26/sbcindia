@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\OvertimeLogController;
 use App\Http\Controllers\Api\MarketingController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\LocationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +34,7 @@ Route::get('/customers/{customer}/contacts', function (Customer $customer) {
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/upload-photos', [AuthController::class, 'uploadPhotos']);
 
     Route::middleware('auth:sanctum')->get('/approval-status', [AuthController::class, 'checkApprovalStatus']);
 
@@ -41,6 +44,8 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
+        Route::put('/update-profile', [AuthController::class, 'updateUserProfile']);
+        
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/qrcode', [AuthController::class, 'getQR']);
 
@@ -52,10 +57,22 @@ Route::prefix('v1')->group(function () {
         Route::put('/attendances/{attendance}', [AttendanceController::class, 'update']);
         Route::delete('/attendances/{attendance}', [AttendanceController::class, 'destroy']);
 
+	 // Ticket Image APIs
+        Route::post('/tickets/upload-images', [TicketController::class, 'uploadTicketImages']);
+        Route::get('/tickets/{ticketUuid}/images', [TicketController::class, 'getTicketImages']);
+
         Route::get('/tickets', [TicketController::class, 'assignedTickets']);
         Route::get('/recentcompletedtickets', [TicketController::class, 'recentCompletedTickets']);
         Route::get('tickets/{uuid}', [TicketController::class, 'show']);
         Route::post('/tickets/{uuid}', [TicketController::class, 'storeTicketEntry']);
+
+
+        // Notification routes
+        Route::post('/notifications/register-fcm-token', [NotificationController::class, 'registerFCMToken']);
+        Route::post('/notifications/test', [NotificationController::class, 'sendTestNotification']);
+        Route::post('/notifications/send-ticket-notification', [NotificationController::class, 'sendTicketNotification']);
+        Route::get('/notifications/settings', [NotificationController::class, 'getNotificationSettings']);
+        Route::put('/notifications/settings', [NotificationController::class, 'updateNotificationSettings']);
 
 
         Route::get('/overtime-logs', [OvertimeLogController::class, 'index']);
@@ -69,6 +86,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/marketing-visits/{marketing}', [MarketingController::class, 'show']);
         Route::put('/marketing-visits/{marketing}', [MarketingController::class, 'update']);
         Route::delete('/marketing-visits/{marketing}', [MarketingController::class, 'destroy']);
+
+        // Location tracking routes
+        Route::post('/locations', [LocationController::class, 'store']);
+        Route::post('/locations/bulk', [LocationController::class, 'storeBulk']);
+        Route::get('/locations/user', [LocationController::class, 'getUserLocations']);
+        Route::get('/locations/user/range', [LocationController::class, 'getUserLocationRange']);
+        Route::get('/locations/user/stats', [LocationController::class, 'getLocationStats']);
 
     });
 
