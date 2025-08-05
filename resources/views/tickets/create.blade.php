@@ -131,18 +131,39 @@
             const customerId = this.value;
             contactSelect.innerHTML = '<option disabled selected>Loading...</option>';
 
-            fetch(`/api/customers/${customerId}/contacts`)
-                .then(res => res.json())
+            if (!customerId) {
+                contactSelect.innerHTML = '<option disabled selected>Select customer first</option>';
+                return;
+            }
+
+            fetch(`/api/customers/${customerId}/contacts`, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     contactSelect.innerHTML = '<option disabled selected>Select contact</option>';
-                    data.forEach(contact => {
-                        const option = document.createElement('option');
-                        option.value = contact.id;
-                        option.textContent = contact.name + ' (' + contact.email + ')';
-                        contactSelect.appendChild(option);
-                    });
+                    if (data && data.length > 0) {
+                        data.forEach(contact => {
+                            const option = document.createElement('option');
+                            option.value = contact.id;
+                            option.textContent = contact.name + ' (' + contact.email + ')';
+                            contactSelect.appendChild(option);
+                        });
+                    } else {
+                        contactSelect.innerHTML = '<option disabled selected>No contacts found</option>';
+                    }
                 })
-                .catch(() => {
+                .catch((error) => {
+                    console.error('Error loading contacts:', error);
                     contactSelect.innerHTML = '<option disabled selected>Error loading contacts</option>';
                 });
         });
