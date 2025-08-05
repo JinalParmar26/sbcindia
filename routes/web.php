@@ -90,14 +90,8 @@ Route::middleware('auth')->group(function () {
         
         Route::middleware('permission:view_users')->group(function () {
             Route::get('/users', Users::class)->name('users');
-            Route::get('/users/export/csv', function() {
-                $usersComponent = new App\Http\Livewire\Users();
-                return $usersComponent->exportCsv();
-            })->name('users.export.csv');
-            Route::get('/users/export/pdf', function() {
-                $usersComponent = new App\Http\Livewire\Users();
-                return $usersComponent->exportPdf();
-            })->name('users.export.pdf');
+            Route::get('/users/export/csv', [UserController::class, 'exportCsv'])->name('users.export.csv');
+            Route::get('/users/export/pdf', [UserController::class, 'exportPdf'])->name('users.export.pdf');
         });
         
         Route::middleware('permission:edit_users')->group(function () {

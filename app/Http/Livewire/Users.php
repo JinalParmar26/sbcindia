@@ -127,7 +127,4 @@ class Users extends Component
         $this->sortField = $field;
     }
 
-
-
-
 }
