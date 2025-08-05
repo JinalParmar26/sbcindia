@@ -3,303 +3,326 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Ticket;
-use App\Services\ImageOptimizationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Ticket;
+use App\Models\Service;
+use App\Models\Delivery;
+use App\Models\ServiceItem;
+use App\Models\TicketImage;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class TicketController extends Controller
 {
-    protected $imageOptimizationService;
-
-    public function __construct(ImageOptimizationService $imageOptimizationService)
+    public function assignedTickets(Request $request)
     {
-        $this->imageOptimizationService = $imageOptimizationService;
+
+        $tickets = Ticket::with(['customer', 'orderProduct.product'])
+            ->where('assigned_to', $request->user()->id)
+            ->latest()
+            ->get();
+
+        return response()->json(['tickets' => $tickets]);
     }
 
-    /**
-     * Upload optimized images for a ticket via API
-     */
-    public function uploadImages(Request $request)
+    public function recentCompletedTickets(Request $request)
     {
-        $request->validate([
-            'ticket_uuid' => 'required|string|exists:tickets,uuid',
-            'images' => 'required|array|min:1|max:10',
-            'images.*' => 'required|string', // Base64 encoded images
-        ]);
+        $thirtyDaysAgo = Carbon::now()->subDays(30);
+
+        $tickets = Ticket::with(['customer', 'orderProduct.product'])
+            ->where('assigned_to', $request->user()->id)
+            ->whereNotNull('end') // Only completed tickets
+            ->where('end', '>=', $thirtyDaysAgo)
+            ->latest('end') // Order by end date, not created_at
+            ->get();
+
+        return response()->json(['tickets' => $tickets]);
+    }
+
+    public function show($uuid)
+    {
 
         try {
-            $ticket = Ticket::where('uuid', $request->ticket_uuid)->firstOrFail();
-            $uploadedImages = [];
-            $failedUploads = [];
-            $optimizationStats = [];
+            $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'No ticket found for the provided UUID.',
+            ], 404);
+        }
+        $ticket = Ticket::with([
+            'customer',
+            'contactPerson',
+            'assignedTo',
+            'orderProduct.product',
+        ])->where('uuid', $uuid)->firstOrFail();
 
-            foreach ($request->images as $index => $imageData) {
-                try {
-                    // Optimize the image with API-specific settings
-                    $optimizationResult = $this->imageOptimizationService->optimizeImage(
-                        $imageData,
-                        1024, // Smaller max width for API
-                        768,  // Smaller max height for API
-                        75    // Slightly lower quality for smaller files
-                    );
+        return response()->json([
+            'ticket' => $ticket
+        ]);
+    }
 
-                    if (!$optimizationResult['success']) {
-                        $failedUploads[] = [
-                            'index' => $index + 1,
-                            'error' => $optimizationResult['error']
-                        ];
-                        continue;
-                    }
+    public function storeTicketEntry(Request $request, $uuid)
+    {
 
-                    // Store the optimized image
-                    $storageResult = $this->imageOptimizationService->storeOptimizedImage(
-                        $optimizationResult['image_data'],
-                        $ticket->uuid,
-                        $index,
-                        $optimizationResult['original_format']
-                    );
+        try {
+            $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'No ticket found for the provided UUID.',
+            ], 404);
+        }
+        try{
+            $data = json_decode($request->input('data'), true);
 
-                    if (!$storageResult['success']) {
-                        $failedUploads[] = [
-                            'index' => $index + 1,
-                            'error' => $storageResult['error']
-                        ];
-                        continue;
-                    }
+            $rules = [];
 
-                    // Create database record
-                    $ticketImage = $ticket->ticketImages()->create([
-                        'image_path' => $storageResult['file_path'],
-                        'original_format' => $optimizationResult['original_format'],
-                        'optimized_format' => 'webp',
-                        'original_size' => $optimizationResult['original_size'],
-                        'optimized_size' => $optimizationResult['optimized_size'],
-                        'compression_ratio' => $optimizationResult['compression_ratio'],
-                        'uploaded_by' => Auth::id(),
-                    ]);
+            if ($request->has('type')) {
+                $rules['type'] = 'required|in:delivery,service';
+            }
+            if ($request->has('start') && $request->input('start') != '') {
+                $rules['start'] = 'required|date';
+            }
+            if ($request->has('end') && $request->input('end') != '') {
+                $rules['end'] = 'nullable|date';
+            }
+            if ($request->has('log') && $request->input('log') != '') {
+                $rules['log'] = 'nullable|string';
+            }
+            if ($request->has('data')) {
+                //$rules['data'] = 'required|array';
 
-                    $uploadedImages[] = [
-                        'id' => $ticketImage->id,
-                        'image_url' => asset('storage/' . $storageResult['file_path']),
-                        'original_format' => $optimizationResult['original_format'],
-                        'optimized_format' => 'webp',
-                        'original_size' => $optimizationResult['original_size'],
-                        'optimized_size' => $optimizationResult['optimized_size'],
-                        'original_size_formatted' => $this->imageOptimizationService->formatFileSize($optimizationResult['original_size']),
-                        'optimized_size_formatted' => $this->imageOptimizationService->formatFileSize($optimizationResult['optimized_size']),
-                        'compression_ratio' => $optimizationResult['compression_ratio'],
-                        'space_saved' => $optimizationResult['original_size'] - $optimizationResult['optimized_size'],
-                        'space_saved_formatted' => $this->imageOptimizationService->formatFileSize($optimizationResult['original_size'] - $optimizationResult['optimized_size']),
-                        'dimensions' => $optimizationResult['optimized_dimensions'],
-                        'uploaded_at' => $ticketImage->created_at->toISOString()
-                    ];
-
-                    // Collect optimization stats
-                    $optimizationStats[] = [
-                        'original_size' => $optimizationResult['original_size'],
-                        'optimized_size' => $optimizationResult['optimized_size'],
-                        'compression_ratio' => $optimizationResult['compression_ratio']
-                    ];
-
-                } catch (\Exception $e) {
-                    $failedUploads[] = [
-                        'index' => $index + 1,
-                        'error' => $e->getMessage()
-                    ];
+                if (isset($request->data['items'])) {
+                    //$rules['data.items'] = 'array';
+                    $rules['data.items.*.item'] = 'required_with:data.items|string';
+                    $rules['data.items.*.qty'] = 'required_with:data.items|numeric';
+                    $rules['data.items.*.rate'] = 'required_with:data.items|numeric';
+                    $rules['data.items.*.amount'] = 'required_with:data.items|numeric';
                 }
             }
 
-            // Calculate total optimization stats
-            $totalOriginalSize = array_sum(array_column($optimizationStats, 'original_size'));
-            $totalOptimizedSize = array_sum(array_column($optimizationStats, 'optimized_size'));
-            $totalSpaceSaved = $totalOriginalSize - $totalOptimizedSize;
-            $overallCompressionRatio = $totalOriginalSize > 0 ? 
-                round((($totalOriginalSize - $totalOptimizedSize) / $totalOriginalSize) * 100, 2) : 0;
+            $validator = $request->validate($rules);
 
-            $response = [
-                'success' => true,
-                'message' => 'Images processed and optimized successfully',
-                'data' => [
-                    'ticket_uuid' => $ticket->uuid,
-                    'total_uploaded' => count($uploadedImages),
-                    'total_failed' => count($failedUploads),
-                    'uploaded_images' => $uploadedImages,
-                    'optimization_summary' => [
-                        'total_images_processed' => count($request->images),
-                        'total_original_size' => $totalOriginalSize,
-                        'total_optimized_size' => $totalOptimizedSize,
-                        'total_space_saved' => $totalSpaceSaved,
-                        'total_original_size_formatted' => $this->imageOptimizationService->formatFileSize($totalOriginalSize),
-                        'total_optimized_size_formatted' => $this->imageOptimizationService->formatFileSize($totalOptimizedSize),
-                        'total_space_saved_formatted' => $this->imageOptimizationService->formatFileSize($totalSpaceSaved),
-                        'overall_compression_ratio' => $overallCompressionRatio,
-                        'average_compression_per_image' => count($optimizationStats) > 0 ? 
-                            round(array_sum(array_column($optimizationStats, 'compression_ratio')) / count($optimizationStats), 2) : 0
-                    ]
-                ]
-            ];
 
-            if (!empty($failedUploads)) {
-                $response['failed_uploads'] = $failedUploads;
+            // if ($validator->fails()) {
+            //     return response()->json(['errors' => $validator->errors()], 422);
+            // }
+
+            $type = $request->input('type');
+            $items = $data['items'] ?? [];
+
+            $updateData = [];
+
+            if ($request->has('start')) {
+                $updateData['start'] = $request->input('start');
             }
 
-            // Log successful uploads with detailed optimization stats
-            if (count($uploadedImages) > 0) {
-                Log::info('API: Optimized ticket images uploaded successfully', [
-                    'ticket_uuid' => $ticket->uuid,
-                    'uploaded_by' => Auth::user()->name ?? 'Unknown',
-                    'user_id' => Auth::id(),
-                    'image_count' => count($uploadedImages),
-                    'optimization_stats' => [
-                        'total_original_size' => $totalOriginalSize,
-                        'total_optimized_size' => $totalOptimizedSize,
-                        'space_saved' => $totalSpaceSaved,
-                        'compression_ratio' => $overallCompressionRatio
-                    ]
-                ]);
+            if ($request->has('end')) {
+                $updateData['end'] = $request->input('end');
             }
 
-            return response()->json($response, 201);
+            if (isset($data['log'])) {
+                $updateData['log'] = $data['log'];
+            }
+
+
+            $ticket->update($updateData);
+
+            if ($type === 'service') {
+                // Remove items before inserting service record
+                unset($data['items']);
+
+                $service = Service::updateOrCreate(
+                    ['ticket_id' => $ticket->id],
+                    array_merge($data, ['ticket_id' => $ticket->id])
+                );
+
+                if($items) {
+                    $service->serviceItems()->delete();
+
+
+                    foreach ($items as $item) {
+                        $service->serviceItems()->create($item);
+                    }
+                }
+
+            } elseif ($type === 'delivery') {
+                unset($data['items']);
+
+                $delivery = Delivery::updateOrCreate(['ticket_id' => $ticket->id],array_merge($data, [
+                    'ticket_id' => $ticket->id,
+                ]));
+
+
+                if($items) {
+                    $delivery->serviceItems()->delete();
+
+
+                    foreach ($items as $item) {
+                        $delivery->serviceItems()->create($item);
+                    }
+                }
+            }
+
+            return response()->json([
+                'message' => ucfirst($type) . ' entry saved successfully.'
+            ]);
 
         } catch (\Exception $e) {
-            Log::error('API: Image upload failed', [
-                'error' => $e->getMessage(),
-                'ticket_uuid' => $request->ticket_uuid ?? 'unknown',
-                'user_id' => Auth::id(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
             return response()->json([
-                'success' => false,
-                'message' => 'Upload failed: ' . $e->getMessage(),
-                'error_code' => 'UPLOAD_FAILED'
+
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 
-    /**
-     * Get optimized images for a ticket via API
-     */
-    public function getImages($ticketUuid)
+    public function uploadTicketImages(Request $request)
     {
-        try {
-            $ticket = Ticket::where('uuid', $ticketUuid)
-                ->with(['ticketImages.uploadedBy'])
-                ->firstOrFail();
+        $validator = Validator::make($request->all(), [
+            'ticket_uuid' => 'required|string|exists:tickets,uuid',
+            'images' => 'required|array|min:1|max:10', // Allow up to 10 images
+            'images.*' => 'required|string', // Each image should be base64 string
+            'descriptions' => 'nullable|array',
+            'descriptions.*' => 'nullable|string|max:500',
+        ]);
 
-            $images = $ticket->ticketImages->map(function ($image) {
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Find the ticket
+        $ticket = Ticket::where('uuid', $request->input('ticket_uuid'))->first();
+        
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket not found'], 404);
+        }
+
+        // Check if user has permission to upload images for this ticket
+        $user = $request->user();
+        if ($ticket->assigned_to !== $user->id && $ticket->attended_by !== $user->id) {
+            return response()->json(['error' => 'You do not have permission to upload images for this ticket'], 403);
+        }
+
+        $images = $request->input('images');
+        $descriptions = $request->input('descriptions', []);
+        $uploadedImages = [];
+        $failedUploads = [];
+
+        foreach ($images as $index => $imageData) {
+            try {
+                $imageInfo = $this->uploadBase64Image($imageData, 'ticket_images');
+                
+                if ($imageInfo) {
+                    // Create ticket image record
+                    $ticketImage = TicketImage::create([
+                        'ticket_id' => $ticket->id,
+                        'uploaded_by' => $user->id,
+                        'image_path' => $imageInfo['path'],
+                        'original_filename' => $imageInfo['filename'],
+                        'mime_type' => $imageInfo['mime_type'],
+                        'file_size' => $imageInfo['file_size'],
+                        'description' => $descriptions[$index] ?? null,
+                    ]);
+
+                    $uploadedImages[] = [
+                        'uuid' => $ticketImage->uuid,
+                        'image_url' => $ticketImage->image_url,
+                        'description' => $ticketImage->description,
+                        'file_size' => $ticketImage->file_size_formatted,
+                        'uploaded_at' => $ticketImage->created_at,
+                    ];
+                } else {
+                    $failedUploads[] = "Image " . ($index + 1) . ": Invalid image format";
+                }
+            } catch (Exception $e) {
+                $failedUploads[] = "Image " . ($index + 1) . ": Upload failed";
+            }
+        }
+
+        $response = [
+            'message' => count($uploadedImages) . ' image(s) uploaded successfully',
+            'uploaded_images' => $uploadedImages,
+            'total_uploaded' => count($uploadedImages),
+            'total_failed' => count($failedUploads),
+        ];
+
+        if (!empty($failedUploads)) {
+            $response['failed_uploads'] = $failedUploads;
+        }
+
+        return response()->json($response, 200);
+    }
+
+    public function getTicketImages(Request $request, $ticketUuid)
+    {
+        $ticket = Ticket::where('uuid', $ticketUuid)->first();
+        
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket not found'], 404);
+        }
+
+        // Check if user has permission to view images for this ticket
+        $user = $request->user();
+        if ($ticket->assigned_to !== $user->id && $ticket->attended_by !== $user->id) {
+            return response()->json(['error' => 'You do not have permission to view images for this ticket'], 403);
+        }
+
+        $images = TicketImage::where('ticket_id', $ticket->id)
+            ->with('uploadedBy:id,name')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($image) {
                 return [
-                    'id' => $image->id,
+                    'uuid' => $image->uuid,
                     'image_url' => $image->image_url,
-                    'original_format' => $image->original_format ?? 'unknown',
-                    'optimized_format' => $image->optimized_format ?? 'webp',
-                    'original_size' => $image->original_size ?? 0,
-                    'optimized_size' => $image->optimized_size ?? 0,
-                    'original_size_formatted' => $this->imageOptimizationService->formatFileSize($image->original_size ?? 0),
-                    'optimized_size_formatted' => $this->imageOptimizationService->formatFileSize($image->optimized_size ?? 0),
-                    'compression_ratio' => $image->compression_ratio ?? 0,
-                    'space_saved' => ($image->original_size ?? 0) - ($image->optimized_size ?? 0),
-                    'space_saved_formatted' => $this->imageOptimizationService->formatFileSize(
-                        ($image->original_size ?? 0) - ($image->optimized_size ?? 0)
-                    ),
-                    'uploaded_by' => [
-                        'id' => $image->uploadedBy->id ?? null,
-                        'name' => $image->uploadedBy->name ?? 'Unknown'
-                    ],
-                    'uploaded_at' => $image->created_at->toISOString(),
-                    'updated_at' => $image->updated_at->toISOString(),
+                    'description' => $image->description,
+                    'file_size' => $image->file_size_formatted,
+                    'uploaded_by' => $image->uploadedBy->name,
+                    'uploaded_at' => $image->created_at,
                 ];
             });
 
-            // Calculate summary statistics
-            $totalOriginalSize = $images->sum('original_size');
-            $totalOptimizedSize = $images->sum('optimized_size');
-            $totalSpaceSaved = $totalOriginalSize - $totalOptimizedSize;
-            $averageCompressionRatio = $images->count() > 0 ? $images->avg('compression_ratio') : 0;
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'ticket_uuid' => $ticket->uuid,
-                    'images' => $images,
-                    'summary' => [
-                        'total_images' => $images->count(),
-                        'total_original_size' => $totalOriginalSize,
-                        'total_optimized_size' => $totalOptimizedSize,
-                        'total_space_saved' => $totalSpaceSaved,
-                        'total_original_size_formatted' => $this->imageOptimizationService->formatFileSize($totalOriginalSize),
-                        'total_optimized_size_formatted' => $this->imageOptimizationService->formatFileSize($totalOptimizedSize),
-                        'total_space_saved_formatted' => $this->imageOptimizationService->formatFileSize($totalSpaceSaved),
-                        'average_compression_ratio' => round($averageCompressionRatio, 2)
-                    ]
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('API: Failed to retrieve images', [
-                'error' => $e->getMessage(),
-                'ticket_uuid' => $ticketUuid,
-                'user_id' => Auth::id()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve images: ' . $e->getMessage(),
-                'error_code' => 'RETRIEVAL_FAILED'
-            ], 500);
-        }
+        return response()->json([
+            'ticket_uuid' => $ticketUuid,
+            'images' => $images,
+            'total_images' => $images->count(),
+        ]);
     }
 
-    /**
-     * Delete an image
-     */
-    public function deleteImage($imageId)
+    private function uploadBase64Image($base64Data, $directory)
     {
         try {
-            $image = \App\Models\TicketImage::findOrFail($imageId);
-            
-            // Check if user has permission to delete this image
-            if (Auth::id() !== $image->uploaded_by && !Auth::user()->hasRole('admin')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized to delete this image',
-                    'error_code' => 'UNAUTHORIZED'
-                ], 403);
+            // Match base64 with data URI scheme
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
+                $image = substr($base64Data, strpos($base64Data, ',') + 1);
+                $imageDecoded = base64_decode($image);
+                $extension = strtolower($type[1]); // jpg, png, etc.
+
+                // Validate file extension
+                if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                    return false;
+                }
+
+                $filename = uniqid($directory . '_', true) . '.' . $extension;
+                $directoryPath = storage_path("app/public/{$directory}");
+                
+                // Create directory if it doesn't exist
+                if (!file_exists($directoryPath)) {
+                    mkdir($directoryPath, 0755, true);
+                }
+                
+                $filePath = $directoryPath . '/' . $filename;
+                file_put_contents($filePath, $imageDecoded);
+
+                return [
+                    'path' => $directory . '/' . $filename,
+                    'filename' => $filename,
+                    'mime_type' => 'image/' . $extension,
+                    'file_size' => strlen($imageDecoded),
+                ];
             }
-
-            // Delete file from storage
-            if (Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
-            }
-
-            // Delete database record
-            $image->delete();
-
-            Log::info('API: Image deleted successfully', [
-                'image_id' => $imageId,
-                'deleted_by' => Auth::user()->name ?? 'Unknown',
-                'user_id' => Auth::id()
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Image deleted successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('API: Failed to delete image', [
-                'error' => $e->getMessage(),
-                'image_id' => $imageId,
-                'user_id' => Auth::id()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete image: ' . $e->getMessage(),
-                'error_code' => 'DELETE_FAILED'
-            ], 500);
+            return false;
+        } catch (Exception $e) {
+            return false;
         }
     }
 }

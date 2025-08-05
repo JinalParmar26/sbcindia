@@ -5,32 +5,43 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class UserLocation extends Model
 {
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = Str::uuid();
+            }
+        });
+    }
+
     protected $fillable = [
+        'uuid',
         'user_id',
         'latitude',
         'longitude',
         'address',
-        'accuracy',
-        'altitude',
-        'speed',
-        'provider',
-        'location_timestamp',
-        'additional_data'
+        'city',
+        'state',
+        'country',
+        'postal_code',
+        'location_type',
+        'status',
+        'notes',
+        'recorded_at'
     ];
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
-        'accuracy' => 'decimal:2',
-        'altitude' => 'decimal:2',
-        'speed' => 'decimal:2',
-        'location_timestamp' => 'datetime',
-        'additional_data' => 'array'
+        'recorded_at' => 'datetime'
     ];
 
     /**
@@ -46,7 +57,7 @@ class UserLocation extends Model
      */
     public function scopeForDate($query, $date)
     {
-        return $query->whereDate('location_timestamp', $date);
+        return $query->whereDate('recorded_at', $date);
     }
 
     /**

@@ -19,7 +19,7 @@ class Leads extends Component
     public $perPage = 10;
 
     protected $paginationTheme = 'bootstrap';
-    protected $queryString = ['search', 'statusFilter', 'leadOwnerFilter', 'visitStatusFilter'];
+    // Removed queryString to keep clean URLs
 
     public function updatingSearch()
     {

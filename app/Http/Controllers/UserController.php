@@ -136,7 +136,6 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -177,6 +176,9 @@ class UserController extends Controller
 
         $user->syncRoles($request->input('role'));
         $user->update($validated);
+        
+        // Refresh user from database to ensure uuid is available
+        $user->refresh();
 
         return redirect()->route('users.show', $user->uuid)->with('success', 'User updated successfully.');
     }
