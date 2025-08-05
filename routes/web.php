@@ -72,14 +72,6 @@ Route::middleware('auth')->group(function () {
     
     // Routes that require admin panel access
     Route::middleware('permission:access_admin_panel')->group(function () {
-        Route::get('/test-admin-access', function() {
-            return 'You have admin panel access!';
-        })->name('test.admin.access');
-        
-        Route::get('/permission-dashboard', function() {
-            return view('permission-dashboard');
-        })->name('permission.dashboard');
-        
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
         Route::get('/bootstrap-tables', BootstrapTables::class)->name('bootstrap-tables');
         Route::get('/buttons', Buttons::class)->name('buttons');
