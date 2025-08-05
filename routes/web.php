@@ -39,6 +39,7 @@ use App\Http\Livewire\StaffAttendanceActions;
 use App\Http\Livewire\StaffLocations;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\TicketController;
 
@@ -144,17 +145,17 @@ Route::middleware('auth')->group(function () {
         // IMPORTANT: Specific routes MUST come before parameterized routes
         
         Route::middleware('permission:create_orders')->group(function () {
-            Route::get('/orders/create', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
-            Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+            Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+            Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
         });
         
         Route::middleware('permission:view_orders')->group(function () {
             Route::get('/orders', Orders::class)->name('orders');
-            Route::get('/orders/export/csv', [App\Http\Controllers\OrderController::class, 'exportCsv'])->name('orders.export.csv');
-            Route::get('/orders/export/pdf', [App\Http\Controllers\OrderController::class, 'exportPdf'])->name('orders.export.pdf');
+            Route::get('/orders/export/csv', [OrderController::class, 'exportCsv'])->name('orders.export.csv');
+            Route::get('/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('orders.export.pdf');
             // Parameterized routes MUST come after specific routes
             Route::get('/orders/{uuid}', Orders::class)->name('orders.show');
-            Route::get('/orders/{id}/pdf', [App\Http\Controllers\OrderController::class, 'exportSinglePdf'])->name('orders.single.pdf');
+            Route::get('/orders/{id}/pdf', [OrderController::class, 'exportSinglePdf'])->name('orders.single.pdf');
         });
         
         Route::middleware('permission:edit_orders')->group(function () {
