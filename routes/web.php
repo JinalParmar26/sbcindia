@@ -81,9 +81,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/typography', Typography::class)->name('typography');
         
         // User Management Routes - Permission Based
+        // IMPORTANT: Specific routes MUST come before parameterized routes
+        
+        Route::middleware('permission:create_users')->group(function () {
+            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+            Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        });
+        
         Route::middleware('permission:view_users')->group(function () {
             Route::get('/users', Users::class)->name('users');
-            Route::get('/users/{uuid}', [UserController::class, 'show'])->name('users.show');
             Route::get('/users/export/csv', function() {
                 $usersComponent = new App\Http\Livewire\Users();
                 return $usersComponent->exportCsv();
@@ -92,18 +98,18 @@ Route::middleware('auth')->group(function () {
                 $usersComponent = new App\Http\Livewire\Users();
                 return $usersComponent->exportPdf();
             })->name('users.export.pdf');
-            Route::get('/users/{uuid}/pdf', [UserController::class, 'exportSinglePdf'])->name('users.single.pdf');
-            Route::get('/users/{uuid}/download-qr', [UserController::class, 'downloadQr'])->name('download-qr');
-        });
-        
-        Route::middleware('permission:create_users')->group(function () {
-            Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-            Route::post('/users', [UserController::class, 'store'])->name('users.store');
         });
         
         Route::middleware('permission:edit_users')->group(function () {
             Route::get('/users/{uuid}/edit', [UserController::class, 'edit'])->name('users.edit');
             Route::put('/users/{uuid}', [UserController::class, 'update'])->name('users.update');
+        });
+        
+        Route::middleware('permission:view_users')->group(function () {
+            // Parameterized routes MUST come after specific routes
+            Route::get('/users/{uuid}', [UserController::class, 'show'])->name('users.show');
+            Route::get('/users/{uuid}/pdf', [UserController::class, 'exportSinglePdf'])->name('users.single.pdf');
+            Route::get('/users/{uuid}/download-qr', [UserController::class, 'downloadQr'])->name('download-qr');
         });
         
         // Customer Management Routes - Permission Based
