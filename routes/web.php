@@ -183,18 +183,21 @@ Route::middleware('auth')->group(function () {
         });
         
         // Lead Management Routes - Permission Based
-        Route::middleware('permission:view_leads|view_marketing')->group(function () {
-            Route::get('/leads', Leads::class)->name('leads');
-            Route::get('/leads/{id}', Leads::class)->name('leads.show');
-            Route::get('/leads/export/csv', function() {
-                $leadsComponent = new App\Http\Livewire\Leads();
-                return $leadsComponent->exportCsv();
-            })->name('leads.export.csv');
-        });
+        // IMPORTANT: Specific routes MUST come before parameterized routes
         
         Route::middleware('permission:create_leads|create_marketing')->group(function () {
             Route::get('/leads/create', [LeadController::class, 'create'])->name('leads.create');
             Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
+        });
+        
+        Route::middleware('permission:view_leads|view_marketing')->group(function () {
+            Route::get('/leads', Leads::class)->name('leads');
+            Route::get('/leads/export/csv', function() {
+                $leadsComponent = new App\Http\Livewire\Leads();
+                return $leadsComponent->exportCsv();
+            })->name('leads.export.csv');
+            // Parameterized routes MUST come after specific routes
+            Route::get('/leads/{id}', Leads::class)->name('leads.show');
         });
         
         Route::middleware('permission:edit_leads|edit_marketing')->group(function () {
