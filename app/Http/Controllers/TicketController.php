@@ -12,22 +12,16 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Services\PdfExportService;
 use App\Services\NotificationService;
-use App\Services\ImageOptimizationService;
 
 class TicketController extends Controller
 {
     protected $pdfExportService;
     protected $notificationService;
-    protected $imageOptimizationService;
 
-    public function __construct(
-        PdfExportService $pdfExportService, 
-        NotificationService $notificationService,
-        ImageOptimizationService $imageOptimizationService
-    ) {
+    public function __construct(PdfExportService $pdfExportService, NotificationService $notificationService)
+    {
         $this->pdfExportService = $pdfExportService;
         $this->notificationService = $notificationService;
-        $this->imageOptimizationService = $imageOptimizationService;
     }
 
     public function index()
@@ -40,11 +34,18 @@ class TicketController extends Controller
         try {
             $customers = Customer::all();
             $products = OrderProduct::with('order', 'product')->get();
-            $staff = User::all(); // Temporary fix - get all users instead of role filtering
+            $staff = User::all(); // Get all users for now, fix role later
+
+            \Log::info('TicketController@create - Data loaded successfully', [
+                'customers_count' => $customers->count(),
+                'products_count' => $products->count(),
+                'staff_count' => $staff->count()
+            ]);
+
             return view('tickets.create', compact('customers', 'products', 'staff'));
         } catch (\Exception $e) {
-            \Log::error('Ticket create error: ' . $e->getMessage());
-            return response('Error loading ticket create page: ' . $e->getMessage(), 500);
+            \Log::error('Error in TicketController@create: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Unable to load the create ticket page. Please try again.');
         }
     }
 
@@ -291,7 +292,7 @@ class TicketController extends Controller
     }
 
     /**
-     * Upload images for a ticket with optimization
+     * Upload images for a ticket
      */
     public function uploadTicketImages(Request $request)
     {
@@ -299,117 +300,82 @@ class TicketController extends Controller
             'ticket_uuid' => 'required|string|exists:tickets,uuid',
             'images' => 'required|array|min:1|max:10',
             'images.*' => 'required|string', // Base64 encoded images
+            'descriptions' => 'nullable|array',
+            'descriptions.*' => 'nullable|string|max:500'
         ]);
 
         try {
             $ticket = Ticket::where('uuid', $request->ticket_uuid)->firstOrFail();
             $uploadedImages = [];
             $failedUploads = [];
-            $optimizationStats = [];
 
             foreach ($request->images as $index => $imageData) {
                 try {
-                    // Optimize the image
-                    $optimizationResult = $this->imageOptimizationService->optimizeImage(
-                        $imageData,
-                        1200, // Max width
-                        800,  // Max height
-                        80    // Quality (0-100)
-                    );
-
-                    if (!$optimizationResult['success']) {
-                        $failedUploads[] = "Image " . ($index + 1) . ": " . $optimizationResult['error'];
+                    // Decode base64 image
+                    if (!preg_match('/^data:image\/(\w+);base64,/', $imageData, $matches)) {
+                        $failedUploads[] = "Image " . ($index + 1) . ": Invalid base64 format";
                         continue;
                     }
 
-                    // Store the optimized image
-                    $storageResult = $this->imageOptimizationService->storeOptimizedImage(
-                        $optimizationResult['image_data'],
-                        $ticket->uuid,
-                        $index,
-                        $optimizationResult['original_format']
-                    );
+                    $imageType = $matches[1];
+                    $imageData = substr($imageData, strpos($imageData, ',') + 1);
+                    $imageData = base64_decode($imageData);
 
-                    if (!$storageResult['success']) {
-                        $failedUploads[] = "Image " . ($index + 1) . ": " . $storageResult['error'];
+                    if (!$imageData) {
+                        $failedUploads[] = "Image " . ($index + 1) . ": Failed to decode base64";
                         continue;
                     }
+
+                    // Generate unique filename
+                    $filename = 'ticket_' . $ticket->uuid . '_' . time() . '_' . $index . '.' . $imageType;
+                    $filePath = 'ticket_images/' . $filename;
+
+                    // Store image
+                    Storage::disk('public')->put($filePath, $imageData);
 
                     // Create database record
                     $ticketImage = $ticket->ticketImages()->create([
-                        'image_path' => $storageResult['file_path'],
-                        'original_format' => $optimizationResult['original_format'],
-                        'optimized_format' => 'webp',
-                        'original_size' => $optimizationResult['original_size'],
-                        'optimized_size' => $optimizationResult['optimized_size'],
-                        'compression_ratio' => $optimizationResult['compression_ratio'],
+                        'image_path' => $filePath,
+                        'description' => $request->descriptions[$index] ?? null,
                         'uploaded_by' => auth()->id(),
                     ]);
 
-                    $uploadedImages[] = [
-                        'id' => $ticketImage->id,
-                        'image_url' => asset('storage/' . $storageResult['file_path']),
-                        'original_format' => $optimizationResult['original_format'],
-                        'optimized_format' => 'webp',
-                        'original_size_formatted' => $this->imageOptimizationService->formatFileSize($optimizationResult['original_size']),
-                        'optimized_size_formatted' => $this->imageOptimizationService->formatFileSize($optimizationResult['optimized_size']),
-                        'compression_ratio' => $optimizationResult['compression_ratio'] . '%',
-                        'dimensions' => $optimizationResult['optimized_dimensions']
-                    ];
-
-                    // Collect optimization stats
-                    $optimizationStats[] = [
-                        'original_size' => $optimizationResult['original_size'],
-                        'optimized_size' => $optimizationResult['optimized_size'],
-                        'compression_ratio' => $optimizationResult['compression_ratio']
-                    ];
+                    $uploadedImages[] = $ticketImage;
 
                 } catch (\Exception $e) {
                     $failedUploads[] = "Image " . ($index + 1) . ": " . $e->getMessage();
                 }
             }
 
-            // Calculate total optimization stats
-            $totalOriginalSize = array_sum(array_column($optimizationStats, 'original_size'));
-            $totalOptimizedSize = array_sum(array_column($optimizationStats, 'optimized_size'));
-            $overallCompressionRatio = $totalOriginalSize > 0 ? 
-                round((($totalOriginalSize - $totalOptimizedSize) / $totalOriginalSize) * 100, 2) : 0;
-
             $response = [
                 'success' => true,
-                'message' => 'Images processed and optimized successfully',
+                'message' => 'Images processed successfully',
                 'total_uploaded' => count($uploadedImages),
                 'total_failed' => count($failedUploads),
                 'uploaded_images' => $uploadedImages,
-                'optimization_summary' => [
-                    'total_original_size' => $this->imageOptimizationService->formatFileSize($totalOriginalSize),
-                    'total_optimized_size' => $this->imageOptimizationService->formatFileSize($totalOptimizedSize),
-                    'total_space_saved' => $this->imageOptimizationService->formatFileSize($totalOriginalSize - $totalOptimizedSize),
-                    'overall_compression_ratio' => $overallCompressionRatio . '%'
-                ]
             ];
 
             if (!empty($failedUploads)) {
                 $response['failed_uploads'] = $failedUploads;
             }
 
-            // Log successful uploads with optimization details
+            // Send notification if any images were uploaded successfully
             if (count($uploadedImages) > 0) {
-                Log::info('Optimized ticket images uploaded successfully', [
-                    'ticket_uuid' => $ticket->uuid,
-                    'uploaded_by' => auth()->user()->name ?? 'Unknown',
-                    'image_count' => count($uploadedImages),
-                    'total_original_size' => $this->imageOptimizationService->formatFileSize($totalOriginalSize),
-                    'total_optimized_size' => $this->imageOptimizationService->formatFileSize($totalOptimizedSize),
-                    'space_saved' => $this->imageOptimizationService->formatFileSize($totalOriginalSize - $totalOptimizedSize),
-                    'compression_ratio' => $overallCompressionRatio . '%'
-                ]);
+                try {
+                    // Log the image upload for future reference
+                    Log::info('Ticket images uploaded successfully', [
+                        'ticket_uuid' => $ticket->uuid,
+                        'uploaded_by' => auth()->user()->name,
+                        'image_count' => count($uploadedImages)
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to log ticket image upload: ' . $e->getMessage());
+                }
             }
 
             return response()->json($response);
 
         } catch (\Exception $e) {
-            Log::error('Image upload failed: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Upload failed: ' . $e->getMessage()
@@ -431,11 +397,7 @@ class TicketController extends Controller
                 return [
                     'id' => $image->id,
                     'image_url' => $image->image_url,
-                    'original_format' => $image->original_format ?? 'unknown',
-                    'optimized_format' => $image->optimized_format ?? 'webp',
-                    'original_size_formatted' => $this->imageOptimizationService->formatFileSize($image->original_size ?? 0),
-                    'optimized_size_formatted' => $this->imageOptimizationService->formatFileSize($image->optimized_size ?? 0),
-                    'compression_ratio' => ($image->compression_ratio ?? 0) . '%',
+                    'description' => $image->description,
                     'uploaded_by' => $image->uploadedBy->name ?? 'Unknown',
                     'uploaded_at' => $image->created_at->format('Y-m-d H:i:s'),
                 ];
@@ -451,59 +413,6 @@ class TicketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve images: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Delete a ticket image
-     */
-    public function deleteTicketImage($imageId)
-    {
-        try {
-            $image = \App\Models\TicketImage::findOrFail($imageId);
-            
-            // Check if user has permission to delete this image
-            // Only allow the uploader or admin users to delete images
-            if (auth()->id() !== $image->uploaded_by) {
-                // You can add additional admin check here if you have role system
-                // For now, we'll allow only the uploader to delete their own images
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized to delete this image'
-                ], 403);
-            }
-
-            // Delete file from storage
-            if (Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
-            }
-
-            // Delete database record
-            $image->delete();
-
-            Log::info('Ticket image deleted successfully', [
-                'image_id' => $imageId,
-                'ticket_id' => $image->ticket_id,
-                'deleted_by' => auth()->user()->name ?? 'Unknown',
-                'user_id' => auth()->id()
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Image deleted successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Failed to delete ticket image', [
-                'error' => $e->getMessage(),
-                'image_id' => $imageId,
-                'user_id' => auth()->id()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete image: ' . $e->getMessage()
             ], 500);
         }
     }

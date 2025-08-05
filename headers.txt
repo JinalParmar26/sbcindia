@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Host: 127.0.0.1:8000
+Connection: close
+X-Powered-By: PHP/8.4.10
+Content-Type: text/html; charset=UTF-8
+Cache-Control: max-age=0, must-revalidate, no-cache, no-store, private
+Date: Tue, 05 Aug 2025 22:21:54 GMT
+Pragma: no-cache
+Expires: Fri, 01 Jan 1990 00:00:00 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: X-Requested-With, Content-Type, X-Token-Auth, Authorization
+Access-Control-Allow-Credentials: true
+Set-Cookie: XSRF-TOKEN=eyJpdiI6IlFtcnEvWDdjMU1ZV21ETi93cEthUVE9PSIsInZhbHVlIjoiZHRqNnRUckI3Yzgvd1VUOVh4K1ZUeCtkNGh5RjRpckZWUm9RUC9YNGVEdms4MUdOWkp5TE5OWXptSTVzYVkvY05RVlEyVWpoK1JuTXlWeFJ5cjlUOWl1RHdlai9RTHdFMjhWRFNvTjZ6U3pHQkxDdUhkMlA3aVY5WC9wMnlPcnciLCJtYWMiOiJmNjQ4NmRlYjg0OGU4ZWRhNzNmOGY1MTQ3NDZkNmFiYTcxOTJkNjA2ODgzNDk4ZGEzODIxMzEwN2RkMTgyNGZlIiwidGFnIjoiIn0%3D; expires=Wed, 06 Aug 2025 00:21:54 GMT; Max-Age=7200; path=/; samesite=lax
+Set-Cookie: laravel_session=eyJpdiI6IndkaUt2cXlMQUFMODR0c210OUZ1Ync9PSIsInZhbHVlIjoiZEhYMXVReWlzdHhwWit6a2F4NTNKdW4xVGFKMFJIdlExQWN5amQrWjI3NVFVYldFVjVJM3E0ckZ4TnhGbEl6cXNtMG0za2d6TWtmQVV1dWZCMExib3VFZk9raTUvSXAwNS9FaVlEZTNMVE5SMXg2VE8wcmJLZ3NpRWxYY1IxdHUiLCJtYWMiOiJmMzFjOWY2NzRjMzQyZTkzN2VmY2ZkNmQ5ZWE3YjQ4ZmM0NmNlMTBlNTYzZmI0NmNhNGQxZDlmMTMzMmYwNmVjIiwidGFnIjoiIn0%3D; expires=Wed, 06 Aug 2025 00:21:54 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+
