@@ -40,6 +40,7 @@ use App\Http\Livewire\StaffLocations;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,21 +163,16 @@ Route::middleware('auth')->group(function () {
         });
         
         // Ticket Management Routes - Permission Based
+        // IMPORTANT: Specific routes MUST come before parameterized routes
         Route::middleware('permission:view_tickets')->group(function () {
             Route::get('/tickets', Tickets::class)->name('tickets');
+            Route::get('/tickets/export', [TicketController::class, 'exportCsv'])->name('tickets.export');
+            Route::get('/tickets/export/pdf', [TicketController::class, 'exportPdf'])->name('tickets.export.pdf');
             Route::get('/tickets/{id}', Tickets::class)->name('tickets.show');
-            Route::get('/tickets/export', function() {
-                $ticketsComponent = new App\Http\Livewire\Tickets();
-                return $ticketsComponent->exportCsv();
-            })->name('tickets.export');
-            Route::get('/tickets/export/pdf', function() {
-                $ticketsComponent = new App\Http\Livewire\Tickets();
-                return $ticketsComponent->exportPdf();
-            })->name('tickets.export.pdf');
         });
         
         Route::middleware('permission:create_tickets')->group(function () {
-            Route::get('/tickets/create', Tickets::class)->name('tickets.create');
+            Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
         });
         
         Route::middleware('permission:edit_tickets')->group(function () {
