@@ -21,6 +21,20 @@
             <p class="mb-0">Your support ticket management dashboard.</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button id="exportTicketsBtn" class="btn btn-sm btn-outline-gray-600 d-inline-flex align-items-center">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export CSV
+                </button>
+                <button id="exportTicketsPdfBtn" class="btn btn-sm btn-outline-gray-600 d-inline-flex align-items-center">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Download PDF
+                </button>
+            </div>
             <a href="{{ route('tickets.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                      xmlns="http://www.w3.org/2000/svg">
@@ -230,5 +244,82 @@
     window.addEventListener('hide-delete-modal', event => {
         var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteTicketModal'));
         deleteModal.hide();
+    });
+
+    // Export functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('exportTicketsBtn').addEventListener('click', function() {
+            // Build query parameters from current filters
+            const params = new URLSearchParams();
+            
+            // Get filter values from the Livewire component
+            const searchInput = document.querySelector('input[wire\\:model\\.debounce\\.300ms="search"]');
+            const customerSelect = document.querySelector('select[wire\\:model="customerFilter"]');
+            const staffSelect = document.querySelector('select[wire\\:model="assignedStaffFilter"]');
+            const yearSelect = document.querySelector('select[wire\\:model="yearFilter"]');
+            const monthSelect = document.querySelector('select[wire\\:model="monthFilter"]');
+            
+            if (searchInput && searchInput.value) {
+                params.append('search', searchInput.value);
+            }
+            if (customerSelect && customerSelect.value && customerSelect.value !== 'all') {
+                params.append('customerFilter', customerSelect.value);
+            }
+            if (staffSelect && staffSelect.value && staffSelect.value !== 'all') {
+                params.append('assignedStaffFilter', staffSelect.value);
+            }
+            if (yearSelect && yearSelect.value && yearSelect.value !== 'all') {
+                params.append('yearFilter', yearSelect.value);
+            }
+            if (monthSelect && monthSelect.value && monthSelect.value !== 'all') {
+                params.append('monthFilter', monthSelect.value);
+            }
+            
+            // Create download URL
+            const exportUrl = '{{ route("tickets.export") }}' + (params.toString() ? '?' + params.toString() : '');
+            
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = exportUrl;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // PDF Export functionality
+        document.getElementById('exportTicketsPdfBtn').addEventListener('click', function() {
+            // Build query parameters from current filters
+            const params = new URLSearchParams();
+            
+            // Get filter values from the Livewire component
+            const searchInput = document.querySelector('input[wire\\:model\\.debounce\\.300ms="search"]');
+            const customerSelect = document.querySelector('select[wire\\:model="customerFilter"]');
+            const staffSelect = document.querySelector('select[wire\\:model="assignedStaffFilter"]');
+            const yearSelect = document.querySelector('select[wire\\:model="yearFilter"]');
+            const monthSelect = document.querySelector('select[wire\\:model="monthFilter"]');
+            
+            if (searchInput && searchInput.value) {
+                params.append('search', searchInput.value);
+            }
+            if (customerSelect && customerSelect.value && customerSelect.value !== 'all') {
+                params.append('customerFilter', customerSelect.value);
+            }
+            if (staffSelect && staffSelect.value && staffSelect.value !== 'all') {
+                params.append('assignedStaffFilter', staffSelect.value);
+            }
+            if (yearSelect && yearSelect.value && yearSelect.value !== 'all') {
+                params.append('yearFilter', yearSelect.value);
+            }
+            if (monthSelect && monthSelect.value && monthSelect.value !== 'all') {
+                params.append('monthFilter', monthSelect.value);
+            }
+            
+            // Create download URL
+            const exportUrl = '{{ route("tickets.export.pdf") }}' + (params.toString() ? '?' + params.toString() : '');
+            
+            // Open PDF in new window
+            window.open(exportUrl, '_blank');
+        });
     });
 </script>

@@ -21,6 +21,11 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(OrderImage::class)->orderBy('sort_order');
+    }
+
     protected static function boot()
     {
         parent::boot();

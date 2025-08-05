@@ -7,9 +7,17 @@ use App\Models\ProductSpecCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PdfExportService;
 
 class ProductController extends Controller
 {
+    protected $pdfExportService;
+
+    public function __construct(PdfExportService $pdfExportService)
+    {
+        $this->pdfExportService = $pdfExportService;
+    }
+
     public function create()
     {
         return view('products.create');
@@ -93,15 +101,26 @@ class ProductController extends Controller
     // app/Http/Controllers/ProductController.php
     public function getSpecs($id)
     {
-        $product = Product::with(['specs.category'])->findOrFail($id);
+        $product = Product::with([
+                        'specs' => function ($query) {
+                            $query->orderBy('id', 'asc');
+                        },
+                        'specs.category'
+                    ])->findOrFail($id);
 
-        $data = $product->specs->map(function ($spec) {
+        $data = $product->specs->mapWithKeys(function ($spec) {
+            $category = $spec->category;
+            $slug = \Str::slug($category->category, '_'); // ← generates slug like "cooling_method"
             return [
-                'key' => $spec->category->id,
-                'value' => $spec->category->category
+                $category->id => [
+                    'key' => $category->id,
+                    'key_slug' => $slug,
+                    'value' => $category->category,
+                    'dynamic' => $category->is_dynamic
+                ]
             ];
-        });
-
+        })->toArray();
+        ksort($data);
         return response()->json($data);
     }
 
@@ -111,5 +130,41 @@ class ProductController extends Controller
         return response()->json($category->options);
     }
 
+    /**
+     * Export products to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = Product::with(['createdBy']);
+
+        // Apply filters
+        $filters = [];
+        
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('model_number', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            $filters['search'] = $request->search;
+        }
+
+        if ($request->filled('status_filter') && $request->status_filter != 'all') {
+            $query->where('status', $request->status_filter);
+            $filters['status_filter'] = $request->status_filter;
+        }
+
+        $products = $query->get();
+
+        return $this->pdfExportService->generateProductsPdf($products, $filters);
+    }
+
+    /**
+     * Export a single product to PDF.
+     */
+    public function exportSinglePdf($uuid)
+    {
+        $product = Product::where('uuid', $uuid)->with(['orders', 'tickets'])->firstOrFail();
+        
+        return $this->pdfExportService->generateSingleProductPdf($product);
+    }
 
 }

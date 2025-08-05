@@ -10,6 +10,7 @@
     <link rel="mask-icon" href="https://sbccindia.com/assets/img/favicon.webp" color="#563d7c">
     <link rel="icon" href="https://sbccindia.com/assets/img/favicon.webp">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Apex Charts -->
     <link type="text/css" href="/vendor/apexcharts/apexcharts.css" rel="stylesheet">
@@ -32,8 +33,6 @@
     <link type="text/css" href="/css/volt.css" rel="stylesheet">
 
     @livewireStyles
-
-    @livewireScripts
 
     <!-- Core -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
@@ -109,6 +108,8 @@
     @endif
 
     {{ $slot }}
+
+    @livewireScripts
 
 </body>
 

@@ -8,10 +8,18 @@ use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
+use App\Services\PdfExportService;
 
 
 class UserController extends Controller
 {
+    protected $pdfExportService;
+
+    public function __construct(PdfExportService $pdfExportService)
+    {
+        $this->pdfExportService = $pdfExportService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -96,7 +104,7 @@ class UserController extends Controller
         $user->working_days = $user->working_days ? explode(',', $user->working_days) : [];
 
          // Generate QR code with text "Hello, Laravel 11!"
-        $qrCode = QrCode::size(150)->generate(route('showPublicProfile', $user->uuid));
+        $qrCode = QrCode::size(150)->generate(route('staff.visiting-card', $user->uuid));
 
         return view('users.show', compact('user', 'days', 'roles','qrCode'));
     }
@@ -280,7 +288,7 @@ class UserController extends Controller
 
     public function downloadQr($uuid)
     {
-        $qrCode = QrCode::format('png')->size(150)->generate(route('showPublicProfile', $uuid));
+        $qrCode = QrCode::format('png')->size(150)->generate(route('staff.visiting-card', $uuid));
         return response($qrCode)->header('Content-Type', 'image/png')
             ->header('Content-Disposition', 'attachment;');
     }
@@ -288,9 +296,206 @@ class UserController extends Controller
 
     public function showQr($uuid)
     {
-        $qrCode = QrCode::format('png')->size(150)->generate(route('showPublicProfile', $uuid));
+        $qrCode = QrCode::format('png')->size(150)->generate(route('staff.visiting-card', $uuid));
         return response($qrCode)->header('Content-Type', 'image/png');
     }
 
+    public function exportCsv(Request $request)
+    {
+        // Get filters from request
+        $search = $request->get('search', '');
+        $statusFilter = $request->get('status_filter', 'all');
+        $roleFilter = $request->get('role_filter', 'all');
 
+        // Build query with same logic as Livewire component
+        $query = User::query()->with('roles');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($statusFilter !== 'all') {
+            $query->where(function ($q) use ($statusFilter) {
+                if ($statusFilter === 'active') {
+                    $q->where('isActive', 1);
+                } else {
+                    $q->where('isActive', 0);
+                }
+            });
+        }
+
+        if ($roleFilter !== 'all') {
+            $query->whereHas('roles', function ($q) use ($roleFilter) {
+                $q->where('name', $roleFilter);
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->get();
+
+        // Create CSV content
+        $csvContent = $this->generateUsersCsvContent($users, $request->all());
+
+        // Create filename
+        $filename = 'users_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        // Return CSV response
+        return response($csvContent)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Cache-Control', 'no-cache, must-revalidate');
+    }
+
+    private function generateUsersCsvContent($users, $filters)
+    {
+        $csv = [];
+        
+        // Add header with filters info
+        $filterText = 'Users Export - Generated on: ' . now()->format('F d, Y \a\t H:i');
+        $csv[] = [$filterText];
+        
+        $appliedFilters = [];
+        if (!empty($filters['search'])) {
+            $appliedFilters[] = "Search: " . $filters['search'];
+        }
+        if (!empty($filters['status_filter']) && $filters['status_filter'] !== 'all') {
+            $appliedFilters[] = "Status: " . ucfirst($filters['status_filter']);
+        }
+        if (!empty($filters['role_filter']) && $filters['role_filter'] !== 'all') {
+            $appliedFilters[] = "Role: " . $filters['role_filter'];
+        }
+        
+        if (!empty($appliedFilters)) {
+            $csv[] = ['Applied Filters: ' . implode(' | ', $appliedFilters)];
+        }
+        
+        $csv[] = []; // Empty row
+        
+        // Add table headers
+        $csv[] = ['Name', 'Email', 'Status', 'Roles', 'Date Created'];
+        
+        // Add data rows
+        foreach ($users as $user) {
+            $status = $user->isActive ? 'Active' : 'Inactive';
+            $roles = $user->roles->pluck('name')->implode(', ') ?: 'No Role';
+            
+            $csv[] = [
+                $user->name,
+                $user->email,
+                $status,
+                $roles,
+                $user->created_at->format('M d, Y')
+            ];
+        }
+        
+        $csv[] = []; // Empty row
+        $csv[] = ['Total Users: ' . $users->count()];
+        
+        // Convert to CSV string
+        $output = '';
+        foreach ($csv as $row) {
+            $output .= '"' . implode('","', $row) . '"' . "\n";
+        }
+        
+        return $output;
+    }
+
+    /**
+     * Export users to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = User::query();
+
+        // Apply filters
+        $filters = [];
+        
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            $filters['search'] = $request->search;
+        }
+
+        if ($request->filled('role_filter') && $request->role_filter != 'all') {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('name', $request->role_filter);
+            });
+            $filters['role_filter'] = $request->role_filter;
+        }
+
+        if ($request->filled('status_filter') && $request->status_filter != 'all') {
+            if ($request->status_filter == 'active') {
+                $query->whereNotNull('email_verified_at');
+            } else {
+                $query->whereNull('email_verified_at');
+            }
+            $filters['status_filter'] = $request->status_filter;
+        }
+
+        $users = $query->get();
+
+        return $this->pdfExportService->generateUsersPdf($users, $filters);
+    }
+
+    /**
+     * Export a single user to PDF.
+     */
+    public function exportSinglePdf($uuid)
+    {
+        $user = User::where('uuid', $uuid)->with(['roles', 'overtimeLogs', 'assignedTickets', 'orders'])->firstOrFail();
+        
+        return $this->pdfExportService->generateSingleUserPdf($user);
+    }
+
+    /**
+     * Show staff visiting card management
+     */
+    public function manageVisitingCards()
+    {
+        $staff = User::where('isActive', true)->get();
+        return view('users.visiting-cards', compact('staff'));
+    }
+
+    /**
+     * Generate staff visiting card links
+     */
+    public function generateVisitingCardLinks()
+    {
+        $staff = User::where('isActive', true)->get();
+        $links = [];
+
+        foreach ($staff as $member) {
+            $links[] = [
+                'name' => $member->name,
+                'email' => $member->email,
+                'role' => $member->role ?? 'Staff',
+                'card_url' => route('staff.visiting-card', $member->uuid),
+                'profile_url' => route('staff.profile', $member->uuid),
+                'uuid' => $member->uuid
+            ];
+        }
+
+        return response()->json($links);
+    }
+
+    /**
+     * Update staff profile for visiting card
+     */
+    public function updateStaffProfile(Request $request, User $user)
+    {
+        $request->validate([
+            'role' => 'required|string|max:255',
+            'department' => 'nullable|string|max:255',
+            'bio' => 'nullable|string|max:500',
+            'linkedin_url' => 'nullable|url',
+            'twitter_url' => 'nullable|url',
+            'public_profile' => 'boolean'
+        ]);
+
+        $user->update($request->all());
+
+        return redirect()->back()->with('success', 'Staff profile updated successfully.');
+    }
 }

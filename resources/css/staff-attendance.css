@@ -1,0 +1,71 @@
+/* Staff Attendance Styles */
+.avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.table-responsive {
+    border-radius: 0.375rem;
+}
+
+.staff-actions {
+    white-space: nowrap;
+}
+
+.status-badge {
+    min-width: 80px;
+    text-align: center;
+}
+
+.time-display {
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.attendance-card {
+    transition: all 0.3s ease;
+}
+
+.attendance-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-btn {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.staff-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.no-activity {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.check-in-time {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.check-out-time {
+    color: #dc3545;
+    font-weight: 600;
+}

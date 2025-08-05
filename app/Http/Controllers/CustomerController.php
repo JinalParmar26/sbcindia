@@ -6,9 +6,17 @@ use App\Models\Customer;
 use App\Models\CustomerContactPerson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Services\PdfExportService;
 
 class CustomerController extends Controller
 {
+    protected $pdfExportService;
+
+    public function __construct(PdfExportService $pdfExportService)
+    {
+        $this->pdfExportService = $pdfExportService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -146,5 +154,121 @@ class CustomerController extends Controller
         $customer->delete();
 
         return redirect()->route('customers')->with('success', 'Customer deleted.');
+    }
+
+    public function exportCsv(Request $request)
+    {
+        // Get filters from request
+        $search = $request->get('search', '');
+
+        // Build query with same logic as Livewire component
+        $query = Customer::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('company_name', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%")
+                    ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $query->orderBy('created_at', 'desc')->get();
+
+        // Create CSV content
+        $csvContent = $this->generateCustomersCsvContent($customers, $request->all());
+
+        // Create filename
+        $filename = 'customers_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        // Return CSV response
+        return response($csvContent)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Cache-Control', 'no-cache, must-revalidate');
+    }
+
+    private function generateCustomersCsvContent($customers, $filters)
+    {
+        $csv = [];
+        
+        // Add header with filters info
+        $filterText = 'Customers Export - Generated on: ' . now()->format('F d, Y \a\t H:i');
+        $csv[] = [$filterText];
+        
+        $appliedFilters = [];
+        if (!empty($filters['search'])) {
+            $appliedFilters[] = "Search: " . $filters['search'];
+        }
+        
+        if (!empty($appliedFilters)) {
+            $csv[] = ['Applied Filters: ' . implode(' | ', $appliedFilters)];
+        }
+        
+        $csv[] = []; // Empty row
+        
+        // Add table headers
+        $csv[] = ['Name', 'Company', 'Email', 'Phone', 'Address', 'Date Created'];
+        
+        // Add data rows
+        foreach ($customers as $customer) {
+            $csv[] = [
+                $customer->name,
+                $customer->company_name,
+                $customer->email,
+                $customer->phone_number,
+                $customer->address,
+                $customer->created_at->format('M d, Y')
+            ];
+        }
+        
+        $csv[] = []; // Empty row
+        $csv[] = ['Total Customers: ' . $customers->count()];
+        
+        // Convert to CSV string
+        $output = '';
+        foreach ($csv as $row) {
+            $output .= '"' . implode('","', $row) . '"' . "\n";
+        }
+        
+        return $output;
+    }
+
+    /**
+     * Export customers to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = Customer::with(['contactPersons']);
+
+        // Apply filters
+        $filters = [];
+        
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('company_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            $filters['search'] = $request->search;
+        }
+
+        if ($request->filled('status_filter') && $request->status_filter != 'all') {
+            $query->where('status', $request->status_filter);
+            $filters['status_filter'] = $request->status_filter;
+        }
+
+        $customers = $query->get();
+
+        return $this->pdfExportService->generateCustomersPdf($customers, $filters);
+    }
+
+    /**
+     * Export a single customer to PDF.
+     */
+    public function exportSinglePdf($uuid)
+    {
+        $customer = Customer::where('uuid', $uuid)->with(['contactPersons', 'orders.products', 'tickets'])->firstOrFail();
+        
+        return $this->pdfExportService->generateSingleCustomerPdf($customer);
     }
 }

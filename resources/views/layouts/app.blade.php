@@ -1,9 +1,9 @@
 <x-layouts.base>
 
 
-    @if(in_array(request()->route()->getName(), ['dashboard', 'customers','products', 'orders','tickets','profile', 'profile-example', 'users', 'bootstrap-tables', 'transactions',
+    @if(in_array(request()->route()->getName(), ['dashboard', 'customers','products', 'orders','leads','tickets','staff','staff.actions','staff.tickets','staff.locations','staff.locations.live','staff.locations.data','staff.locations.show','staff.locations.trail','profile', 'profile-example', 'users', 'roles', 'role-permissions', 'bootstrap-tables', 'transactions',
     'buttons',
-    'forms', 'modals', 'notifications', 'typography', 'upgrade-to-pro']))
+    'forms', 'modals', 'notifications', 'typography', 'upgrade-to-pro', 'location.index', 'location.live.tracking', 'location.live.data', 'location.user.show', 'location.user.trail', 'location.user.data', 'location.user.summary', 'location.user.export', 'location.users.with.data', 'location.cleanup']))
 
     {{-- Nav --}}
     @include('layouts.nav')
@@ -40,7 +40,8 @@
 
         {{-- TopBar --}}
         @include('layouts.topbar')
-        {{ $slot }}
+        @yield('content')
+        {{ $slot ?? '' }}
         {{-- Footer --}}
         @include('layouts.footer')
     </main>
@@ -48,14 +49,14 @@
     @elseif(in_array(request()->route()->getName(), ['register', 'register-example', 'login', 'login-example',
     'forgot-password', 'forgot-password-example', 'reset-password','reset-password-example']))
 
-    {{ $slot }}
+    @yield('content')
     {{-- Footer --}}
     @include('layouts.footer2')
 
 
     @elseif(in_array(request()->route()->getName(), ['404', '500', 'lock']))
 
-    {{ $slot }}
+    @yield('content')
 
     @endif
 </x-layouts.base>
