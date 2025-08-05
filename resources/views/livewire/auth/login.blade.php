@@ -1,5 +1,4 @@
-
-    
+<div>
     <main>
         <title>Volt Laravel Dashboard - Sign In page</title>
         <!-- Section -->
@@ -20,7 +19,7 @@
 <!---->
 <!--                                </p>-->
                             </div>
-                        <form wire:submit.prevent="login" action="#" class="mt-4" method="POST">
+                        <form wire:submit.prevent="login" action="#" class="mt-4">
                             <!-- Form -->
                             <div class="form-group mb-4">
                                 <label for="email">Your Email</label>
@@ -121,3 +120,4 @@
             </div>
         </section>
     </main>
+</div>

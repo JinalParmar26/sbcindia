@@ -55,7 +55,7 @@ class StaffLocations extends Component
         }
 
         if ($this->selectedDate) {
-            $locationsQuery->whereDate('user_locations.location_timestamp', $this->selectedDate);
+            $locationsQuery->whereDate('user_locations.recorded_at', $this->selectedDate);
         }
 
         if ($this->search) {
@@ -65,21 +65,21 @@ class StaffLocations extends Component
                           ->orWhere('user_locations.address', 'like', "%{$searchTerm}%");
         }
 
-        $locations = $locationsQuery->orderBy('user_locations.location_timestamp', 'desc')
+        $locations = $locationsQuery->orderBy('user_locations.recorded_at', 'desc')
             ->paginate($this->perPage);
 
         // Get statistics for the selected date
         $stats = [];
         if ($this->selectedDate) {
             $totalUsers = User::count();
-            $usersWithLocations = UserLocation::whereDate('location_timestamp', $this->selectedDate)
+            $usersWithLocations = UserLocation::whereDate('recorded_at', $this->selectedDate)
                 ->distinct('user_id')
                 ->count('user_id');
             
             $stats = [
                 'total_users' => $totalUsers,
                 'users_with_locations' => $usersWithLocations,
-                'total_locations' => UserLocation::whereDate('location_timestamp', $this->selectedDate)->count(),
+                'total_locations' => UserLocation::whereDate('recorded_at', $this->selectedDate)->count(),
                 'date' => Carbon::parse($this->selectedDate)->format('d M Y')
             ];
         }
@@ -88,15 +88,15 @@ class StaffLocations extends Component
         $mapLocations = [];
         if ($this->selectedUserId && $this->selectedDate) {
             $userLocations = UserLocation::where('user_id', $this->selectedUserId)
-                ->whereDate('location_timestamp', $this->selectedDate)
-                ->orderBy('location_timestamp', 'asc')
+                ->whereDate('recorded_at', $this->selectedDate)
+                ->orderBy('recorded_at', 'asc')
                 ->get();
             
             foreach ($userLocations as $loc) {
                 $mapLocations[] = [
                     'lat' => (float) $loc->latitude,
                     'lng' => (float) $loc->longitude,
-                    'timestamp' => $loc->location_timestamp->format('H:i:s'),
+                    'timestamp' => $loc->recorded_at->format('H:i:s'),
                     'address' => $loc->address,
                     'accuracy' => $loc->accuracy,
                 ];

@@ -1,7 +1,7 @@
 <x-layouts.base>
 
 
-    @if(in_array(request()->route()->getName(), ['dashboard', 'customers','products', 'orders','leads','tickets','staff','staff.actions','staff.tickets','staff.locations','staff.locations.live','staff.locations.data','staff.locations.show','staff.locations.trail','profile', 'profile-example', 'users', 'roles', 'role-permissions', 'bootstrap-tables', 'transactions',
+    @if(in_array(request()->route()->getName(), ['dashboard', 'customers','customers.create','customers.edit','products','products.create','products.edit', 'orders','orders.create','orders.edit','leads','leads.create','leads.edit','tickets','tickets.create','tickets.edit','staff','staff.actions','staff.tickets','staff.locations','staff.locations.live','staff.locations.data','staff.locations.show','staff.locations.trail','profile', 'profile-example', 'users','users.create','users.edit', 'roles', 'roles.index', 'roles.create', 'roles.show', 'roles.edit', 'role-permissions', 'bootstrap-tables', 'transactions',
     'buttons',
     'forms', 'modals', 'notifications', 'typography', 'upgrade-to-pro', 'location.index', 'location.live.tracking', 'location.live.data', 'location.user.show', 'location.user.trail', 'location.user.data', 'location.user.summary', 'location.user.export', 'location.users.with.data', 'location.cleanup']))
 
