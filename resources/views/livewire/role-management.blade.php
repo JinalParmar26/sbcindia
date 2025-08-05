@@ -150,6 +150,23 @@
                         </div>
 
                         <div class="mb-3">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0">Admin Panel Access</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" wire:model="adminPanelAccess" id="adminPanelAccess">
+                                        <label class="form-check-label" for="adminPanelAccess">
+                                            <strong>Allow access to admin panel</strong>
+                                            <small class="d-block text-muted">Users with this role will be able to access the admin panel if this is checked.</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Permissions</label>
                             @if(!empty($permissionGroups))
                                 @foreach($permissionGroups as $module => $permissions)
@@ -213,6 +230,23 @@
                             <label for="edit_description" class="form-label">Description</label>
                             <textarea wire:model="description" class="form-control @error('description') is-invalid @enderror" id="edit_description" rows="3"></textarea>
                             @error('description') <span class="invalid-feedback">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0">Admin Panel Access</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" wire:model="adminPanelAccess" id="editAdminPanelAccess">
+                                        <label class="form-check-label" for="editAdminPanelAccess">
+                                            <strong>Allow access to admin panel</strong>
+                                            <small class="d-block text-muted">Users with this role will be able to access the admin panel if this is checked.</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
