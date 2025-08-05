@@ -449,11 +449,33 @@
                 }
             });
 
+            const url = '{{ route("orders.export.csv") }}' + (params.toString() ? '?' + params.toString() : '');
+            window.open(url, '_blank');
+        }
+
+        // PDF Export function
+        function exportOrdersPdf() {
+            const currentFilters = {
+                search: @this.get('search') || '',
+                customer_filter: @this.get('customerFilter') || 'all',
+                year_filter: @this.get('yearFilter') || 'all',
+                month_filter: @this.get('monthFilter') || 'all'
+            };
+
+            // Build URL with current filters
+            const params = new URLSearchParams();
+            Object.keys(currentFilters).forEach(key => {
+                if (currentFilters[key] && currentFilters[key] !== 'all') {
+                    params.append(key, currentFilters[key]);
+                }
+            });
+
             const url = '{{ route("orders.export.pdf") }}' + (params.toString() ? '?' + params.toString() : '');
             window.open(url, '_blank');
         }
 
-        // Make function globally available
+        // Make functions globally available
         window.exportToCsv = exportToCsv;
+        window.exportOrdersPdf = exportOrdersPdf;
     </script>
 </div>

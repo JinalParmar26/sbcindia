@@ -149,6 +149,7 @@ Route::middleware('auth')->group(function () {
         
         Route::middleware('permission:view_orders')->group(function () {
             Route::get('/orders', Orders::class)->name('orders');
+            Route::get('/orders/export/csv', [App\Http\Controllers\OrderController::class, 'exportCsv'])->name('orders.export.csv');
             Route::get('/orders/export/pdf', [App\Http\Controllers\OrderController::class, 'exportPdf'])->name('orders.export.pdf');
             // Parameterized routes MUST come after specific routes
             Route::get('/orders/{uuid}', Orders::class)->name('orders.show');
@@ -192,10 +193,7 @@ Route::middleware('auth')->group(function () {
         
         Route::middleware('permission:view_leads|view_marketing')->group(function () {
             Route::get('/leads', Leads::class)->name('leads');
-            Route::get('/leads/export/csv', function() {
-                $leadsComponent = new App\Http\Livewire\Leads();
-                return $leadsComponent->exportCsv();
-            })->name('leads.export.csv');
+            Route::get('/leads/export/csv', [LeadController::class, 'exportCsv'])->name('leads.export.csv');
             // Parameterized routes MUST come after specific routes
             Route::get('/leads/{id}', Leads::class)->name('leads.show');
         });

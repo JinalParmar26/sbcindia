@@ -428,6 +428,84 @@ class OrderController extends Controller
     }
 
     /**
+     * Export orders to CSV
+     */
+    public function exportCsv(Request $request)
+    {
+        $query = Order::with(['customer', 'orderProducts.product']);
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('customer', function($q) use ($request) {
+                      $q->where('name', 'like', '%' . $request->search . '%');
+                  });
+        }
+
+        if ($request->filled('customer_filter') && $request->customer_filter != 'all') {
+            $query->where('customer_id', $request->customer_filter);
+        }
+
+        if ($request->filled('year_filter') && $request->year_filter != 'all') {
+            $query->whereYear('created_at', $request->year_filter);
+        }
+
+        if ($request->filled('month_filter') && $request->month_filter != 'all') {
+            $query->whereMonth('created_at', $request->month_filter);
+        }
+
+        $orders = $query->get();
+
+        $filename = 'orders_' . now()->format('Y_m_d_H_i_s') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($orders) {
+            $file = fopen('php://output', 'w');
+
+            // CSV headers
+            fputcsv($file, [
+                'Order ID',
+                'Customer Name',
+                'Title',
+                'Total Amount',
+                'Status',
+                'Payment Method',
+                'Delivery Date',
+                'Products',
+                'Created At',
+                'Updated At',
+            ]);
+
+            // CSV data
+            foreach ($orders as $order) {
+                $products = $order->orderProducts->map(function($orderProduct) {
+                    return $orderProduct->product ? $orderProduct->product->name : 'N/A';
+                })->implode(', ');
+
+                fputcsv($file, [
+                    $order->id,
+                    $order->customer ? $order->customer->name : 'N/A',
+                    $order->title,
+                    $order->total,
+                    $order->status,
+                    $order->payment_method,
+                    $order->delivery_date ? $order->delivery_date->format('Y-m-d') : 'TBD',
+                    $products,
+                    $order->created_at ? $order->created_at->format('Y-m-d H:i:s') : '',
+                    $order->updated_at ? $order->updated_at->format('Y-m-d H:i:s') : '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
      * Handle multiple image uploads for an order
      */
     private function handleImageUploads(Request $request, Order $order)
