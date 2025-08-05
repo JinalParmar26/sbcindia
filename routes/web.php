@@ -110,18 +110,13 @@ Route::middleware('auth')->group(function () {
         Route::middleware('permission:view_customers')->group(function () {
             Route::get('/customers', Customers::class)->name('customers');
             Route::get('/customers/{uuid}', [CustomerController::class, 'show'])->name('customers.show');
-            Route::get('/customers/export/csv', function() {
-                $customersComponent = new App\Http\Livewire\Customers();
-                return $customersComponent->exportCsv();
-            })->name('customers.export.csv');
-            Route::get('/customers/export/pdf', function() {
-                $customersComponent = new App\Http\Livewire\Customers();
-                return $customersComponent->exportPdf();
-            })->name('customers.export.pdf');
+            Route::get('/customers/export/csv', [CustomerController::class, 'exportCsv'])->name('customers.export.csv');
+            Route::get('/customers/export/pdf', [CustomerController::class, 'exportPdf'])->name('customers.export.pdf');
         });
         
         Route::middleware('permission:create_customers')->group(function () {
-            Route::get('/customers/create', Customers::class)->name('customers.create');
+            Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
+            Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
         });
         
         Route::middleware('permission:edit_customers')->group(function () {
