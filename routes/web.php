@@ -168,15 +168,19 @@ Route::middleware('auth')->group(function () {
             Route::get('/tickets', Tickets::class)->name('tickets');
             Route::get('/tickets/export', [TicketController::class, 'exportCsv'])->name('tickets.export');
             Route::get('/tickets/export/pdf', [TicketController::class, 'exportPdf'])->name('tickets.export.pdf');
-            Route::get('/tickets/{id}', Tickets::class)->name('tickets.show');
         });
         
         Route::middleware('permission:create_tickets')->group(function () {
             Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+            Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
         });
         
         Route::middleware('permission:edit_tickets')->group(function () {
             Route::get('/tickets/{id}/edit', Tickets::class)->name('tickets.edit');
+        });
+        
+        Route::middleware('permission:view_tickets')->group(function () {
+            Route::get('/tickets/{id}', Tickets::class)->name('tickets.show');
         });
         
         // Lead Management Routes - Permission Based
