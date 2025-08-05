@@ -37,10 +37,15 @@ class TicketController extends Controller
 
     public function create()
     {
-        $customers = Customer::all();
-        $products = OrderProduct::with('order', 'product')->get();
-        $staff = User::role('staff')->get(); // Assuming roles are used
-        return view('tickets.create', compact('customers', 'products', 'staff'));
+        try {
+            $customers = Customer::all();
+            $products = OrderProduct::with('order', 'product')->get();
+            $staff = User::all(); // Temporary fix - get all users instead of role filtering
+            return view('tickets.create', compact('customers', 'products', 'staff'));
+        } catch (\Exception $e) {
+            \Log::error('Ticket create error: ' . $e->getMessage());
+            return response('Error loading ticket create page: ' . $e->getMessage(), 500);
+        }
     }
 
     public function store(Request $request)
