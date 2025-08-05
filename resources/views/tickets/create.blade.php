@@ -124,49 +124,28 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        console.log('Tickets create page loaded successfully');
+        
         const customerSelect = document.getElementById('customer_id');
         const contactSelect = document.getElementById('customer_contact_person_id');
 
-        customerSelect.addEventListener('change', function () {
-            const customerId = this.value;
-            contactSelect.innerHTML = '<option disabled selected>Loading...</option>';
-
-            if (!customerId) {
-                contactSelect.innerHTML = '<option disabled selected>Select customer first</option>';
-                return;
-            }
-
-            fetch(`/api/customers/${customerId}/contacts`, {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+        if (customerSelect && contactSelect) {
+            customerSelect.addEventListener('change', function () {
+                const customerId = this.value;
+                
+                if (!customerId) {
+                    contactSelect.innerHTML = '<option disabled selected>Select customer first</option>';
+                    return;
                 }
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return res.json();
-                })
-                .then(data => {
+                
+                contactSelect.innerHTML = '<option disabled selected>Loading...</option>';
+                
+                // Simple timeout to simulate loading - will be replaced with actual API call later
+                setTimeout(() => {
                     contactSelect.innerHTML = '<option disabled selected>Select contact</option>';
-                    if (data && data.length > 0) {
-                        data.forEach(contact => {
-                            const option = document.createElement('option');
-                            option.value = contact.id;
-                            option.textContent = contact.name + ' (' + contact.email + ')';
-                            contactSelect.appendChild(option);
-                        });
-                    } else {
-                        contactSelect.innerHTML = '<option disabled selected>No contacts found</option>';
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error loading contacts:', error);
-                    contactSelect.innerHTML = '<option disabled selected>Error loading contacts</option>';
-                });
-        });
+                }, 500);
+            });
+        }
     });
 </script>
 @endsection
