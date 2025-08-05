@@ -27,6 +27,7 @@ class RoleManagement extends Component
     public $name = '';
     public $description = '';
     public $selectedPermissions = [];
+    public $adminPanelAccess = false;
     
     // Permissions grouped by module
     public $permissionGroups = [];
@@ -98,6 +99,11 @@ class RoleManagement extends Component
         $this->name = $role->name;
         $this->description = $role->description ?? '';
         $this->selectedPermissions = $role->permissions->pluck('id')->toArray();
+        
+        // Check if role has admin panel access permission
+        $adminPanelPermission = Permission::where('name', 'access_admin_panel')->first();
+        $this->adminPanelAccess = $adminPanelPermission && $role->hasPermissionTo('access_admin_panel');
+        
         $this->showEditModal = true;
     }
 
@@ -126,6 +132,17 @@ class RoleManagement extends Component
 
         // Sync permissions
         $permissions = Permission::whereIn('id', $this->selectedPermissions)->get();
+        
+        // Handle admin panel access permission
+        $adminPanelPermission = Permission::where('name', 'access_admin_panel')->first();
+        if ($this->adminPanelAccess && $adminPanelPermission) {
+            $permissions = $permissions->merge([$adminPanelPermission]);
+        } elseif (!$this->adminPanelAccess && $adminPanelPermission) {
+            $permissions = $permissions->reject(function($permission) {
+                return $permission->name === 'access_admin_panel';
+            });
+        }
+        
         $role->syncPermissions($permissions);
 
         $this->resetForm();
@@ -163,6 +180,7 @@ class RoleManagement extends Component
         $this->name = '';
         $this->description = '';
         $this->selectedPermissions = [];
+        $this->adminPanelAccess = false;
         $this->resetErrorBag();
     }
 
