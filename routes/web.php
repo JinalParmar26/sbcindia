@@ -140,19 +140,19 @@ Route::middleware('auth')->group(function () {
         });
         
         // Order Management Routes - Permission Based
-        Route::middleware('permission:view_orders')->group(function () {
-            Route::get('/orders', Orders::class)->name('orders');
-            Route::get('/orders/{uuid}', Orders::class)->name('orders.show');
-            Route::get('/orders/{id}/pdf', Orders::class)->name('orders.single.pdf');
-            Route::get('/orders/export/pdf', function() {
-                $ordersComponent = new App\Http\Livewire\Orders();
-                return $ordersComponent->exportPdf();
-            })->name('orders.export.pdf');
-        });
+        // IMPORTANT: Specific routes MUST come before parameterized routes
         
         Route::middleware('permission:create_orders')->group(function () {
-            Route::get('/orders/create', Orders::class)->name('orders.create');
-            Route::post('/orders', Orders::class)->name('orders.store');
+            Route::get('/orders/create', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
+            Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+        });
+        
+        Route::middleware('permission:view_orders')->group(function () {
+            Route::get('/orders', Orders::class)->name('orders');
+            Route::get('/orders/export/pdf', [App\Http\Controllers\OrderController::class, 'exportPdf'])->name('orders.export.pdf');
+            // Parameterized routes MUST come after specific routes
+            Route::get('/orders/{uuid}', Orders::class)->name('orders.show');
+            Route::get('/orders/{id}/pdf', [App\Http\Controllers\OrderController::class, 'exportSinglePdf'])->name('orders.single.pdf');
         });
         
         Route::middleware('permission:edit_orders')->group(function () {
