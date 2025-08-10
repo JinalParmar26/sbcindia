@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'uuid' => Str::uuid(),
             'name' => 'Super Admin',
             'email' => 'admin@sbcerp.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('admin123'),
             'isActive' => true,
             'phone_number' => '1234567890',
             'working_days' => 'Monday to Friday',
