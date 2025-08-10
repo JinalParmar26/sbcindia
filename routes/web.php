@@ -43,6 +43,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\LocationManagementController;
+use App\Http\Controllers\PublicStaffController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +70,10 @@ Route::get('/register-example', RegisterExample::class)->name('register-example'
 Route::get('/forgot-password-example', ForgotPasswordExample::class)->name('forgot-password-example');
 Route::get('/reset-password-example', ResetPasswordExample::class)->name('reset-password-example');
 Route::get('/profile-example', ProfileExample::class)->name('profile-example');
+
+// Public Staff Routes (No Authentication Required)
+Route::get('/staff/visiting-card/{uuid}', [PublicStaffController::class, 'visitingCard'])->name('staff.visiting-card');
+Route::get('/staff/profile/{uuid}', [PublicStaffController::class, 'profile'])->name('staff.profile');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', Profile::class)->name('profile');
@@ -207,8 +212,6 @@ Route::middleware('auth')->group(function () {
         // Staff Management Routes - Permission Based
         Route::middleware('permission:view_staff')->group(function () {
             Route::get('/staff', Staff::class)->name('staff');
-            Route::get('/staff/visiting-card/{uuid?}', Staff::class)->name('staff.visiting-card');
-            Route::get('/staff/profile/{uuid}', Staff::class)->name('staff.profile');
             Route::get('/staff/export/pdf', Staff::class)->name('staff.export.pdf');
             Route::get('/staff-tickets', StaffTickets::class)->name('staff-tickets');
             Route::get('/staff-attendance-actions', StaffAttendanceActions::class)->name('staff-attendance-actions');
