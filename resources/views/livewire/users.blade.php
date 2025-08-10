@@ -21,6 +21,7 @@
             <p class="mb-0">Your web analytics dashboard template.</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
+            @can('create_users')
             <a href="{{ route('users.create') }}" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                      xmlns="http://www.w3.org/2000/svg">
@@ -29,6 +30,8 @@
                 </svg>
                 New User
             </a>
+            @endcan
+            @can('view_users')
             <div class="btn-group ms-2 ms-lg-3">
                 <button type="button" class="btn btn-sm btn-outline-gray-600" onclick="exportUsersCsv()">
                     <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -43,6 +46,7 @@
                     Download PDF
                 </button>
             </div>
+            @endcan
         </div>
     </div>
 
@@ -158,6 +162,7 @@
 {{--                    </div>--}}
 {{--                </td>--}}
                 <td>
+                    @can('view_users')
                     <a href="{{ route('users.edit', $user) }}" class="d-flex align-items-center">
                         <div class="avatar avatar-md me-3">
                             <img alt="user-avatar" src="{{ $user->profile_photo ? asset('storage/'.$user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}" class="rounded-circle">
@@ -167,6 +172,17 @@
                             <div class="small text-gray">{{ $user->email }}</div>
                         </div>
                     </a>
+                    @else
+                    <div class="d-flex align-items-center">
+                        <div class="avatar avatar-md me-3">
+                            <img alt="user-avatar" src="{{ $user->profile_photo ? asset('storage/'.$user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}" class="rounded-circle">
+                        </div>
+                        <div class="d-block">
+                            <span class="fw-bold">{{ $user->name }}</span>
+                            <div class="small text-gray">{{ $user->email }}</div>
+                        </div>
+                    </div>
+                    @endcan
                 </td>
                 <td>
                     <span class="fw-normal">{{ $user->roles->pluck('name')->join(', ') }}</span>
@@ -196,12 +212,14 @@
                    @endif
                 </td>
                 <td>
+                    @if(auth()->user()->can('view_users') || auth()->user()->can('edit_users') || auth()->user()->can('delete_users'))
                     <div class="dropdown">
                         <a href="#" class="btn btn-sm btn-gray-600 d-inline-flex align-items-center dropdown-toggle"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             Actions
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            @can('view_users')
                             <li><a class="dropdown-item" href="{{ route('users.show', $user->uuid) }}">
                                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -209,26 +227,36 @@
                                 </svg>
                                 View
                             </a></li>
+                            @endcan
+                            @can('edit_users')
                             <li><a class="dropdown-item" href="{{ route('users.edit', $user) }}">
                                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                 </svg>
                                 Edit
                             </a></li>
+                            @endcan
+                            @can('view_users')
                             <li><a class="dropdown-item" href="{{ route('staff.visiting-card', $user->uuid) }}" target="_blank">
                                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 012-2h2a2 2 0 012 2v2m-4 0a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V8a2 2 0 012-2z"></path>
                                 </svg>
                                 Visiting Card
                             </a></li>
+                            @endcan
+                            @can('delete_users')
                             <li><a class="dropdown-item text-danger" href="#" wire:click.prevent="confirmDelete({{ $user->id }})">
                                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                 </svg>
                                 Delete
                             </a></li>
+                            @endcan
                         </ul>
                     </div>
+                    @else
+                    <span class="text-muted small">No actions available</span>
+                    @endif
                 </td>
             </tr>
             @empty
