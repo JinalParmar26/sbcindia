@@ -160,13 +160,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/orders/export/csv', [OrderController::class, 'exportCsv'])->name('orders.export.csv');
             Route::get('/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('orders.export.pdf');
             // Parameterized routes MUST come after specific routes
-            Route::get('/orders/{uuid}', Orders::class)->name('orders.show');
+            Route::get('/orders/{uuid}', [OrderController::class, 'show'])->name('orders.show');
             Route::get('/orders/{id}/pdf', [OrderController::class, 'exportSinglePdf'])->name('orders.single.pdf');
         });
         
         Route::middleware('permission:edit_orders')->group(function () {
-            Route::get('/orders/{uuid}/edit', Orders::class)->name('orders.edit');
-            Route::put('/orders/{order}', Orders::class)->name('orders.update');
+            Route::get('/orders/{uuid}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+            Route::put('/orders/{uuid}', [OrderController::class, 'update'])->name('orders.update');
         });
         
         // Ticket Management Routes - Permission Based

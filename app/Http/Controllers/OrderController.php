@@ -171,18 +171,36 @@ class OrderController extends Controller
 
     public function show($uuid)
     {
-        $order = Order::with([
-            'orderProducts.product',
-            'orderProducts.tickets.customer',
-            'orderProducts.tickets.assignedTo',
-            'orderProducts.tickets.attendedBy',
-            'customer'
-        ])->where('uuid', $uuid)->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $order = Order::with([
+                'orderProducts.product',
+                'orderProducts.tickets.customer',
+                'orderProducts.tickets.assignedTo',
+                'orderProducts.tickets.attendedBy',
+                'customer'
+            ])->findOrFail($uuid);
+        } else {
+            $order = Order::with([
+                'orderProducts.product',
+                'orderProducts.tickets.customer',
+                'orderProducts.tickets.assignedTo',
+                'orderProducts.tickets.attendedBy',
+                'customer'
+            ])->where('uuid', $uuid)->firstOrFail();
+        }
         return view('orders.show', compact('order'));
     }
 
-    public function edit(Order $order)
+    public function edit($uuid)
     {
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $order = Order::with(['orderProducts.product', 'customer'])->findOrFail($uuid);
+        } else {
+            $order = Order::with(['orderProducts.product', 'customer'])->where('uuid', $uuid)->firstOrFail();
+        }
+        
         $customers = Customer::all();
         $products = Product::all();
 
@@ -219,8 +237,15 @@ class OrderController extends Controller
         return view('orders.upload-test', compact('order', 'customers', 'products'));
     }
 
-   public function update(Request $request, Order $order)
+   public function update(Request $request, $uuid)
     {
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $order = Order::findOrFail($uuid);
+        } else {
+            $order = Order::where('uuid', $uuid)->firstOrFail();
+        }
+        
         // Debug: Log all request data
         \Log::info('Update Order Request Data:', [
             'order_id' => $order->id,
