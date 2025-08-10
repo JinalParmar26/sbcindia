@@ -157,19 +157,89 @@
                                     </svg>
                                     Open Public View
                                 </a>
-                                <button class="btn btn-sm btn-success" onclick="downloadQRCode()">
-                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                    Download QR Code
-                                </button>
                             </div>
                         </div>
                         <div class="col-md-4 text-center">
-                            <div id="qrcode" class="d-inline-block p-3 bg-white border rounded"></div>
+                            <canvas id="qrcode" class="d-inline-block p-3 bg-white border rounded" width="150" height="150"></canvas>
                             <div class="mt-2">
                                 <small class="text-muted">Scan with mobile device</small>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Section -->
+        <div class="mt-4">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Our Services & Company Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Services -->
+                        <div class="col-md-6 mb-3">
+                            <h6><strong>Our Services</strong></h6>
+                            <div class="d-flex flex-column gap-2">
+                                <a href="https://sbccindia.com/products.php" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                    Products
+                                </a>
+                                <a href="https://sbccindia.com/contact.php" target="_blank" class="btn btn-sm btn-outline-info">
+                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                    </svg>
+                                    Contact
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Company Brochure -->
+                        <div class="col-md-6 mb-3">
+                            <h6><strong>Company Brochure</strong></h6>
+                            <div class="d-flex flex-column gap-2">
+                                <a href="https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf" target="_blank" class="btn btn-sm btn-outline-danger">
+                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Download Brochure
+                                </a>
+                                <a href="https://sbccindia.com/" target="_blank" class="btn btn-sm btn-outline-success">
+                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                                    </svg>
+                                    Visit Website
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SBC Footer Information -->
+        <div class="mt-4">
+            <div class="card" style="background: #1e3c72; color: white;">
+                <div class="card-body text-center">
+                    <h5 class="mb-3"><strong>SBC Cooling Systems</strong></h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Address:</strong></p>
+                            <p class="mb-3">123 Industrial Area, Phase-II<br>Chandigarh - 160002, India</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Contact Information:</strong></p>
+                            <p class="mb-1"><strong>Office:</strong> +91-172-1234567</p>
+                            <p class="mb-1"><strong>Email:</strong> info@sbccindia.com</p>
+                            <p class="mb-0"><strong>Hours:</strong> Mon-Sat 9:00 AM - 6:00 PM</p>
                         </div>
                     </div>
                 </div>
@@ -200,7 +270,9 @@
 // Generate QR Code
 document.addEventListener('DOMContentLoaded', function() {
     const publicUrl = "{{ route('order.public-details', $order->uuid) }}";
-    QRCode.toCanvas(document.getElementById('qrcode'), publicUrl, {
+    const canvas = document.getElementById('qrcode');
+    
+    QRCode.toCanvas(canvas, publicUrl, {
         width: 150,
         height: 150,
         margin: 2,
@@ -209,38 +281,13 @@ document.addEventListener('DOMContentLoaded', function() {
             light: '#ffffff'
         }
     }, function (error) {
-        if (error) console.error(error);
+        if (error) {
+            console.error('QR Code generation error:', error);
+        } else {
+            console.log('QR Code generated successfully');
+        }
     });
 });
-
-// Download QR Code as PNG
-function downloadQRCode() {
-    const publicUrl = "{{ route('order.public-details', $order->uuid) }}";
-    const canvas = document.createElement('canvas');
-    
-    QRCode.toCanvas(canvas, publicUrl, {
-        width: 300,
-        height: 300,
-        margin: 4,
-        color: {
-            dark: '#1e3c72',
-            light: '#ffffff'
-        }
-    }, function (error) {
-        if (error) {
-            console.error(error);
-            return;
-        }
-        
-        // Create download link
-        const link = document.createElement('a');
-        link.download = 'Order_{{ $order->title }}_QRCode.png';
-        link.href = canvas.toDataURL();
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
-}
 
 function openImageModal(imageSrc) {
     document.getElementById('modalImage').src = imageSrc;
