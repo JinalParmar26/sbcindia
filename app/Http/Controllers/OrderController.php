@@ -678,4 +678,16 @@ class OrderController extends Controller
         
         return true;
     }
+
+    public function publicOrderDetails($uuid)
+    {
+        $order = Order::where('uuid', $uuid)->with([
+            'customer',
+            'orderProducts.product',
+            'images',
+            'tickets.user'
+        ])->firstOrFail();
+
+        return view('public.order-details', compact('order'));
+    }
 }

@@ -26,6 +26,11 @@ class Order extends Model
         return $this->hasMany(OrderImage::class)->orderBy('sort_order');
     }
 
+    public function tickets()
+    {
+        return $this->hasManyThrough(Ticket::class, OrderProduct::class);
+    }
+
     protected static function boot()
     {
         parent::boot();

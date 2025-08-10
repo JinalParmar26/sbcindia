@@ -131,6 +131,51 @@
             </a>
             <a href="{{ route('orders') }}" class="btn btn-secondary">Back</a>
         </div>
+
+        <!-- QR Code Section -->
+        <div class="mt-4">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Public Order Details QR Code
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <p class="mb-2"><strong>Share this order with customers:</strong></p>
+                            <p class="text-muted small mb-3">
+                                Scan this QR code or use the link to view order details, customer information, products, and support tickets in a public format.
+                            </p>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="publicOrderUrl" value="{{ route('order.public-details', $order->uuid) }}" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard()">
+                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                            </div>
+                            <a href="{{ route('order.public-details', $order->uuid) }}" target="_blank" class="btn btn-sm btn-primary">
+                                <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Open Public View
+                            </a>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div id="qrcode" class="d-inline-block p-3 bg-white border rounded"></div>
+                            <div class="mt-2">
+                                <small class="text-muted">Scan with mobile device</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -149,7 +194,52 @@
     </div>
 </div>
 
+<!-- QR Code Library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
 <script>
+// Generate QR Code
+document.addEventListener('DOMContentLoaded', function() {
+    const publicUrl = "{{ route('order.public-details', $order->uuid) }}";
+    QRCode.toCanvas(document.getElementById('qrcode'), publicUrl, {
+        width: 150,
+        height: 150,
+        margin: 2,
+        color: {
+            dark: '#1e3c72',
+            light: '#ffffff'
+        }
+    }, function (error) {
+        if (error) console.error(error);
+    });
+});
+
+// Copy URL to clipboard
+function copyToClipboard() {
+    const urlField = document.getElementById('publicOrderUrl');
+    urlField.select();
+    urlField.setSelectionRange(0, 99999);
+    
+    try {
+        document.execCommand('copy');
+        
+        // Show success feedback
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+    }
+}
+
 function openImageModal(imageSrc) {
     document.getElementById('modalImage').src = imageSrc;
     var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));

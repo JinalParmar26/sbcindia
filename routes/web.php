@@ -75,6 +75,9 @@ Route::get('/profile-example', ProfileExample::class)->name('profile-example');
 Route::get('/staff/visiting-card/{uuid}', [PublicStaffController::class, 'visitingCard'])->name('staff.visiting-card');
 Route::get('/staff/profile/{uuid}', [PublicStaffController::class, 'profile'])->name('staff.profile');
 
+// Public Order Routes
+Route::get('/order/details/{uuid}', [OrderController::class, 'publicOrderDetails'])->name('order.public-details');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', Profile::class)->name('profile');
     
