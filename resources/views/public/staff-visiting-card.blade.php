@@ -250,24 +250,114 @@
 
         .customer-logos {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 8px;
             align-items: center;
+            margin-bottom: 15px;
         }
 
-        .customer-logo {
+        .customer-logos-more {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .customer-logo-img {
             width: 100%;
-            height: 35px;
-            background: #f8f9fa;
+            height: 50px;
+            object-fit: contain;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 6px;
+            padding: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .customer-logo-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .show-more-customers {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+
+        .show-more-customers:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .brochure-section {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .brochure-section h6 {
+            color: #1e3c72;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .brochure-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-brochure {
+            padding: 12px 8px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            color: #666;
-            text-align: center;
+            gap: 6px;
+        }
+
+        .btn-brochure:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+
+        .btn-website {
+            padding: 12px 8px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
             font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-website:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            color: white;
         }
 
         .footer-section {
@@ -304,7 +394,12 @@
                 grid-template-columns: 1fr;
             }
 
-            .customer-logos {
+            .brochure-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .customer-logos,
+            .customer-logos-more {
                 grid-template-columns: repeat(2, 1fr);
             }
 
@@ -394,11 +489,24 @@
                 <div class="services-section">
                     <h6><i class="fas fa-cogs"></i> Our Services</h6>
                     <div class="services-grid">
-                        <a href="https://sbccindia.com/download/brochure" target="_blank" class="service-btn">
-                            <i class="fas fa-download"></i> Brochure
-                        </a>
                         <a href="https://sbccindia.com/products.php" target="_blank" class="service-btn">
                             <i class="fas fa-box"></i> Products
+                        </a>
+                        <a href="https://sbccindia.com/contact.php" target="_blank" class="service-btn">
+                            <i class="fas fa-phone"></i> Contact
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Brochure Section -->
+                <div class="brochure-section">
+                    <h6><i class="fas fa-file-pdf"></i> Company Brochure</h6>
+                    <div class="brochure-actions">
+                        <a href="https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf" target="_blank" class="btn-brochure">
+                            <i class="fas fa-download"></i> Download Brochure
+                        </a>
+                        <a href="https://sbccindia.com/" target="_blank" class="btn-website">
+                            <i class="fas fa-globe"></i> Visit Website
                         </a>
                     </div>
                 </div>
@@ -407,12 +515,41 @@
                 <div class="customers-section">
                     <h6><i class="fas fa-handshake"></i> Our Valuable Customers</h6>
                     <div class="customer-logos">
-                        <div class="customer-logo">Reliance</div>
-                        <div class="customer-logo">TATA</div>
-                        <div class="customer-logo">Bajaj</div>
-                        <div class="customer-logo">Mahindra</div>
-                        <div class="customer-logo">L&T</div>
-                        <div class="customer-logo">Godrej</div>
+                        <img src="https://sbccindia.com/assets/img/client/Client-1.webp" alt="Client 1" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-2.webp" alt="Client 2" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-3.webp" alt="Client 3" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-4.webp" alt="Client 4" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-5.webp" alt="Client 5" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-6.webp" alt="Client 6" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-7.webp" alt="Client 7" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-8.webp" alt="Client 8" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-9.webp" alt="Client 9" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-10.webp" alt="Client 10" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-11.webp" alt="Client 11" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-12.webp" alt="Client 12" class="customer-logo-img">
+                    </div>
+                    
+                    <!-- Show More Customers Button -->
+                    <button class="show-more-customers" onclick="toggleMoreCustomers()">
+                        <i class="fas fa-plus"></i> Show More Customers
+                    </button>
+                    
+                    <!-- Additional Customer Logos (Initially Hidden) -->
+                    <div class="customer-logos-more" id="moreCustomers" style="display: none;">
+                        <img src="https://sbccindia.com/assets/img/client/Client-13.webp" alt="Client 13" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-14.webp" alt="Client 14" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-15.webp" alt="Client 15" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-16.webp" alt="Client 16" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-17.webp" alt="Client 17" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-18.webp" alt="Client 18" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-19.webp" alt="Client 19" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-20.webp" alt="Client 20" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-21.webp" alt="Client 21" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-22.webp" alt="Client 22" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-23.webp" alt="Client 23" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-24.webp" alt="Client 24" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-25.webp" alt="Client 25" class="customer-logo-img">
+                        <img src="https://sbccindia.com/assets/img/client/Client-26.webp" alt="Client 26" class="customer-logo-img">
                     </div>
                 </div>
             </div>
@@ -498,158 +635,20 @@ END:VCARD`;
         // Preload company logo
         const logo = new Image();
         logo.src = 'https://sbccindia.com/assets/img/logo/sbc-logo.webp';
+
+        // Toggle more customers function
+        function toggleMoreCustomers() {
+            const moreCustomers = document.getElementById('moreCustomers');
+            const toggleBtn = document.querySelector('.show-more-customers');
+            
+            if (moreCustomers.style.display === 'none' || moreCustomers.style.display === '') {
+                moreCustomers.style.display = 'grid';
+                toggleBtn.innerHTML = '<i class="fas fa-minus"></i> Show Less Customers';
+            } else {
+                moreCustomers.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-plus"></i> Show More Customers';
+            }
+        }
     </script>
-</body>
-</html>
-        }
-
-        .working-hours {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .working-hours h6 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .working-hours p {
-            margin: 5px 0;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .btn-contact {
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-outline {
-            border: 2px solid #667eea;
-            color: #667eea;
-            background: transparent;
-        }
-
-        .btn-outline:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .company-footer {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #27ae60;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-        }
-
-        @media (max-width: 480px) {
-            .visiting-card {
-                margin: 20px;
-                max-width: none;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="visiting-card">
-        <div class="card-header">
-            <div class="status-badge">
-                <i class="fas fa-circle"></i> Active
-            </div>
-        </div>
-        
-        <div class="profile-photo">
-            @if($staff->profile_photo)
-                <img src="{{ asset('storage/' . $staff->profile_photo) }}" alt="{{ $staff->name }}">
-            @else
-                <i class="fas fa-user"></i>
-            @endif
-        </div>
-        
-        <div class="card-body">
-            <div class="staff-name">{{ $staff->name }}</div>
-            <div class="staff-role">{{ $staff->role ?? 'Staff Member' }}</div>
-            
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>
-                </div>
-                
-                @if($staff->phone_number)
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <a href="tel:{{ $staff->phone_number }}">{{ $staff->phone_number }}</a>
-                </div>
-                @endif
-            </div>
-            
-            @if($staff->working_hours_start && $staff->working_hours_end)
-            <div class="working-hours">
-                <h6><i class="fas fa-clock"></i> Working Hours</h6>
-                <p>{{ date('g:i A', strtotime($staff->working_hours_start)) }} - {{ date('g:i A', strtotime($staff->working_hours_end)) }}</p>
-                @if($staff->working_days)
-                <p>{{ $staff->working_days }}</p>
-                @endif
-            </div>
-            @endif
-            
-            <div class="action-buttons">
-                <a href="mailto:{{ $staff->email }}" class="btn-contact btn-primary">
-                    <i class="fas fa-envelope"></i> Email
-                </a>
-                @if($staff->phone_number)
-                <a href="tel:{{ $staff->phone_number }}" class="btn-contact btn-outline">
-                    <i class="fas fa-phone"></i> Call
-                </a>
-                @endif
-            </div>
-        </div>
-        
-        <div class="company-footer">
-            <strong>SBC Cooling Systems</strong><br>
-            Industrial Cooling Solutions
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
