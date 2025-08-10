@@ -6,7 +6,7 @@
             <h4 class="mb-0">Edit User</h4>
         </div>
         <div class="card-body">
-            <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('users.update', $user->uuid) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
