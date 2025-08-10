@@ -151,12 +151,6 @@
                                 Scan this QR code to view order details, customer information, products, and support tickets in a public format.
                             </p>
                             <div class="d-flex gap-2">
-                                <a href="{{ route('order.public-details', $order->uuid) }}" target="_blank" class="btn btn-sm btn-primary">
-                                    <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                    </svg>
-                                    Open Public View
-                                </a>
                                 <button onclick="downloadQRCode()" class="btn btn-sm btn-success">
                                     <svg class="icon icon-xs me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>

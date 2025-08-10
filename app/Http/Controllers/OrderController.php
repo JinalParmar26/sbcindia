@@ -685,7 +685,7 @@ class OrderController extends Controller
             'customer',
             'orderProducts.product',
             'images',
-            'tickets.user'
+            'tickets.assignedTo'
         ])->firstOrFail();
 
         return view('public.order-details', compact('order'));
