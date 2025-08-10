@@ -229,14 +229,29 @@
                     <i class="fas fa-ticket-alt"></i> Support Tickets ({{ $order->tickets->count() }})
                 </div>
                 @foreach($order->tickets as $ticket)
-                <div class="ticket-item">
-                    <div class="ticket-subject">{{ $ticket->subject }}</div>
-                    <div class="ticket-meta">
-                        Type: {{ ucfirst($ticket->type) }} | 
-                        Status: {{ $ticket->end ? 'Closed' : 'Open' }}
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #1e3c72;">
+                    <div style="font-weight: 600; font-size: 16px; color: #1e3c72; margin-bottom: 10px;">{{ $ticket->subject }}</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 14px;">
+                        <div><strong>Type:</strong> <span style="background: #e9ecef; padding: 2px 8px; border-radius: 4px;">{{ ucfirst($ticket->type) }}</span></div>
+                        <div><strong>Status:</strong> 
+                            @if($ticket->end)
+                                <span style="background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 4px;">Closed</span>
+                            @elseif($ticket->start)
+                                <span style="background: #fff3cd; color: #856404; padding: 2px 8px; border-radius: 4px;">In Progress</span>
+                            @else
+                                <span style="background: #d1ecf1; color: #0c5460; padding: 2px 8px; border-radius: 4px;">Pending</span>
+                            @endif
+                        </div>
                         @if($ticket->assignedTo)
-                            | Assigned to: {{ $ticket->assignedTo->name }}
+                        <div><strong>Assigned to:</strong> {{ $ticket->assignedTo->name }}</div>
                         @endif
+                        @if($ticket->start)
+                        <div><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($ticket->start)->format('M d, Y') }}</div>
+                        @endif
+                        @if($ticket->end)
+                        <div><strong>End Date:</strong> {{ \Carbon\Carbon::parse($ticket->end)->format('M d, Y') }}</div>
+                        @endif
+                        <div><strong>Ticket ID:</strong> {{ $ticket->uuid }}</div>
                     </div>
                 </div>
                 @endforeach
@@ -248,14 +263,14 @@
                     <i class="fas fa-cogs"></i> Our Services
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                    <a href="https://sbccindia.com/products.php" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #1e3c72; border-left: 4px solid #1e3c72;">
-                        <i class="fas fa-cube" style="margin-right: 10px; color: #1e3c72;"></i>
-                        <strong>Products</strong>
-                    </a>
-                    <a href="https://sbccindia.com/contact.php" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #1e3c72; border-left: 4px solid #17a2b8;">
-                        <i class="fas fa-phone" style="margin-right: 10px; color: #17a2b8;"></i>
-                        <strong>Contact</strong>
-                    </a>
+                    <button onclick="window.open('https://sbccindia.com/products.php', '_blank')" style="display: flex; align-items: center; padding: 15px; background: #1e3c72; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                        <i class="fas fa-cube" style="margin-right: 10px;"></i>
+                        Products
+                    </button>
+                    <button onclick="window.open('https://sbccindia.com/contact.php', '_blank')" style="display: flex; align-items: center; padding: 15px; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                        <i class="fas fa-phone" style="margin-right: 10px;"></i>
+                        Contact
+                    </button>
                 </div>
 
                 <!-- Company Brochure Section -->
@@ -263,14 +278,14 @@
                     <i class="fas fa-file-pdf"></i> Company Brochure
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                    <a href="https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #dc3545; border-left: 4px solid #dc3545;">
-                        <i class="fas fa-download" style="margin-right: 10px; color: #dc3545;"></i>
-                        <strong>Download Brochure</strong>
-                    </a>
-                    <a href="https://sbccindia.com/" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #28a745; border-left: 4px solid #28a745;">
-                        <i class="fas fa-globe" style="margin-right: 10px; color: #28a745;"></i>
-                        <strong>Visit Website</strong>
-                    </a>
+                    <button onclick="window.open('https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf', '_blank')" style="display: flex; align-items: center; padding: 15px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                        <i class="fas fa-download" style="margin-right: 10px;"></i>
+                        Download Brochure
+                    </button>
+                    <button onclick="window.open('https://sbccindia.com/', '_blank')" style="display: flex; align-items: center; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                        <i class="fas fa-globe" style="margin-right: 10px;"></i>
+                        Visit Website
+                    </button>
                 </div>
 
                 <!-- SBC Cooling Systems Information -->
@@ -284,6 +299,7 @@
         <div class="order-card">
             <div style="background: #1e3c72; color: white; padding: 30px; text-align: center;">
                 <h5 style="margin-bottom: 20px; color: white;"><strong>SBC Cooling Systems</strong></h5>
+                <p style="margin-bottom: 15px; color: #87ceeb; font-style: italic;">Industrial Cooling Solutions Excellence</p>
                 <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
                     <div style="flex: 1; min-width: 250px;">
                         <p style="margin-bottom: 8px; color: white;"><strong>Address:</strong></p>
@@ -296,14 +312,10 @@
                         <p style="margin-bottom: 0; color: white;"><strong>Hours:</strong> Mon-Sat 9:00 AM - 6:00 PM</p>
                     </div>
                 </div>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #87ceeb;">
+                    <small style="color: #87ceeb;">Order Reference: {{ $order->uuid }}</small>
+                </div>
             </div>
-        </div>
-
-        <!-- Footer Section -->
-        <div class="footer-section">
-            <strong>SBC Cooling Systems</strong>
-            Industrial Cooling Solutions Excellence<br>
-            <small>Order Reference: {{ $order->uuid }}</small>
         </div>
     </div>
 
