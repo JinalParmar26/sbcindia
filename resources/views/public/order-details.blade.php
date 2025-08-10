@@ -222,7 +222,8 @@
                     <div class="info-value">{{ $order->uuid }}</div>
                 </div>
 
-                <!-- Tickets -->
+                <!-- Tickets (Only for authenticated users) -->
+                @auth
                 @if($order->tickets->count() > 0)
                 <div class="section-title" style="margin-top: 30px;">
                     <i class="fas fa-ticket-alt"></i> Support Tickets ({{ $order->tickets->count() }})
@@ -240,6 +241,7 @@
                 </div>
                 @endforeach
                 @endif
+                @endauth
 
                 <!-- Our Services Section -->
                 <div class="section-title" style="margin-top: 30px;">
