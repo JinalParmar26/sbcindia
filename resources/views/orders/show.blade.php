@@ -189,12 +189,44 @@
 
 <!-- QR Code Library -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-
+<!-- Fallback QR Code Library -->
 <script>
-// Generate QR Code
-document.addEventListener('DOMContentLoaded', function() {
+if (typeof QRCode === 'undefined') {
+    console.log('Loading fallback QR Code library...');
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';
+    script.onload = function() {
+        console.log('Fallback QR Code library loaded');
+        generateQRCode();
+    };
+    document.head.appendChild(script);
+} else {
+    generateQRCode();
+}
+
+function generateQRCode() {
     const publicUrl = "{{ route('order.public-details', $order->uuid) }}";
     const canvas = document.getElementById('qrcode');
+    
+    if (!canvas) {
+        console.error('QR Code canvas element not found');
+        return;
+    }
+    
+    console.log('Generating QR code for URL:', publicUrl);
+    
+    // Check if QRCode library is loaded
+    if (typeof QRCode === 'undefined') {
+        console.error('QRCode library not loaded');
+        // Create a fallback image-based QR code
+        const img = document.createElement('img');
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl)}`;
+        img.width = 150;
+        img.height = 150;
+        img.className = 'd-inline-block p-3 bg-white border rounded';
+        canvas.parentNode.replaceChild(img, canvas);
+        return;
+    }
     
     QRCode.toCanvas(canvas, publicUrl, {
         width: 150,
@@ -207,18 +239,51 @@ document.addEventListener('DOMContentLoaded', function() {
     }, function (error) {
         if (error) {
             console.error('QR Code generation error:', error);
+            // Fallback: use online QR generator
+            const img = document.createElement('img');
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl)}`;
+            img.width = 150;
+            img.height = 150;
+            img.className = 'd-inline-block p-3 bg-white border rounded';
+            img.alt = 'QR Code';
+            canvas.parentNode.replaceChild(img, canvas);
         } else {
-            console.log('QR Code generated successfully');
+            console.log('QR Code generated successfully for:', publicUrl);
         }
     });
+}
+</script>
+
+<script>
+// Initialize QR Code generation when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if QR library is already loaded
+    if (typeof QRCode !== 'undefined') {
+        generateQRCode();
+    }
+    // Otherwise, the fallback script above will handle it
 });
 
 function downloadQRCode() {
     const canvas = document.getElementById('qrcode');
-    const link = document.createElement('a');
-    link.download = 'order-{{ $order->uuid }}-qr-code.png';
-    link.href = canvas.toDataURL();
-    link.click();
+    const img = document.querySelector('#qrcode, img[alt="QR Code"]');
+    
+    if (canvas && canvas.tagName === 'CANVAS') {
+        // Download from canvas
+        const link = document.createElement('a');
+        link.download = 'order-{{ $order->uuid }}-qr-code.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    } else if (img && img.tagName === 'IMG') {
+        // Download from image
+        const link = document.createElement('a');
+        link.download = 'order-{{ $order->uuid }}-qr-code.png';
+        link.href = img.src;
+        link.target = '_blank';
+        link.click();
+    } else {
+        alert('QR Code not found. Please wait for it to load or refresh the page.');
+    }
 }
 
 function openImageModal(imageSrc) {
