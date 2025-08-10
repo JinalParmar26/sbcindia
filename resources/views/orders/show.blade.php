@@ -191,98 +191,100 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <!-- Fallback QR Code Library -->
 <script>
-if (typeof QRCode === 'undefined') {
-    console.log('Loading fallback QR Code library...');
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';
-    script.onload = function() {
-        console.log('Fallback QR Code library loaded');
-        generateQRCode();
-    };
-    document.head.appendChild(script);
-} else {
+// Simple approach: always generate QR code after page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, generating QR code...');
     generateQRCode();
-}
+});
 
 function generateQRCode() {
     const publicUrl = "{{ route('order.public-details', $order->uuid) }}";
     const canvas = document.getElementById('qrcode');
+    
+    console.log('generateQRCode called');
+    console.log('Public URL:', publicUrl);
+    console.log('Canvas element:', canvas);
+    console.log('QRCode library available:', typeof QRCode !== 'undefined');
     
     if (!canvas) {
         console.error('QR Code canvas element not found');
         return;
     }
     
-    console.log('Generating QR code for URL:', publicUrl);
+    // Always use fallback image-based QR code for better reliability
+    console.log('Using image-based QR code generation');
+    const img = document.createElement('img');
+    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl)}`;
+    img.width = 150;
+    img.height = 150;
+    img.className = 'd-inline-block p-3 bg-white border rounded';
+    img.alt = 'QR Code';
+    img.style.border = '1px solid #ddd';
     
-    // Check if QRCode library is loaded
-    if (typeof QRCode === 'undefined') {
-        console.error('QRCode library not loaded');
-        // Create a fallback image-based QR code
-        const img = document.createElement('img');
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl)}`;
-        img.width = 150;
-        img.height = 150;
-        img.className = 'd-inline-block p-3 bg-white border rounded';
-        canvas.parentNode.replaceChild(img, canvas);
-        return;
-    }
+    // Add error handling for image loading
+    img.onerror = function() {
+        console.error('Failed to load QR code image');
+        img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMnB4IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UVIgQ29kZSBFcnJvcjwvdGV4dD48L3N2Zz4=';
+    };
     
-    QRCode.toCanvas(canvas, publicUrl, {
-        width: 150,
-        height: 150,
-        margin: 2,
-        color: {
-            dark: '#1e3c72',
-            light: '#ffffff'
-        }
-    }, function (error) {
-        if (error) {
-            console.error('QR Code generation error:', error);
-            // Fallback: use online QR generator
-            const img = document.createElement('img');
-            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl)}`;
-            img.width = 150;
-            img.height = 150;
-            img.className = 'd-inline-block p-3 bg-white border rounded';
-            img.alt = 'QR Code';
-            canvas.parentNode.replaceChild(img, canvas);
-        } else {
-            console.log('QR Code generated successfully for:', publicUrl);
-        }
-    });
+    img.onload = function() {
+        console.log('QR code image loaded successfully');
+    };
+    
+    canvas.parentNode.replaceChild(img, canvas);
 }
 </script>
 
 <script>
-// Initialize QR Code generation when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if QR library is already loaded
-    if (typeof QRCode !== 'undefined') {
-        generateQRCode();
-    }
-    // Otherwise, the fallback script above will handle it
-});
+
 
 function downloadQRCode() {
-    const canvas = document.getElementById('qrcode');
-    const img = document.querySelector('#qrcode, img[alt="QR Code"]');
+    console.log('downloadQRCode called');
     
-    if (canvas && canvas.tagName === 'CANVAS') {
-        // Download from canvas
-        const link = document.createElement('a');
-        link.download = 'order-{{ $order->uuid }}-qr-code.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    } else if (img && img.tagName === 'IMG') {
-        // Download from image
-        const link = document.createElement('a');
-        link.download = 'order-{{ $order->uuid }}-qr-code.png';
-        link.href = img.src;
-        link.target = '_blank';
-        link.click();
-    } else {
+    // Look for either canvas or img element
+    const qrElement = document.querySelector('#qrcode, img[alt="QR Code"]');
+    console.log('QR element found:', qrElement);
+    
+    if (!qrElement) {
         alert('QR Code not found. Please wait for it to load or refresh the page.');
+        return;
+    }
+    
+    if (qrElement.tagName === 'CANVAS') {
+        // Download from canvas
+        console.log('Downloading from canvas');
+        const link = document.createElement('a');
+        link.download = 'order-{{ $order->uuid }}-qr-code.png';
+        link.href = qrElement.toDataURL();
+        link.click();
+    } else if (qrElement.tagName === 'IMG') {
+        // For image elements, we need to convert to canvas first to download
+        console.log('Converting image to canvas for download');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 150;
+        canvas.height = 150;
+        
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, 150, 150);
+            const link = document.createElement('a');
+            link.download = 'order-{{ $order->uuid }}-qr-code.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        };
+        img.onerror = function() {
+            // If cross-origin fails, just open the image in new tab
+            console.log('Cross-origin failed, opening in new tab');
+            const link = document.createElement('a');
+            link.href = qrElement.src;
+            link.target = '_blank';
+            link.click();
+        };
+        img.src = qrElement.src;
+    } else {
+        alert('QR Code not ready. Please wait for it to load.');
     }
 }
 
