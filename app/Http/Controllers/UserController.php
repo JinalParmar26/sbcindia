@@ -113,12 +113,12 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  string  $uuid
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($uuid)
     {
-        $user = User::findOrFail($id); // Fetch user or throw 404 if not found
+        $user = User::where('uuid', $uuid)->firstOrFail(); // Fetch user by UUID
         $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $roles = Role::all(); // Load all roles, or filter if needed
 
@@ -158,7 +158,7 @@ class UserController extends Controller
 
         $validated['working_days'] = isset($validated['working_days'])
             ? implode(',', $validated['working_days'])
-            :  $user->working_days;
+            : null;
             // dd($validated);
 
         if ($request->hasFile('profile_photo')) {
