@@ -94,8 +94,12 @@ class UserController extends Controller
      */
     public function show($uuid)
     {
-        // Fetch user by uuid
-        $user = User::where('uuid', $uuid)->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $user = User::findOrFail($uuid);
+        } else {
+            $user = User::where('uuid', $uuid)->firstOrFail();
+        }
 
         $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $roles = Role::all(); // If needed in view
@@ -118,7 +122,13 @@ class UserController extends Controller
      */
     public function edit($uuid)
     {
-        $user = User::where('uuid', $uuid)->firstOrFail(); // Fetch user by UUID
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $user = User::findOrFail($uuid);
+        } else {
+            $user = User::where('uuid', $uuid)->firstOrFail();
+        }
+        
         $days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         $roles = Role::all(); // Load all roles, or filter if needed
 
@@ -136,7 +146,12 @@ class UserController extends Controller
      */
     public function update(Request $request, $uuid)
     {
-        $user = User::where('uuid', $uuid)->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $user = User::findOrFail($uuid);
+        } else {
+            $user = User::where('uuid', $uuid)->firstOrFail();
+        }
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',

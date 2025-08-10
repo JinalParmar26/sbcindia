@@ -97,33 +97,11 @@ Route::middleware('auth')->group(function () {
         });
         
         Route::middleware('permission:edit_users')->group(function () {
-            // Redirect ID-based routes to UUID-based routes
-            Route::get('/users/{id}/edit', function($id) {
-                $user = \App\Models\User::findOrFail($id);
-                return redirect()->route('users.edit', $user->uuid);
-            })->where('id', '[0-9]+');
-            
             Route::get('/users/{uuid}/edit', [UserController::class, 'edit'])->name('users.edit');
             Route::put('/users/{uuid}', [UserController::class, 'update'])->name('users.update');
         });
         
         Route::middleware('permission:view_users')->group(function () {
-            // Redirect ID-based routes to UUID-based routes  
-            Route::get('/users/{id}', function($id) {
-                $user = \App\Models\User::findOrFail($id);
-                return redirect()->route('users.show', $user->uuid);
-            })->where('id', '[0-9]+');
-            
-            Route::get('/users/{id}/pdf', function($id) {
-                $user = \App\Models\User::findOrFail($id);
-                return redirect()->route('users.single.pdf', $user->uuid);
-            })->where('id', '[0-9]+');
-            
-            Route::get('/users/{id}/download-qr', function($id) {
-                $user = \App\Models\User::findOrFail($id);
-                return redirect()->route('download-qr', $user->uuid);
-            })->where('id', '[0-9]+');
-            
             // Parameterized routes MUST come after specific routes
             Route::get('/users/{uuid}', [UserController::class, 'show'])->name('users.show');
             Route::get('/users/{uuid}/pdf', [UserController::class, 'exportSinglePdf'])->name('users.single.pdf');
