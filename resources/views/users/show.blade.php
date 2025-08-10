@@ -67,7 +67,6 @@
 
                         <div class="mt-4 d-flex justify-content-end">
                             <a href="{{ route('users') }}" class="btn btn-secondary me-2">Back to List</a>
-                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Edit User</a>
                         </div>
                     </div>
                 </div>
