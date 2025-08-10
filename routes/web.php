@@ -128,13 +128,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/customers/export/pdf', [CustomerController::class, 'exportPdf'])->name('customers.export.pdf');
             // Parameterized routes MUST come after specific routes
             Route::get('/customers/{uuid}', [CustomerController::class, 'show'])->name('customers.show');
+            Route::get('/customers/{uuid}/pdf', [CustomerController::class, 'exportSinglePdf'])->name('customers.single.pdf');
         });
-        
+
         Route::middleware('permission:edit_customers')->group(function () {
-            Route::get('/customers/{id}/edit', Customers::class)->name('customers.edit');
-        });
-        
-        // Product Management Routes - Permission Based
+            Route::get('/customers/{uuid}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+            Route::put('/customers/{uuid}', [CustomerController::class, 'update'])->name('customers.update');
+        });        // Product Management Routes - Permission Based
         Route::middleware('permission:view_products')->group(function () {
             Route::get('/products', Products::class)->name('products');
         });

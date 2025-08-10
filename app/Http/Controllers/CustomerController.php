@@ -80,24 +80,40 @@ class CustomerController extends Controller
      */
     public function show($uuid)
     {
-        $customer = Customer::where('uuid', $uuid)->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $customer = Customer::findOrFail($uuid);
+        } else {
+            $customer = Customer::where('uuid', $uuid)->firstOrFail();
+        }
         return view('customers.show', compact('customer'));
     }
 
     /**
      * Show the form for editing the specified customer.
      */
-    public function edit(Customer $customer)
+    public function edit($uuid)
     {
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $customer = Customer::findOrFail($uuid);
+        } else {
+            $customer = Customer::where('uuid', $uuid)->firstOrFail();
+        }
         return view('customers.edit', compact('customer'));
     }
 
     /**
      * Update the specified customer in storage.
      */
-
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, $uuid)
     {
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $customer = Customer::findOrFail($uuid);
+        } else {
+            $customer = Customer::where('uuid', $uuid)->firstOrFail();
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'company_name' => 'required|string|max:255',
@@ -267,7 +283,12 @@ class CustomerController extends Controller
      */
     public function exportSinglePdf($uuid)
     {
-        $customer = Customer::where('uuid', $uuid)->with(['contactPersons', 'orders.products', 'tickets'])->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($uuid)) {
+            $customer = Customer::with(['contactPersons', 'orders.products', 'tickets'])->findOrFail($uuid);
+        } else {
+            $customer = Customer::where('uuid', $uuid)->with(['contactPersons', 'orders.products', 'tickets'])->firstOrFail();
+        }
         
         return $this->pdfExportService->generateSingleCustomerPdf($customer);
     }
