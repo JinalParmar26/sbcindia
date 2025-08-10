@@ -28,10 +28,11 @@
         }
 
         .card-header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background: white;
+            color: #1e3c72;
             padding: 30px;
             text-align: center;
+            border-bottom: 3px solid #1e3c72;
         }
 
         .logo-section {
@@ -48,11 +49,13 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 10px;
+            color: #1e3c72;
         }
 
         .order-subtitle {
             font-size: 16px;
-            opacity: 0.9;
+            opacity: 0.8;
+            color: #1e3c72;
         }
 
         .content-section {
@@ -119,50 +122,6 @@
             color: #856404;
         }
 
-        .contact-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .contact-btn {
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
-            color: white;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
-            color: white;
-        }
-
         .footer-section {
             background: #1e3c72;
             color: white;
@@ -186,10 +145,6 @@
 
             .content-section {
                 padding: 20px;
-            }
-
-            .contact-actions {
-                grid-template-columns: 1fr;
             }
 
             .info-item {
@@ -229,26 +184,6 @@
                 <div class="info-item">
                     <div class="info-label">Address:</div>
                     <div class="info-value">{{ $order->customer->address }}</div>
-                </div>
-                @endif
-                @if($order->customer->email)
-                <div class="info-item">
-                    <div class="info-label">Email:</div>
-                    <div class="info-value">
-                        <a href="mailto:{{ $order->customer->email }}" style="color: #1e3c72;">
-                            {{ $order->customer->email }}
-                        </a>
-                    </div>
-                </div>
-                @endif
-                @if($order->customer->phone_number)
-                <div class="info-item">
-                    <div class="info-label">Phone:</div>
-                    <div class="info-value">
-                        <a href="tel:{{ $order->customer->phone_number }}" style="color: #1e3c72;">
-                            {{ $order->customer->phone_number }}
-                        </a>
-                    </div>
                 </div>
                 @endif
 
@@ -306,18 +241,35 @@
                 @endforeach
                 @endif
 
-                <!-- Contact Actions -->
-                <div class="contact-actions">
-                    @if($order->customer->email)
-                    <a href="mailto:{{ $order->customer->email }}" class="contact-btn btn-primary">
-                        <i class="fas fa-envelope"></i> Email Customer
-                    </a>
-                    @endif
-                    @if($order->customer->phone_number)
-                    <a href="tel:{{ $order->customer->phone_number }}" class="contact-btn btn-success">
-                        <i class="fas fa-phone"></i> Call Customer
-                    </a>
-                    @endif
+                <!-- SBC Contact Information -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-building"></i> SBC Cooling Systems Contact
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Address:</div>
+                    <div class="info-value">123 Industrial Area, Phase-II<br>Chandigarh - 160002, India</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value">
+                        <a href="tel:+91-172-1234567" style="color: #1e3c72;">+91-172-1234567</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value">
+                        <a href="mailto:info@sbccindia.com" style="color: #1e3c72;">info@sbccindia.com</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Website:</div>
+                    <div class="info-value">
+                        <a href="https://sbccindia.com" target="_blank" style="color: #1e3c72;">www.sbccindia.com</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Hours:</div>
+                    <div class="info-value">Mon-Sat 9:00 AM - 6:00 PM</div>
                 </div>
             </div>
         </div>
