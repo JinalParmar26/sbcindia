@@ -65,7 +65,7 @@
         </div>
     </div>
 
-    @if($order->products && count($order->products) > 0)
+    @if($order->orderProducts && count($order->orderProducts) > 0)
         <div class="page-break">
             <h3>Order Items</h3>
             <table>
@@ -78,7 +78,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($order->products as $item)
+                    @foreach($order->orderProducts as $item)
                         <tr>
                             <td>{{ $item->product->name ?? 'N/A' }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>

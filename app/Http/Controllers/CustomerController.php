@@ -285,9 +285,9 @@ class CustomerController extends Controller
     {
         // Handle both UUID and ID parameters
         if (is_numeric($uuid)) {
-            $customer = Customer::with(['contactPersons', 'orders.products', 'tickets'])->findOrFail($uuid);
+            $customer = Customer::with(['contactPersons', 'orders.orderProducts.product', 'tickets'])->findOrFail($uuid);
         } else {
-            $customer = Customer::where('uuid', $uuid)->with(['contactPersons', 'orders.products', 'tickets'])->firstOrFail();
+            $customer = Customer::where('uuid', $uuid)->with(['contactPersons', 'orders.orderProducts.product', 'tickets'])->firstOrFail();
         }
         
         return $this->pdfExportService->generateSingleCustomerPdf($customer);

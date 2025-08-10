@@ -85,9 +85,9 @@
                 <tr>
                     <td>{{ $order->id }}</td>
                     <td>
-                        @if($order->products)
-                            @foreach($order->products as $product)
-                                {{ $product->name }}@if(!$loop->last), @endif
+                        @if($order->orderProducts)
+                            @foreach($order->orderProducts as $orderProduct)
+                                {{ $orderProduct->product->name ?? $orderProduct->serial_number ?? 'N/A' }}@if(!$loop->last), @endif
                             @endforeach
                         @else
                             N/A
