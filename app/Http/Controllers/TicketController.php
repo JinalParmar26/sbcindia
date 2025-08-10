@@ -82,32 +82,57 @@ class TicketController extends Controller
         return redirect()->route('tickets.show', $ticket->uuid)->with('success', 'Ticket created successfully.');
     }
 
-    public function show($uuid)
+    public function show($id)
     {
-        $ticket = Ticket::with([
-            'customer', 
-            'orderProduct.product', 
-            'assignedTo', 
-            'additionalStaff',
-            'services',
-            'ticketImages.uploadedBy'
-        ])->where('uuid', $uuid)->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($id)) {
+            $ticket = Ticket::with([
+                'customer', 
+                'orderProduct.product', 
+                'assignedTo', 
+                'additionalStaff',
+                'services',
+                'ticketImages.uploadedBy'
+            ])->findOrFail($id);
+        } else {
+            $ticket = Ticket::with([
+                'customer', 
+                'orderProduct.product', 
+                'assignedTo', 
+                'additionalStaff',
+                'services',
+                'ticketImages.uploadedBy'
+            ])->where('uuid', $id)->firstOrFail();
+        }
         
         return view('tickets.show', compact('ticket'));
     }
 
     public function edit($id)
     {
-        $ticket = Ticket::findOrFail($id);
+        // Handle both UUID and ID parameters
+        if (is_numeric($id)) {
+            $ticket = Ticket::with(['customer.contactPersons'])->findOrFail($id);
+        } else {
+            $ticket = Ticket::with(['customer.contactPersons'])->where('uuid', $id)->firstOrFail();
+        }
+        
         $customers = Customer::all();
         $products = OrderProduct::with('order', 'product')->get();
         $staff = User::role('staff')->get();
-        $customerContacts =  $ticket->customer->contactPersons;
+        $customerContacts = $ticket->customer->contactPersons;
         return view('tickets.edit', compact('ticket', 'customers', 'products', 'staff','customerContacts'));
     }
 
-    public function update(Request $request, Ticket $ticket)
+    public function update(Request $request, $id)
     {
+        // Handle both UUID and ID parameters
+        if (is_numeric($id)) {
+            $ticket = Ticket::findOrFail($id);
+        } else {
+            $ticket = Ticket::where('uuid', $id)->firstOrFail();
+        }
+        
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
             'customer_id' => 'required|exists:customers,id',

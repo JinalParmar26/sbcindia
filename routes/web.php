@@ -183,11 +183,12 @@ Route::middleware('auth')->group(function () {
         });
         
         Route::middleware('permission:edit_tickets')->group(function () {
-            Route::get('/tickets/{id}/edit', Tickets::class)->name('tickets.edit');
+            Route::get('/tickets/{id}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
+            Route::put('/tickets/{id}', [TicketController::class, 'update'])->name('tickets.update');
         });
         
         Route::middleware('permission:view_tickets')->group(function () {
-            Route::get('/tickets/{id}', Tickets::class)->name('tickets.show');
+            Route::get('/tickets/{id}', [TicketController::class, 'show'])->name('tickets.show');
         });
         
         // Lead Management Routes - Permission Based
