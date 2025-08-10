@@ -288,20 +288,34 @@ class TicketController extends Controller
     /**
      * Export single ticket to PDF
      */
-    public function exportSinglePdf($uuid)
+    public function exportSinglePdf($id)
     {
-        // Find the ticket by UUID and load all relationships
-        $ticket = Ticket::with([
-            'customer', 
-            'assignedTo', 
-            'attendedBy', 
-            'contactPerson',
-            'orderProduct.product',
-            'orderProduct.order',
-            'additionalStaff',
-            'services',
-            'ticketImages.uploadedBy'
-        ])->where('uuid', $uuid)->firstOrFail();
+        // Handle both UUID and ID parameters
+        if (is_numeric($id)) {
+            $ticket = Ticket::with([
+                'customer', 
+                'assignedTo', 
+                'attendedBy', 
+                'contactPerson',
+                'orderProduct.product',
+                'orderProduct.order',
+                'additionalStaff',
+                'services',
+                'ticketImages.uploadedBy'
+            ])->findOrFail($id);
+        } else {
+            $ticket = Ticket::with([
+                'customer', 
+                'assignedTo', 
+                'attendedBy', 
+                'contactPerson',
+                'orderProduct.product',
+                'orderProduct.order',
+                'additionalStaff',
+                'services',
+                'ticketImages.uploadedBy'
+            ])->where('uuid', $id)->firstOrFail();
+        }
 
         // Debug: Log what we're loading
         Log::info('PDF Export Debug', [

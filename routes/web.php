@@ -175,6 +175,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/tickets', Tickets::class)->name('tickets');
             Route::get('/tickets/export', [TicketController::class, 'exportCsv'])->name('tickets.export');
             Route::get('/tickets/export/pdf', [TicketController::class, 'exportPdf'])->name('tickets.export.pdf');
+            // Single ticket PDF export route
+            Route::get('/tickets/{id}/pdf', [TicketController::class, 'exportSinglePdf'])->name('tickets.single.pdf');
         });
         
         Route::middleware('permission:create_tickets')->group(function () {
