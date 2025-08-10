@@ -42,6 +42,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\LocationManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -225,6 +226,20 @@ Route::middleware('auth')->group(function () {
         
         Route::middleware('permission:manage_attendance')->group(function () {
             Route::post('/staff/checkout/{staff}', Staff::class)->name('staff.checkout');
+        });
+
+        // Location Management Routes
+        Route::middleware('permission:view_users')->group(function () {
+            Route::get('/location', [LocationManagementController::class, 'index'])->name('location.index');
+            Route::get('/location/live-tracking', [LocationManagementController::class, 'liveLocationTracking'])->name('location.live.tracking');
+            Route::get('/location/live-data', [LocationManagementController::class, 'getLiveLocationData'])->name('location.live.data');
+            Route::get('/location/user/{userId}', [LocationManagementController::class, 'showUserLocations'])->name('location.user.show');
+            Route::get('/location/user/{userId}/trail', [LocationManagementController::class, 'getUserLocationTrail'])->name('location.user.trail');
+            Route::get('/location/user/{userId}/data', [LocationManagementController::class, 'getLocationData'])->name('location.user.data');
+            Route::get('/location/user/{userId}/summary', [LocationManagementController::class, 'getUserLocationSummary'])->name('location.user.summary');
+            Route::get('/location/user/{userId}/export', [LocationManagementController::class, 'exportLocationData'])->name('location.user.export');
+            Route::get('/location/users-with-data', [LocationManagementController::class, 'getUsersWithLocationData'])->name('location.users.with.data');
+            Route::post('/location/cleanup', [LocationManagementController::class, 'cleanupOldLocations'])->name('location.cleanup');
         });
         
         Route::get('/transactions', Transactions::class)->name('transactions');
