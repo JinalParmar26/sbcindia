@@ -21,13 +21,13 @@
 
         .logo-section {
             text-align: center;
-            margin-bottom: 20px;
+            padding: 20px 30px 10px;
+            background: white;
         }
 
         .company-logo {
-            max-width: 200px;
+            max-width: 150px;
             height: auto;
-            margin-bottom: 10px;
         }
 
         .visiting-card {
@@ -270,18 +270,6 @@
             font-weight: 600;
         }
 
-        .status-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #28a745;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
         .footer-section {
             background: #1e3c72;
             color: white;
@@ -332,17 +320,14 @@
 </head>
 <body>
     <div class="container">
-        <!-- Logo Section -->
-        <div class="logo-section">
-            <img src="https://sbccindia.com/assets/img/logo/sbc-logo.webp" alt="SBC Cooling Systems" class="company-logo">
-        </div>
-
         <!-- Main Visiting Card -->
         <div class="visiting-card">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <img src="https://sbccindia.com/assets/img/logo/sbc-logo.webp" alt="SBC Cooling Systems" class="company-logo">
+            </div>
+            
             <div class="card-header">
-                <div class="status-badge">
-                    <i class="fas fa-circle"></i> Active
-                </div>
             </div>
             
             <div class="profile-section">
@@ -358,17 +343,17 @@
                 <div class="staff-designation">{{ $staff->role ?? 'Staff Member' }}</div>
                 
                 <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>
+                    </div>
+                    
                     @if($staff->phone_number)
                     <div class="contact-item">
                         <i class="fas fa-phone"></i>
                         <a href="tel:{{ $staff->phone_number }}">{{ $staff->phone_number }}</a>
                     </div>
                     @endif
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>
-                    </div>
                 </div>
                 
                 <div class="action-buttons">
