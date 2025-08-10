@@ -8,44 +8,64 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f7fa;
             min-height: 100vh;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px 0;
         }
 
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .company-logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
         .visiting-card {
-            max-width: 420px;
-            margin: 20px auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             overflow: hidden;
             position: relative;
+            margin-bottom: 20px;
         }
 
         .card-header {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            height: 120px;
+            height: 80px;
             position: relative;
         }
 
+        .profile-section {
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            margin-top: -40px;
+        }
+
         .profile-photo {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            border: 6px solid white;
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
+            border: 4px solid white;
             background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 36px;
             color: #6c757d;
             overflow: hidden;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .profile-photo img {
@@ -54,48 +74,47 @@
             object-fit: cover;
         }
 
-        .card-body {
-            padding: 80px 30px 30px;
-            text-align: center;
-        }
-
         .staff-name {
-            font-size: 26px;
-            font-weight: bold;
+            font-size: 24px;
+            font-weight: 700;
             color: #1e3c72;
             margin-bottom: 5px;
+            line-height: 1.2;
         }
 
         .staff-designation {
-            color: #2a5298;
-            font-size: 18px;
+            color: #666;
+            font-size: 16px;
             font-weight: 500;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-transform: capitalize;
         }
 
         .contact-info {
             margin-bottom: 25px;
+            text-align: left;
         }
 
         .contact-item {
             display: flex;
             align-items: center;
-            justify-content: center;
             margin-bottom: 12px;
-            color: #34495e;
+            color: #333;
             font-size: 14px;
+            padding: 8px 0;
         }
 
         .contact-item i {
-            width: 20px;
-            margin-right: 10px;
+            width: 24px;
+            margin-right: 12px;
             color: #1e3c72;
+            font-size: 16px;
         }
 
         .contact-item a {
-            color: #34495e;
+            color: #333;
             text-decoration: none;
+            flex: 1;
         }
 
         .contact-item a:hover {
@@ -105,156 +124,188 @@
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 25px;
         }
 
         .btn-contact {
             padding: 12px 16px;
             border-radius: 8px;
-            font-weight: 500;
+            font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            border: none;
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
             color: white;
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-            border: none;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
 
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
             color: white;
         }
 
         .company-info {
             background: #f8f9fa;
             padding: 20px;
-            margin: 20px 0;
-            border-radius: 10px;
-            text-align: left;
+            margin: 0 -30px 25px;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .company-info h6 {
             color: #1e3c72;
             margin-bottom: 15px;
-            font-weight: bold;
+            font-weight: 700;
             text-align: center;
+            font-size: 16px;
         }
 
-        .company-info p {
-            margin: 5px 0;
-            color: #6c757d;
+        .company-info .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
             font-size: 13px;
+            color: #555;
+        }
+
+        .company-info .info-item i {
+            width: 16px;
+            margin-right: 8px;
+            color: #1e3c72;
+            margin-top: 2px;
         }
 
         .services-section {
-            margin: 20px 0;
+            margin-bottom: 25px;
+        }
+
+        .services-section h6 {
+            color: #1e3c72;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 16px;
         }
 
         .services-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 15px;
         }
 
         .service-btn {
-            padding: 12px 10px;
+            padding: 12px 8px;
             background: white;
             border: 2px solid #1e3c72;
             color: #1e3c72;
             border-radius: 8px;
             text-decoration: none;
             font-size: 12px;
-            font-weight: 500;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .service-btn:hover {
             background: #1e3c72;
             color: white;
+            transform: translateY(-1px);
         }
 
         .customers-section {
-            margin: 25px 0;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         .customers-section h6 {
             color: #1e3c72;
             margin-bottom: 15px;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 16px;
         }
 
         .customer-logos {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
         .customer-logo {
-            width: 60px;
-            height: 40px;
+            width: 100%;
+            height: 35px;
             background: #f8f9fa;
             border: 1px solid #e9ecef;
-            border-radius: 5px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 10px;
-            color: #6c757d;
+            color: #666;
             text-align: center;
-            margin: 0 auto;
-        }
-
-        .company-footer {
-            background: #1e3c72;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 14px;
+            font-weight: 600;
         }
 
         .status-badge {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: #27ae60;
+            background: #28a745;
             color: white;
-            padding: 5px 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .footer-section {
+            background: #1e3c72;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
             border-radius: 15px;
-            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .footer-section strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
         }
 
         @media (max-width: 480px) {
-            .visiting-card {
+            .container {
                 margin: 10px;
                 max-width: none;
+            }
+
+            .visiting-card {
+                margin-bottom: 15px;
             }
             
             .action-buttons {
@@ -268,94 +319,123 @@
             .customer-logos {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .profile-section {
+                padding: 20px;
+            }
+
+            .company-info {
+                margin: 0 -20px 25px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="visiting-card">
-        <div class="card-header">
-            <div class="status-badge">
-                <i class="fas fa-circle"></i> Active
-            </div>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="https://sbccindia.com/assets/img/logo/sbc-logo.webp" alt="SBC Cooling Systems" class="company-logo">
         </div>
-        
-        <div class="profile-photo">
-            @if($staff->profile_photo)
-                <img src="{{ asset('storage/' . $staff->profile_photo) }}" alt="{{ $staff->name }}">
-            @else
-                <i class="fas fa-user"></i>
-            @endif
-        </div>
-        
-        <div class="card-body">
-            <div class="staff-name">{{ $staff->name }}</div>
-            <div class="staff-designation">{{ $staff->role ?? 'Staff Member' }}</div>
-            
-            <div class="contact-info">
-                @if($staff->phone_number)
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <a href="tel:{{ $staff->phone_number }}">{{ $staff->phone_number }}</a>
+
+        <!-- Main Visiting Card -->
+        <div class="visiting-card">
+            <div class="card-header">
+                <div class="status-badge">
+                    <i class="fas fa-circle"></i> Active
                 </div>
-                @endif
+            </div>
+            
+            <div class="profile-section">
+                <div class="profile-photo">
+                    @if($staff->profile_photo)
+                        <img src="{{ asset('storage/' . $staff->profile_photo) }}" alt="{{ $staff->name }}">
+                    @else
+                        <i class="fas fa-user"></i>
+                    @endif
+                </div>
                 
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>
+                <div class="staff-name">{{ $staff->name }}</div>
+                <div class="staff-designation">{{ $staff->role ?? 'Staff Member' }}</div>
+                
+                <div class="contact-info">
+                    @if($staff->phone_number)
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:{{ $staff->phone_number }}">{{ $staff->phone_number }}</a>
+                    </div>
+                    @endif
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="action-buttons">
-                <button onclick="saveContact()" class="btn-contact btn-success">
-                    <i class="fas fa-download"></i> Save Contact
-                </button>
-                <a href="https://sbccindia.com/" target="_blank" class="btn-contact btn-primary">
-                    <i class="fas fa-globe"></i> Visit Website
-                </a>
-            </div>
-
-            <!-- Company Information -->
-            <div class="company-info">
-                <h6><i class="fas fa-building"></i> SBC Cooling Systems</h6>
-                <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong></p>
-                <p>123 Industrial Area, Phase-II<br>
-                   Chandigarh - 160002, India</p>
-                <p><i class="fas fa-phone"></i> <strong>Office:</strong> +91-172-1234567</p>
-                <p><i class="fas fa-envelope"></i> <strong>Email:</strong> info@sbccindia.com</p>
-                <p><i class="fas fa-clock"></i> <strong>Hours:</strong> Mon-Sat 9:00 AM - 6:00 PM</p>
-            </div>
-
-            <!-- Services Section -->
-            <div class="services-section">
-                <h6 style="color: #1e3c72; font-weight: bold; margin-bottom: 15px;">
-                    <i class="fas fa-cogs"></i> Our Services
-                </h6>
-                <div class="services-grid">
-                    <a href="https://sbccindia.com/download/brochure" target="_blank" class="service-btn">
-                        <i class="fas fa-download"></i> Brochure
-                    </a>
-                    <a href="https://sbccindia.com/products.php" target="_blank" class="service-btn">
-                        <i class="fas fa-box"></i> Products
+                
+                <div class="action-buttons">
+                    <button onclick="saveContact()" class="btn-contact btn-success">
+                        <i class="fas fa-download"></i> Save Contact
+                    </button>
+                    <a href="https://sbccindia.com/" target="_blank" class="btn-contact btn-primary">
+                        <i class="fas fa-globe"></i> Visit Website
                     </a>
                 </div>
-            </div>
 
-            <!-- Customers Section -->
-            <div class="customers-section">
-                <h6><i class="fas fa-handshake"></i> Our Valuable Customers</h6>
-                <div class="customer-logos">
-                    <div class="customer-logo">Reliance</div>
-                    <div class="customer-logo">TATA</div>
-                    <div class="customer-logo">Bajaj</div>
-                    <div class="customer-logo">Mahindra</div>
-                    <div class="customer-logo">L&T</div>
-                    <div class="customer-logo">Godrej</div>
+                <!-- Company Information -->
+                <div class="company-info">
+                    <h6><i class="fas fa-building"></i> SBC Cooling Systems</h6>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Address:</strong><br>
+                            123 Industrial Area, Phase-II<br>
+                            Chandigarh - 160002, India
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div><strong>Office:</strong> +91-172-1234567</div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div><strong>Email:</strong> info@sbccindia.com</div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div><strong>Hours:</strong> Mon-Sat 9:00 AM - 6:00 PM</div>
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <div class="services-section">
+                    <h6><i class="fas fa-cogs"></i> Our Services</h6>
+                    <div class="services-grid">
+                        <a href="https://sbccindia.com/download/brochure" target="_blank" class="service-btn">
+                            <i class="fas fa-download"></i> Brochure
+                        </a>
+                        <a href="https://sbccindia.com/products.php" target="_blank" class="service-btn">
+                            <i class="fas fa-box"></i> Products
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Customers Section -->
+                <div class="customers-section">
+                    <h6><i class="fas fa-handshake"></i> Our Valuable Customers</h6>
+                    <div class="customer-logos">
+                        <div class="customer-logo">Reliance</div>
+                        <div class="customer-logo">TATA</div>
+                        <div class="customer-logo">Bajaj</div>
+                        <div class="customer-logo">Mahindra</div>
+                        <div class="customer-logo">L&T</div>
+                        <div class="customer-logo">Godrej</div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="company-footer">
-            <strong>SBC Cooling Systems</strong><br>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <strong>SBC Cooling Systems</strong>
             Industrial Cooling Solutions Excellence
         </div>
     </div>
@@ -383,7 +463,7 @@ END:VCARD`;
             // Create download link
             const link = document.createElement('a');
             link.href = url;
-            link.download = '{{ str_replace(' ', '_', $staff->name) }}_SBC_Contact.vcf';
+            link.download = '{{ str_replace(" ", "_", $staff->name) }}_SBC_Contact.vcf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -400,13 +480,14 @@ END:VCARD`;
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
                 color: white;
-                padding: 15px 20px;
-                border-radius: 5px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 z-index: 9999;
                 font-size: 14px;
+                font-weight: 500;
                 max-width: 300px;
             `;
             toast.textContent = message;
@@ -415,7 +496,9 @@ END:VCARD`;
             
             // Remove toast after 3 seconds
             setTimeout(() => {
-                document.body.removeChild(toast);
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
             }, 3000);
         }
 
@@ -426,6 +509,10 @@ END:VCARD`;
                 // You can add analytics tracking here
             });
         });
+
+        // Preload company logo
+        const logo = new Image();
+        logo.src = 'https://sbccindia.com/assets/img/logo/sbc-logo.webp';
     </script>
 </body>
 </html>
