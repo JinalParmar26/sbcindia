@@ -685,7 +685,10 @@ class OrderController extends Controller
             'customer',
             'orderProducts.product',
             'images',
-            'tickets.assignedTo'
+            'tickets.assignedTo',
+            'tickets.services.serviceItems',
+            'tickets.customer',
+            'tickets.orderProduct.product'
         ])->firstOrFail();
 
         return view('public.order-details', compact('order'));

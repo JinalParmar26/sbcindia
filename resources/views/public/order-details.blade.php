@@ -229,30 +229,203 @@
                     <i class="fas fa-ticket-alt"></i> Support Tickets ({{ $order->tickets->count() }})
                 </div>
                 @foreach($order->tickets as $ticket)
-                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #1e3c72;">
-                    <div style="font-weight: 600; font-size: 16px; color: #1e3c72; margin-bottom: 10px;">{{ $ticket->subject }}</div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 14px;">
-                        <div><strong>Type:</strong> <span style="background: #e9ecef; padding: 2px 8px; border-radius: 4px;">{{ ucfirst($ticket->type) }}</span></div>
-                        <div><strong>Status:</strong> 
-                            @if($ticket->end)
-                                <span style="background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 4px;">Closed</span>
-                            @elseif($ticket->start)
-                                <span style="background: #fff3cd; color: #856404; padding: 2px 8px; border-radius: 4px;">In Progress</span>
-                            @else
-                                <span style="background: #d1ecf1; color: #0c5460; padding: 2px 8px; border-radius: 4px;">Pending</span>
+                <div style="background: #fff; border: 1px solid #e9ecef; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Ticket Header -->
+                    <div style="border-bottom: 2px solid #1e3c72; padding-bottom: 15px; margin-bottom: 20px;">
+                        <div style="font-weight: 700; font-size: 18px; color: #1e3c72; margin-bottom: 8px;">{{ $ticket->subject }}</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; color: #666;">
+                            <div><strong>Type:</strong> <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-weight: 600;">{{ ucfirst($ticket->type) }}</span></div>
+                            <div><strong>Status:</strong> 
+                                @if($ticket->end)
+                                    <span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: 600;">Closed</span>
+                                @elseif($ticket->start)
+                                    <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: 600;">In Progress</span>
+                                @else
+                                    <span style="background: #d1ecf1; color: #0c5460; padding: 4px 8px; border-radius: 4px; font-weight: 600;">Pending</span>
+                                @endif
+                            </div>
+                            @if($ticket->assignedTo)
+                            <div><strong>Assigned to:</strong> <span style="color: #1e3c72; font-weight: 600;">{{ $ticket->assignedTo->name }}</span></div>
                             @endif
+                            <div><strong>Created:</strong> {{ $ticket->created_at->format('M d, Y H:i') }}</div>
                         </div>
-                        @if($ticket->assignedTo)
-                        <div><strong>Assigned to:</strong> {{ $ticket->assignedTo->name }}</div>
-                        @endif
-                        @if($ticket->start)
-                        <div><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($ticket->start)->format('M d, Y') }}</div>
-                        @endif
-                        @if($ticket->end)
-                        <div><strong>End Date:</strong> {{ \Carbon\Carbon::parse($ticket->end)->format('M d, Y') }}</div>
-                        @endif
-                        <div><strong>Ticket ID:</strong> {{ $ticket->uuid }}</div>
                     </div>
+
+                    <!-- Ticket Basic Info -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: 600; color: #1e3c72; margin-bottom: 8px;">📋 Ticket Information</div>
+                            @if($ticket->start)
+                            <div style="margin-bottom: 5px;"><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($ticket->start)->format('M d, Y H:i') }}</div>
+                            @endif
+                            @if($ticket->end)
+                            <div style="margin-bottom: 5px;"><strong>End Date:</strong> {{ \Carbon\Carbon::parse($ticket->end)->format('M d, Y H:i') }}</div>
+                            @endif
+                            <div><strong>Ticket ID:</strong> {{ $ticket->uuid }}</div>
+                        </div>
+                        @if($ticket->orderProduct)
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: 600; color: #1e3c72; margin-bottom: 8px;">🔧 Product Information</div>
+                            <div style="margin-bottom: 5px;"><strong>Product:</strong> {{ $ticket->orderProduct->product->name ?? 'N/A' }}</div>
+                            <div style="margin-bottom: 5px;"><strong>Model:</strong> {{ $ticket->orderProduct->model_number ?? 'N/A' }}</div>
+                            <div><strong>Serial:</strong> {{ $ticket->orderProduct->serial_number ?? 'N/A' }}</div>
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- Services Details -->
+                    @if($ticket->services && $ticket->services->count() > 0)
+                    <div style="margin-top: 20px;">
+                        <div style="font-weight: 600; color: #1e3c72; margin-bottom: 15px; font-size: 16px;">🔧 Service Details ({{ $ticket->services->count() }})</div>
+                        @foreach($ticket->services as $index => $service)
+                        <div style="background: #f1f3f4; border-radius: 8px; padding: 20px; margin-bottom: 15px; {{ $index > 0 ? 'margin-top: 15px;' : '' }}">
+                            <!-- Service Header -->
+                            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                                <div style="font-weight: 600; color: #1e3c72;">Service {{ $index + 1 }}: {{ ucfirst(str_replace('_', ' ', $service->service_type)) }}</div>
+                                <div style="background: {{ $service->payment_status === 'received' ? '#d4edda' : '#fff3cd' }}; color: {{ $service->payment_status === 'received' ? '#155724' : '#856404' }}; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    {{ ucfirst($service->payment_status ?? 'pending') }}
+                                </div>
+                            </div>
+
+                            <!-- Basic Service Information -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                                <div style="background: white; padding: 12px; border-radius: 6px;">
+                                    <div style="font-weight: 600; color: #666; margin-bottom: 8px;">👤 Contact & Payment</div>
+                                    <div style="font-size: 14px;">
+                                        <div style="margin-bottom: 4px;"><strong>Contact:</strong> {{ $service->contact_person_name ?? '-' }}</div>
+                                        <div style="margin-bottom: 4px;"><strong>Payment Type:</strong> 
+                                            <span style="background: {{ $service->payment_type === 'warranty' ? '#d4edda' : ($service->payment_type === 'paid' ? '#cce5ff' : '#f8f9fa') }}; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                                {{ ucfirst($service->payment_type ?? 'N/A') }}
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 4px;"><strong>Unit Model:</strong> {{ $service->unit_model_number ?? '-' }}</div>
+                                        <div><strong>Unit Serial:</strong> {{ $service->unit_sr_no ?? '-' }}</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: white; padding: 12px; border-radius: 6px;">
+                                    <div style="font-weight: 600; color: #666; margin-bottom: 8px;">📅 Schedule & Location</div>
+                                    <div style="font-size: 14px;">
+                                        @if($service->start_date_time)
+                                        <div style="margin-bottom: 4px;"><strong>Start:</strong> {{ \Carbon\Carbon::parse($service->start_date_time)->format('M d, Y H:i') }}</div>
+                                        @endif
+                                        @if($service->end_date_time)
+                                        <div style="margin-bottom: 4px;"><strong>End:</strong> {{ \Carbon\Carbon::parse($service->end_date_time)->format('M d, Y H:i') }}</div>
+                                        @endif
+                                        @if($service->start_location_name)
+                                        <div style="margin-bottom: 4px;"><strong>Start Location:</strong> {{ $service->start_location_name }}</div>
+                                        @endif
+                                        @if($service->end_location_name)
+                                        <div><strong>End Location:</strong> {{ $service->end_location_name }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Technical Readings -->
+                            @if($service->service_type === 'service_report' || $service->voltage || $service->refrigerant)
+                            <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                <div style="font-weight: 600; color: #666; margin-bottom: 12px;">⚡ Technical Readings</div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; font-size: 13px;">
+                                    <!-- Electrical -->
+                                    <div>
+                                        <div style="font-weight: 600; color: #1e3c72; margin-bottom: 6px;">Electrical</div>
+                                        @if($service->voltage)<div><strong>Voltage:</strong> {{ $service->voltage }}</div>@endif
+                                        @if($service->amp_r)<div><strong>Amp R:</strong> {{ $service->amp_r }}</div>@endif
+                                        @if($service->amp_y)<div><strong>Amp Y:</strong> {{ $service->amp_y }}</div>@endif
+                                        @if($service->amp_b)<div><strong>Amp B:</strong> {{ $service->amp_b }}</div>@endif
+                                    </div>
+                                    
+                                    <!-- Pressure & Gas -->
+                                    <div>
+                                        <div style="font-weight: 600; color: #1e3c72; margin-bottom: 6px;">Pressure & Gas</div>
+                                        @if($service->refrigerant)<div><strong>Refrigerant:</strong> {{ $service->refrigerant }}</div>@endif
+                                        @if($service->standing_pressure)<div><strong>Standing Pressure:</strong> {{ $service->standing_pressure }}</div>@endif
+                                        @if($service->suction_pressure)<div><strong>Suction Pressure:</strong> {{ $service->suction_pressure }}</div>@endif
+                                        @if($service->discharge_pressure)<div><strong>Discharge Pressure:</strong> {{ $service->discharge_pressure }}</div>@endif
+                                    </div>
+                                    
+                                    <!-- Temperature -->
+                                    <div>
+                                        <div style="font-weight: 600; color: #1e3c72; margin-bottom: 6px;">Temperature</div>
+                                        @if($service->room_temp)<div><strong>Room:</strong> {{ $service->room_temp }}</div>@endif
+                                        @if($service->cabinet_temp)<div><strong>Cabinet:</strong> {{ $service->cabinet_temp }}</div>@endif
+                                        @if($service->suction_temp)<div><strong>Suction:</strong> {{ $service->suction_temp }}</div>@endif
+                                        @if($service->discharge_temp)<div><strong>Discharge:</strong> {{ $service->discharge_temp }}</div>@endif
+                                        @if($service->water_tank_temp)<div><strong>Water Tank:</strong> {{ $service->water_tank_temp }}</div>@endif
+                                    </div>
+                                </div>
+                                
+                                @if($service->chilled_water_in || $service->chilled_water_out)
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e9ecef;">
+                                    <div style="font-weight: 600; color: #1e3c72; margin-bottom: 6px;">Water Temperature</div>
+                                    @if($service->chilled_water_in)<span style="margin-right: 20px;"><strong>Chilled Water In:</strong> {{ $service->chilled_water_in }}</span>@endif
+                                    @if($service->chilled_water_out)<span><strong>Chilled Water Out:</strong> {{ $service->chilled_water_out }}</span>@endif
+                                </div>
+                                @endif
+                            </div>
+                            @endif
+
+                            <!-- Service Description -->
+                            @if($service->service_description)
+                            <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                <div style="font-weight: 600; color: #666; margin-bottom: 8px;">📝 Service Description</div>
+                                <div style="font-size: 14px; line-height: 1.5;">{{ $service->service_description }}</div>
+                            </div>
+                            @endif
+
+                            <!-- Service Log -->
+                            @if($service->log)
+                            <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                <div style="font-weight: 600; color: #666; margin-bottom: 8px;">📊 Service Log</div>
+                                <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 200px; overflow-y: auto;">{{ $service->log }}</div>
+                            </div>
+                            @endif
+
+                            <!-- Service Items -->
+                            @if($service->serviceItems && $service->serviceItems->count() > 0)
+                            <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                <div style="font-weight: 600; color: #666; margin-bottom: 12px;">🛠️ Service Items Used</div>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                        <thead>
+                                            <tr style="background: #f8f9fa;">
+                                                <th style="padding: 8px; border: 1px solid #dee2e6; text-align: left;">Item</th>
+                                                <th style="padding: 8px; border: 1px solid #dee2e6; text-align: center;">Qty</th>
+                                                <th style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">Rate</th>
+                                                <th style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php $totalAmount = 0; @endphp
+                                            @foreach($service->serviceItems as $item)
+                                            <tr>
+                                                <td style="padding: 8px; border: 1px solid #dee2e6;">{{ $item->item }}</td>
+                                                <td style="padding: 8px; border: 1px solid #dee2e6; text-align: center;">{{ $item->qty }}</td>
+                                                <td style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">₹{{ number_format($item->rate, 2) }}</td>
+                                                <td style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">₹{{ number_format($item->amount, 2) }}</td>
+                                            </tr>
+                                            @php $totalAmount += $item->amount; @endphp
+                                            @endforeach
+                                            <tr style="background: #e3f2fd; font-weight: 600;">
+                                                <td colspan="3" style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">Total</td>
+                                                <td style="padding: 8px; border: 1px solid #dee2e6; text-align: right;">₹{{ number_format($totalAmount, 2) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            @endif
+
+                            <!-- Service Timestamps -->
+                            <div style="display: flex; justify-content: between; align-items: center; font-size: 12px; color: #666; padding-top: 10px; border-top: 1px solid #e9ecef;">
+                                <div>📅 Created: {{ $service->created_at->format('M d, Y H:i') }}</div>
+                                <div>🔄 Updated: {{ $service->updated_at->format('M d, Y H:i') }}</div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
                 @endforeach
                 @endif
