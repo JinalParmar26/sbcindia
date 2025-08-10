@@ -241,35 +241,58 @@
                 @endforeach
                 @endif
 
-                <!-- SBC Contact Information -->
+                <!-- Our Services Section -->
                 <div class="section-title" style="margin-top: 30px;">
-                    <i class="fas fa-building"></i> SBC Cooling Systems Contact
+                    <i class="fas fa-cogs"></i> Our Services
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Address:</div>
-                    <div class="info-value">123 Industrial Area, Phase-II<br>Chandigarh - 160002, India</div>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <a href="https://sbccindia.com/products.php" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #1e3c72; border-left: 4px solid #1e3c72;">
+                        <i class="fas fa-cube" style="margin-right: 10px; color: #1e3c72;"></i>
+                        <strong>Products</strong>
+                    </a>
+                    <a href="https://sbccindia.com/contact.php" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #1e3c72; border-left: 4px solid #17a2b8;">
+                        <i class="fas fa-phone" style="margin-right: 10px; color: #17a2b8;"></i>
+                        <strong>Contact</strong>
+                    </a>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Phone:</div>
-                    <div class="info-value">
-                        <a href="tel:+91-172-1234567" style="color: #1e3c72;">+91-172-1234567</a>
+
+                <!-- Company Brochure Section -->
+                <div class="section-title">
+                    <i class="fas fa-file-pdf"></i> Company Brochure
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <a href="https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #dc3545; border-left: 4px solid #dc3545;">
+                        <i class="fas fa-download" style="margin-right: 10px; color: #dc3545;"></i>
+                        <strong>Download Brochure</strong>
+                    </a>
+                    <a href="https://sbccindia.com/" target="_blank" style="display: flex; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #28a745; border-left: 4px solid #28a745;">
+                        <i class="fas fa-globe" style="margin-right: 10px; color: #28a745;"></i>
+                        <strong>Visit Website</strong>
+                    </a>
+                </div>
+
+                <!-- SBC Cooling Systems Information -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-building"></i> SBC Cooling Systems
+                </div>
+            </div>
+        </div>
+
+        <!-- SBC Footer Information -->
+        <div class="order-card">
+            <div style="background: #1e3c72; color: white; padding: 30px; text-align: center;">
+                <h5 style="margin-bottom: 20px; color: white;"><strong>SBC Cooling Systems</strong></h5>
+                <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <p style="margin-bottom: 8px; color: white;"><strong>Address:</strong></p>
+                        <p style="margin-bottom: 20px; color: white;">123 Industrial Area, Phase-II<br>Chandigarh - 160002, India</p>
                     </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Email:</div>
-                    <div class="info-value">
-                        <a href="mailto:info@sbccindia.com" style="color: #1e3c72;">info@sbccindia.com</a>
+                    <div style="flex: 1; min-width: 250px;">
+                        <p style="margin-bottom: 8px; color: white;"><strong>Contact Information:</strong></p>
+                        <p style="margin-bottom: 4px; color: white;"><strong>Office:</strong> <a href="tel:+91-172-1234567" style="color: #87ceeb;">+91-172-1234567</a></p>
+                        <p style="margin-bottom: 4px; color: white;"><strong>Email:</strong> <a href="mailto:info@sbccindia.com" style="color: #87ceeb;">info@sbccindia.com</a></p>
+                        <p style="margin-bottom: 0; color: white;"><strong>Hours:</strong> Mon-Sat 9:00 AM - 6:00 PM</p>
                     </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Website:</div>
-                    <div class="info-value">
-                        <a href="https://sbccindia.com" target="_blank" style="color: #1e3c72;">www.sbccindia.com</a>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Hours:</div>
-                    <div class="info-value">Mon-Sat 9:00 AM - 6:00 PM</div>
                 </div>
             </div>
         </div>
