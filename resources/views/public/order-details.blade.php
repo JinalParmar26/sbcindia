@@ -172,37 +172,9 @@
             </div>
 
             <div class="content-section">
-                <!-- Customer Details -->
-                <div class="section-title">
-                    <i class="fas fa-user"></i> Customer Details
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Name:</div>
-                    <div class="info-value">{{ $order->customer->name }}</div>
-                </div>
-                @if($order->customer->address)
-                <div class="info-item">
-                    <div class="info-label">Address:</div>
-                    <div class="info-value">{{ $order->customer->address }}</div>
-                </div>
-                @endif
-
-                <!-- Order Details -->
-                <div class="section-title" style="margin-top: 30px;">
-                    <i class="fas fa-shopping-cart"></i> Order Information
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Order Date:</div>
-                    <div class="info-value">{{ $order->created_at->format('M d, Y') }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Order ID:</div>
-                    <div class="info-value">{{ $order->uuid }}</div>
-                </div>
-
                 <!-- Products -->
                 @if($order->orderProducts->count() > 0)
-                <div class="section-title" style="margin-top: 30px;">
+                <div class="section-title">
                     <i class="fas fa-box"></i> Products ({{ $order->orderProducts->count() }})
                 </div>
                 @foreach($order->orderProducts as $orderProduct)
@@ -221,6 +193,34 @@
                 </div>
                 @endforeach
                 @endif
+
+                <!-- Customer Details -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-user"></i> Customer Details
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Name:</div>
+                    <div class="info-value">{{ $order->customer->name }}</div>
+                </div>
+                @if($order->customer->address)
+                <div class="info-item">
+                    <div class="info-label">Address:</div>
+                    <div class="info-value">{{ $order->customer->address }}</div>
+                </div>
+                @endif
+
+                <!-- Order Information -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-shopping-cart"></i> Order Information
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Order Date:</div>
+                    <div class="info-value">{{ $order->created_at->format('M d, Y') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Order ID:</div>
+                    <div class="info-value">{{ $order->uuid }}</div>
+                </div>
 
                 <!-- Tickets -->
                 @if($order->tickets->count() > 0)
