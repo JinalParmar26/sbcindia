@@ -452,9 +452,9 @@
                 </div>
                 
                 <div class="action-buttons">
-                    <button onclick="saveContact()" class="btn-contact btn-success">
+                    <a href="{{ route('public.staff.vcf', $staff->uuid) }}" class="btn-contact btn-success">
                         <i class="fas fa-download"></i> Save Contact
-                    </button>
+                    </a>
                     <a href="https://sbccindia.com/" target="_blank" class="btn-contact btn-primary">
                         <i class="fas fa-globe"></i> Visit Website
                     </a>
@@ -564,33 +564,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function saveContact() {
-    const vCardData = `BEGIN:VCARD
-VERSION:3.0
-FN:staff222
-ORG:SBC Cooling Systems
-TITLE:staff
-TEL:
-EMAIL:staff2@test.com
-URL:https://sbccindia.com/
-ADR:;;123 Industrial Area, Phase-II;Chandigarh;;160002;India
-NOTE:Industrial Cooling Solutions Excellence
-END:VCARD`;
-
-    // Create a blob and a URL for it
-    const blob = new Blob([vCardData], { type: 'text/vcard' });
-    const url = URL.createObjectURL(blob);
-
-    // On phones, opening the URL instead of "downloading" will
-    // trigger the native contacts app
-    window.location.href = url;
-
-    // Revoke URL later
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-       
-
         // Add click analytics
         document.querySelectorAll('a[href^="http"]').forEach(link => {
             link.addEventListener('click', function() {

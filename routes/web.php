@@ -72,7 +72,7 @@ Route::get('/reset-password-example', ResetPasswordExample::class)->name('reset-
 Route::get('/profile-example', ProfileExample::class)->name('profile-example');
 
 // Public Staff Routes (No Authentication Required)
-Route::get('/contact/{id}/vcf', [PublicStaffController::class, 'downloadVcf']);
+Route::get('/contact/{uuid}/vcf', [PublicStaffController::class, 'downloadVcf'])->name('public.staff.vcf');
 Route::get('/staff/visiting-card/{uuid}', [PublicStaffController::class, 'visitingCard'])->name('staff.visiting-card');
 Route::get('/staff/profile/{uuid}', [PublicStaffController::class, 'profile'])->name('staff.profile');
 
