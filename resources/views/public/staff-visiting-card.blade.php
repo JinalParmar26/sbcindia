@@ -502,7 +502,7 @@
                 <div class="brochure-section">
                     <h6><i class="fas fa-file-pdf"></i> Company Brochure</h6>
                     <div class="brochure-actions">
-                        <a href="https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf" target="_blank" class="btn-brochure">
+                        <a href="https://sbccindia.com/download/brochure" target="_blank" class="btn-brochure">
                             <i class="fas fa-download"></i> Download Brochure
                         </a>
                         <a href="https://sbccindia.com/" target="_blank" class="btn-website">
@@ -565,64 +565,31 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function saveContact() {
-            // Create vCard data
-            const vCardData = `BEGIN:VCARD
+    const vCardData = `BEGIN:VCARD
 VERSION:3.0
-FN:{{ $staff->name }}
+FN:staff222
 ORG:SBC Cooling Systems
-TITLE:{{ $staff->role ?? 'Staff Member' }}
-TEL:{{ $staff->phone_number ?? '' }}
-EMAIL:{{ $staff->email }}
+TITLE:staff
+TEL:
+EMAIL:staff2@test.com
 URL:https://sbccindia.com/
 ADR:;;123 Industrial Area, Phase-II;Chandigarh;;160002;India
 NOTE:Industrial Cooling Solutions Excellence
 END:VCARD`;
 
-            // Create blob and download
-            const blob = new Blob([vCardData], { type: 'text/vcard' });
-            const url = window.URL.createObjectURL(blob);
-            
-            // Create download link
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = '{{ str_replace(" ", "_", $staff->name) }}_SBC_Contact.vcf';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            
-            // Show success message
-            showToast('Contact saved successfully!', 'success');
-        }
+    // Create a blob and a URL for it
+    const blob = new Blob([vCardData], { type: 'text/vcard' });
+    const url = URL.createObjectURL(blob);
 
-        function showToast(message, type) {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#28a745' : '#dc3545'};
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                font-size: 14px;
-                font-weight: 500;
-                max-width: 300px;
-            `;
-            toast.textContent = message;
-            
-            document.body.appendChild(toast);
-            
-            // Remove toast after 3 seconds
-            setTimeout(() => {
-                if (document.body.contains(toast)) {
-                    document.body.removeChild(toast);
-                }
-            }, 3000);
-        }
+    // On phones, opening the URL instead of "downloading" will
+    // trigger the native contacts app
+    window.location.href = url;
+
+    // Revoke URL later
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+       
 
         // Add click analytics
         document.querySelectorAll('a[href^="http"]').forEach(link => {

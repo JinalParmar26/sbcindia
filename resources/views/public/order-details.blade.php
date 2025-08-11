@@ -451,7 +451,7 @@
                     <i class="fas fa-file-pdf"></i> Company Brochure
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                    <button onclick="window.open('https://sbccindia.com/assets/brochure/sbc-company-brochure.pdf', '_blank')" style="display: flex; align-items: center; padding: 15px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
+                    <button onclick="window.open('https://sbccindia.com/download/brochure', '_blank')" style="display: flex; align-items: center; padding: 15px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s;">
                         <i class="fas fa-download" style="margin-right: 10px;"></i>
                         Download Brochure
                     </button>
