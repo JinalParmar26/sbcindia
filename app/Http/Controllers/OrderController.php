@@ -691,6 +691,21 @@ class OrderController extends Controller
             'tickets.orderProduct.product'
         ])->firstOrFail();
 
+        // Check if request is from the mobile app
+        $userAgent = request()->header('User-Agent', '');
+        
+        if (strpos($userAgent, 'sbccIndia') !== false) {
+            // Request from mobile app - return JSON with order details
+            return response()->json([
+                'order_id' => $order->uuid,
+                'order_title' => $order->title,
+                'customer_name' => $order->customer->name,
+                'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+                'status' => 'success'
+            ]);
+        }
+
+        // Default behavior - return HTML view
         return view('public.order-details', compact('order'));
     }
 }
