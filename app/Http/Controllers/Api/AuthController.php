@@ -31,8 +31,8 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Allow only staff roles
-        if (!$user->hasRole(['marketing', 'staff'])) {
+        // Allow staff roles and super_admin
+        if (!$user->hasRole(['marketing', 'staff', 'super_admin'])) {
             return response()->json(['message' => 'Access denied.'], 403);
         }
 
