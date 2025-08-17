@@ -40,7 +40,7 @@ Route::prefix('v1')->group(function () {
 
 
     // Protected routes
-    Route::middleware('auth:sanctum', 'approval.check')->group(function () {
+    Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
