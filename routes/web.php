@@ -37,6 +37,7 @@ use App\Http\Livewire\Staff;
 use App\Http\Livewire\StaffTickets;
 use App\Http\Livewire\StaffAttendanceActions;
 use App\Http\Livewire\StaffLocations;
+use App\Http\Controllers\ChallanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
@@ -84,6 +85,11 @@ Route::get('/user-profile/{uuid}', [UserController::class, 'showPublicProfile'])
 Route::get('/download-qr/{uuid}', [UserController::class, 'downloadQr'])->name('download-qr-1');
 
 Route::get('/qr/{uuid}', [UserController::class, 'showQr'])->name('showQr');
+
+Route::get('/challan/{id}/pdf', [ChallanController::class, 'exportServiceChallan'])->name('challan.single.pdf');
+
+Route::get('/service-challan/preview', [ChallanController::class, 'previewServiceChallan'])
+     ->name('service-challan.preview');
 
 
 Route::middleware('auth')->group(function () {

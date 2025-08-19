@@ -238,4 +238,20 @@ class PdfExportService
         
         return $this->generatePdf('pdf.single-user', $data, 'user-' . $user->id . '.pdf');
     }
+
+    public function generateServiceChallanPdf($data)
+    {
+        //return $this->generatePdf('pdf.service-challan', ['data' => $data], 'service-challan.pdf');
+        try {
+            $html = \View::make('pdf.service-challan', ['data' => $data])->render();
+
+            $pdf = \PDF::loadHTML($html);
+            $pdf->setPaper('A4', 'portrait'); // ✅ fix cut issue by using landscape
+
+            return $pdf->download('service-challan.pdf');
+        } catch (\Exception $e) {
+            // fallback to HTML download if PDF fails
+            return $this->generateHtmlFallback('pdf.service-challan', ['data' => $data], 'service-challan.pdf');
+        }
+    }
 }

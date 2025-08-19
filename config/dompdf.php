@@ -12,6 +12,7 @@ return [
     */
     'show_warnings' => false,   // Throw an Exception on warnings from dompdf
     'public_path' => null,      // Override the public path if needed
+    'remote_enabled' => true,
     
     /*
     |--------------------------------------------------------------------------

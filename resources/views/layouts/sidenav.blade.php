@@ -29,6 +29,7 @@
         </a>
       </div>
     </div>
+    @auth
     <ul class="nav flex-column pt-3 pt-md-0">
       <li class="nav-item">
         <a href="/dashboard" class="nav-link d-flex align-items-center">
@@ -455,5 +456,6 @@
         </a>
       </li> -->
     </ul>
+    @endauth
   </div>
 </nav>
