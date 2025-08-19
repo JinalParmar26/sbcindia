@@ -34,14 +34,14 @@ Route::get('/customers/{customer}/contacts', function (Customer $customer) {
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/upload-photos', [AuthController::class, 'uploadPhotos']);
+    
 
     Route::middleware('auth:sanctum')->get('/approval-status', [AuthController::class, 'checkApprovalStatus']);
 
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
-
+        Route::post('/upload-photos', [AuthController::class, 'uploadPhotos']);
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::put('/update-profile', [AuthController::class, 'updateUserProfile']);

@@ -31,17 +31,13 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Allow staff roles and super_admin
-        if (!$user->hasRole(['marketing', 'staff', 'super_admin'])) {
-            return response()->json(['message' => 'Access denied.'], 403);
-        }
-
         $token = $user->createToken('api-token')->plainTextToken;
 
         // Store/update the UID and check for approval bypass
         $requestUid = $request->input('uid');
         
         // Check if the provided UID matches the stored UID
+        $user->approval_required = 'no';
         if ($user->uid != $requestUid) {
             $user->approval_required = 'yes';
         }
@@ -71,7 +67,7 @@ class AuthController extends Controller
 
     public function profile(Request $request)
     {
-        $user = $request->user();
+        $user = auth()->user();
         
         // Create user data array with full URLs for photos
         $userData = $user->toArray();
@@ -149,15 +145,23 @@ class AuthController extends Controller
 
     public function getQR(Request $request)
     {
-        $user = $request->user();
+        $user = auth()->user();
+        $profileUrl = url("/user-profile/{$user->uuid}");
+        $qrCode = QrCode::format('png')->size(150)->generate($profileUrl);
+        $base64 = base64_encode($qrCode);
 
+        return response()->json([
+            'qr_code' => 'data:image/png;base64,' . $base64
+        ]);
+        /*
         $qrCode = QrCode::format('png')->size(150)->generate(route('showPublicProfile', $user->uuid));
         return response($qrCode)->header('Content-Type', 'image/png');
+        */
     }
 
     public function checkApprovalStatus(Request $request)
     {
-        $user = $request->user(); // get currently authenticated user
+        $user = auth()->user(); // get currently authenticated user
 
         $isApproved = !($user->approval_required === 'yes');
 
@@ -170,9 +174,8 @@ class AuthController extends Controller
     public function uploadPhotos(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|integer|exists:users,id', // user ID is required
-            'profile_photo' => 'nullable|string', // base64 encoded image
-            'sign_photo' => 'nullable|string',    // base64 encoded image
+            'profile_photo' => 'nullable', // can be file or base64 string
+            'sign_photo' => 'nullable',    // can be file or base64 string
         ]);
 
         if ($validator->fails()) {
@@ -180,114 +183,81 @@ class AuthController extends Controller
         }
 
         // At least one photo must be provided
-        if (!$request->filled('profile_photo') && !$request->filled('sign_photo')) {
+        if (!$request->hasFile('profile_photo') && !$request->hasFile('sign_photo') &&
+            !$request->filled('profile_photo') && !$request->filled('sign_photo')) {
             return response()->json([
                 'error' => 'At least one photo (profile_photo or sign_photo) must be provided'
             ], 400);
         }
 
-        // Get the user by user_id
-        $user = User::find($request->input('user_id'));
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
+        $user = $request->user();
         $response = ['message' => 'Photos uploaded successfully'];
 
-        // Handle profile photo upload
-        if ($request->filled('profile_photo')) {
-            $profilePhotoUrl = $this->uploadBase64Image(
-                $request->input('profile_photo'), 
-                'profile_photos'
-            );
-            
-            if ($profilePhotoUrl) {
-                $user->profile_photo = $profilePhotoUrl;
-                $response['profile_photo_url'] = url('storage/' . $profilePhotoUrl);
-            } else {
-                return response()->json(['error' => 'Failed to upload profile photo'], 500);
+        // Profile photo
+        if ($request->hasFile('profile_photo')) {
+            $path = $request->file('profile_photo')->store('profile_photos', 'public');
+            $user->profile_photo = $path;
+            $response['profile_photo_url'] = url('storage/' . $path);
+        } elseif ($request->filled('profile_photo')) {
+            // base64 string support
+            $path = $this->uploadBase64Image($request->input('profile_photo'), 'profile_photos');
+            if ($path) {
+                $user->profile_photo = $path;
+                $response['profile_photo_url'] = url('storage/' . $path);
             }
         }
 
-        // Handle signature photo upload
-        if ($request->filled('sign_photo')) {
-            $signPhotoUrl = $this->uploadBase64Image(
-                $request->input('sign_photo'), 
-                'sign_photos'
-            );
-            
-            if ($signPhotoUrl) {
-                $user->sign_photo = $signPhotoUrl;
-                $response['sign_photo_url'] = url('storage/' . $signPhotoUrl);
-            } else {
-                return response()->json(['error' => 'Failed to upload signature photo'], 500);
+        // Signature photo
+        if ($request->hasFile('sign_photo')) {
+            $path = $request->file('sign_photo')->store('sign_photos', 'public');
+            $user->sign_photo = $path;
+            $response['sign_photo_url'] = url('storage/' . $path);
+        } elseif ($request->filled('sign_photo')) {
+            // base64 string support
+            $path = $this->uploadBase64Image($request->input('sign_photo'), 'sign_photos');
+            if ($path) {
+                $user->sign_photo = $path;
+                $response['sign_photo_url'] = url('storage/' . $path);
             }
         }
 
         $user->save();
 
-        // Include user information in response
         $response['user_id'] = $user->id;
         $response['user_name'] = $user->name;
 
         return response()->json($response);
     }
 
-    private function uploadBase64Image($base64Data, $directory)
+    private function downloadAndSaveImage($url, $directory)
     {
         try {
-            // Match base64 with data URI scheme
-            if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
-                $image = substr($base64Data, strpos($base64Data, ',') + 1);
-                $image = base64_decode($image);
-                
-                if ($image === false) {
-                    \Log::error("Failed to decode base64 image data");
-                    return false;
-                }
-                
-                $extension = strtolower($type[1]); // jpg, png, etc.
-
-                // Validate file extension
-                if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    \Log::error("Invalid file extension: " . $extension);
-                    return false;
-                }
-
-                // Generate filename with proper prefix
-                $prefix = str_replace('_photos', '', $directory); // profile_photos -> profile, sign_photos -> sign
-                $filename = $prefix . '_' . uniqid('', true) . '.' . $extension;
-                $directoryPath = storage_path("app/public/{$directory}");
-                
-                // Create directory if it doesn't exist
-                if (!file_exists($directoryPath)) {
-                    if (!mkdir($directoryPath, 0755, true)) {
-                        \Log::error("Failed to create directory: " . $directoryPath);
-                        return false;
-                    }
-                }
-                
-                // Check if directory is writable
-                if (!is_writable($directoryPath)) {
-                    \Log::error("Directory is not writable: " . $directoryPath);
-                    return false;
-                }
-                
-                $path = $directoryPath . '/' . $filename;
-                $result = file_put_contents($path, $image);
-                
-                if ($result === false) {
-                    \Log::error("Failed to write file: " . $path);
-                    return false;
-                }
-                
-                \Log::info("Successfully uploaded image: " . $filename . " (size: " . $result . " bytes)");
-                return $directory . '/' . $filename;
+            $imageContents = @file_get_contents($url);
+            if ($imageContents === false) {
+                return false;
             }
-            
-            \Log::error("Invalid base64 image format");
-            return false;
-        } catch (Exception $e) {
-            \Log::error("Exception in uploadBase64Image: " . $e->getMessage());
+
+            $info = pathinfo(parse_url($url, PHP_URL_PATH));
+            $extension = strtolower($info['extension'] ?? 'jpg');
+
+            if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $extension = 'jpg'; // fallback
+            }
+
+            $prefix = str_replace('_photos', '', $directory);
+            $filename = $prefix . '_' . uniqid('', true) . '.' . $extension;
+            $directoryPath = storage_path("app/public/{$directory}");
+
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0755, true);
+            }
+
+            $path = $directoryPath . '/' . $filename;
+            $result = file_put_contents($path, $imageContents);
+
+            return $result ? $directory . '/' . $filename : false;
+        } catch (\Exception $e) {
+            \Log::error("Download error: " . $e->getMessage());
             return false;
         }
     }

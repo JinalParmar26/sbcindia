@@ -79,6 +79,13 @@ Route::get('/staff/profile/{uuid}', [PublicStaffController::class, 'profile'])->
 // Public Order Routes
 Route::get('/order/details/{uuid}', [OrderController::class, 'publicOrderDetails'])->name('order.public-details');
 
+
+Route::get('/user-profile/{uuid}', [UserController::class, 'showPublicProfile'])->name('showPublicProfile');
+Route::get('/download-qr/{uuid}', [UserController::class, 'downloadQr'])->name('download-qr-1');
+
+Route::get('/qr/{uuid}', [UserController::class, 'showQr'])->name('showQr');
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', Profile::class)->name('profile');
     

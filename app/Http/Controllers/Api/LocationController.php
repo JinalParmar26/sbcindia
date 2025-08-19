@@ -22,7 +22,6 @@ class LocationController extends Controller
         try {
             // Validate the request
             $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
                 'latitude' => 'required|numeric|between:-90,90',
                 'longitude' => 'required|numeric|between:-180,180',
                 'address' => 'nullable|string|max:500',
@@ -42,18 +41,22 @@ class LocationController extends Controller
                 ], 422);
             }
 
+            $user = auth()->user();
+
+            $additionalData = $request->has('additional_data') ? json_encode($request->additional_data) : null;
+
             // Create location record
-            $location = UserLocation::create([
-                'user_id' => $request->user_id,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'address' => $request->address,
-                'accuracy' => $request->accuracy,
-                'altitude' => $request->altitude,
-                'speed' => $request->speed,
-                'provider' => $request->provider,
-                'location_timestamp' => $request->location_timestamp,
-                'additional_data' => $request->additional_data
+             $location = UserLocation::create([
+                'user_id'           => $user->id,
+                'latitude'          => $request->latitude,
+                'longitude'         => $request->longitude,
+                'address'           => $request->address,
+                'accuracy'          => $request->accuracy,
+                'altitude'          => $request->altitude,
+                'speed'             => $request->speed,
+                'provider'          => $request->provider,
+                'location_timestamp'=> $request->location_timestamp,
+                'additional_data'   => $additionalData
             ]);
 
             return response()->json([
@@ -79,7 +82,6 @@ class LocationController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'locations' => 'required|array|min:1|max:100',
-                'locations.*.user_id' => 'required|exists:users,id',
                 'locations.*.latitude' => 'required|numeric|between:-90,90',
                 'locations.*.longitude' => 'required|numeric|between:-180,180',
                 'locations.*.address' => 'nullable|string|max:500',
@@ -99,10 +101,13 @@ class LocationController extends Controller
                 ], 422);
             }
 
+            $user = auth()->user();
+            $userId = $user->id;
+
             // Prepare data for bulk insert
-            $locationData = collect($request->locations)->map(function ($location) {
+            $locationData = collect($request->locations)->map(function ($location) use ($userId) {
                 return [
-                    'user_id' => $location['user_id'],
+                    'user_id' => $userId,
                     'latitude' => $location['latitude'],
                     'longitude' => $location['longitude'],
                     'address' => $location['address'] ?? null,
@@ -110,15 +115,15 @@ class LocationController extends Controller
                     'altitude' => $location['altitude'] ?? null,
                     'speed' => $location['speed'] ?? null,
                     'provider' => $location['provider'] ?? null,
-                    'location_timestamp' => $location['location_timestamp'],
-                    'additional_data' => isset($location['additional_data']) ? json_encode($location['additional_data']) : null,
+                    'location_timestamp' => Carbon::parse($location['location_timestamp'])->format('Y-m-d H:i:s'),
+                    'additional_data' => $location['additional_data'] ?? null,
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
             })->toArray();
 
             // Bulk insert
-            UserLocation::insert($locationData);
+            $user->locations()->createMany($locationData);
 
             return response()->json([
                 'success' => true,
