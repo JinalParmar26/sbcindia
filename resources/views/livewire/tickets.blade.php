@@ -199,6 +199,9 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('tickets.show', $ticket->uuid) }}">View</a></li>
                             <li><a class="dropdown-item" href="{{ route('tickets.edit', $ticket) }}">Edit</a></li>
+                            @if ($ticket->service->isNotEmpty())
+                            <li><a class="dropdown-item" href="{{ route('challan.single.pdf', $ticket->uuid) }}">Challan</a></li>
+                            @endif
                             <li><a class="dropdown-item text-danger" href="#" wire:click.prevent="confirmDelete({{ $ticket->id }})">Delete</a></li>
                         </ul>
                     </div>

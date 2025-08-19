@@ -104,7 +104,6 @@ class TicketController extends Controller
                 'ticketImages.uploadedBy'
             ])->where('uuid', $id)->firstOrFail();
         }
-        
         return view('tickets.show', compact('ticket'));
     }
 

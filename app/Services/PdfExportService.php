@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
 use PDF;
+use Illuminate\Support\Str;
 
 class PdfExportService
 {
@@ -239,6 +240,18 @@ class PdfExportService
         return $this->generatePdf('pdf.single-user', $data, 'user-' . $user->id . '.pdf');
     }
 
+    public function generateServiceChallanPdf($ticket)
+    {
+        $data = [
+            'ticket' => $ticket,
+            'title' => 'Service Challan',
+            'generated_at' => date('Y-m-d H:i:s'),
+        ];
+        $randomId = Str::random(4);
+        return $this->generatePdf('pdf.service-challan', $data, 'service-challan-' . $randomId . '.pdf');
+    }
+    /*
+
     public function generateServiceChallanPdf($data)
     {
         //return $this->generatePdf('pdf.service-challan', ['data' => $data], 'service-challan.pdf');
@@ -254,4 +267,5 @@ class PdfExportService
             return $this->generateHtmlFallback('pdf.service-challan', ['data' => $data], 'service-challan.pdf');
         }
     }
+        */
 }

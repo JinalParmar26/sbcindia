@@ -88,8 +88,7 @@ Route::get('/qr/{uuid}', [UserController::class, 'showQr'])->name('showQr');
 
 Route::get('/challan/{id}/pdf', [ChallanController::class, 'exportServiceChallan'])->name('challan.single.pdf');
 
-Route::get('/service-challan/preview', [ChallanController::class, 'previewServiceChallan'])
-     ->name('service-challan.preview');
+Route::get('/service-challan/preview', [ChallanController::class, 'previewServiceChallan'])->name('service-challan.preview');
 
 
 Route::middleware('auth')->group(function () {
