@@ -87,4 +87,9 @@ class Ticket extends Model
             $ticket->uuid = (string) Str::uuid();
         });
     }
+
+    public function images()
+    {
+        return $this->hasMany(TicketImage::class, 'ticket_id', 'id');
+    }
 }

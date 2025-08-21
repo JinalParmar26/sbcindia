@@ -55,71 +55,69 @@ class ServiceController extends Controller
         }
     }
 
-    public function serviceDetails($uuid, Request $request)
+    public function serviceDetails(Request $request, $uuid)
     {
         try {
-            $user = $request->user();
+            $user = Auth::user();
 
-            // Find service by UUID, ensure it belongs to the user
+            // Fetch service with related ticket, customer, order product, images, and additional staff
             $service = Service::with([
                 'ticket.customer',
                 'ticket.orderProduct',
-                'ticket.images',
-                'ticket.additionalStaff.user',
-            ])->where('uuid', $uuid)
-            ->where('user_id', $user->id)
+                'ticket.ticketImages',
+                'ticket.additionalStaff', // <-- fixed here
+            ])
+            ->where('uuid', $uuid)
+            ->where('user_id', $user->id) // verify the authenticated user
             ->first();
 
             if (!$service) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Service not found or unauthorized',
+                    'message' => 'Service not found or access denied',
                 ], 404);
             }
 
-            // Build challan PDF download link
-            $challanUrl = route('challan.single.pdf', ['uuid' => $service->uuid]);
-
+            // Format response
             $data = [
                 'service_uuid'       => $service->uuid,
-                'service_type'       => $service->service_type,
-                'service_start_time' => $service->start_time ? $service->start_time->format('Y-m-d H:i:s') : null,
-                'service_end_time'   => $service->end_time ? $service->end_time->format('Y-m-d H:i:s') : null,
-
                 'ticket_subject'     => $service->ticket->subject ?? null,
-                'ticket_description' => $service->ticket->description ?? null,
-                'ticket_created_at'  => optional($service->ticket->created_at)->format('Y-m-d H:i:s'),
-
                 'customer_name'      => $service->ticket->customer->name ?? null,
-                'customer_email'     => $service->ticket->customer->email ?? null,
-                'customer_phone'     => $service->ticket->customer->phone ?? null,
-
                 'product_serial_no'  => $service->ticket->orderProduct->serial_number ?? null,
                 'product_model_no'   => $service->ticket->orderProduct->model_number ?? null,
-
-                'ticket_images'      => $service->ticket->images->map(function ($img) {
-                    return url('storage/' . $img->image_path);
+                'service_start_time' => $service->start_date_time ? $service->start_date_time->format('Y-m-d H:i:s') : null,
+                'service_end_time'   => $service->end_date_time ? $service->end_date_time->format('Y-m-d H:i:s') : null,
+                'ticket_created_at'  => optional($service->ticket->created_at)->format('Y-m-d H:i:s'),
+                'additional_staff'   => $service->ticket->additionalStaff->map(function($staff) {
+                    return [
+                        'id'   => $staff->id,
+                        'name' => $staff->name ?? null, // <- user name is already available
+                    ];
                 }),
-
-                'additional_staff'   => $service->ticket->additionalStaff->map(function ($staff) {
-                    return $staff->user->name ?? null;
+                'images' => $service->ticket->ticketImages->map(function($img) {
+                    return [
+                        'id' => $img->id,
+                        'url' => $img->image_url,
+                        'description' => $img->description,
+                    ];
                 }),
-
-                'challan_pdf_url'    => $challanUrl,
+                'challan_pdf_link' => route('challan.single.pdf', ['id' => $service->uuid])
             ];
 
             return response()->json([
                 'status' => true,
                 'message' => 'Service details fetched successfully',
-                'data' => $data,
+                'data' => $data
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to fetch service details',
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ], 500);
         }
     }
+
+
 }
