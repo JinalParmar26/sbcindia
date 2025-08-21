@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\OvertimeLogController;
 use App\Http\Controllers\Api\MarketingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\ServiceController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -96,6 +97,7 @@ Route::prefix('v1')->group(function () {
 
 
         Route::get('/services', [ServiceController::class, 'userServices']);
+        Route::get('/services/{uuid}', [ServiceController::class, 'serviceDetails']);
 
 
     });
