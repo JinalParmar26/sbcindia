@@ -72,6 +72,11 @@ class Service extends Model
         return $this->morphMany(ServiceItem::class, 'serviceable');
     }
 
+    public function assignedTo()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     protected static function booted()
     {
         static::creating(function ($service) {

@@ -260,7 +260,7 @@ class PdfExportService
         $ticket = $service->ticket;
 
          
-        $signPath = $ticket->assignedTo->sign_photo ?? null;
+        $signPath = $service->assignedTo->sign_photo ?? null;
         $signFull = $signPath ? public_path('storage/' . $signPath) : null;
             
 

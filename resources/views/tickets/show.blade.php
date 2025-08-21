@@ -285,6 +285,46 @@
                     </div>
                 </div>
             </div>
+            <div class="mb-3">
+                <div class="card bg-white border-0 shadow-sm">
+                    <div class="card-header bg-warning text-dark py-2">
+                        <h6 class="mb-0"><i class="bi bi-list-check me-2"></i>Attended by</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Photo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ $service->assignedTo->name }}</td>
+                                        <td>{{ $service->assignedTo->email }}</td>
+                                        <td>{{ $service->assignedTo->phone_number }}</td>
+                                        <td> 
+                                            @if(!empty($service->assignedTo->profile_photo ))
+                                            @php
+                                                $signPath = $service->assignedTo->profile_photo ?? null;
+                                                $signFull = $signPath ? asset('storage/' . $signPath) : null;
+                                            @endphp
+                                            <img src="{{ $signFull }}" alt="{{ $service->assignedTo->name }}" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                            @endif
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
             @endif
             
             <!-- Service Timestamps -->
@@ -297,6 +337,12 @@
                     <i class="bi bi-calendar-check me-1"></i>
                     Updated: {{ $service->updated_at->format('Y-m-d H:i') }}
                 </span>
+                <a href="{{ route('challan.single.pdf', $service->uuid) }}" class="btn btn-outline-primary me-2" target="_blank">
+                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Download Challan
+                </a>
             </div>
         </div>
         @endforeach
@@ -441,14 +487,7 @@
     <a href="{{ route('tickets') }}" class="btn btn-secondary">Back to List</a>
     <div>
 
-        @if ($ticket->service->isNotEmpty())
-        <a href="{{ route('challan.single.pdf', $ticket->uuid) }}" class="btn btn-outline-primary me-2" target="_blank">
-            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            Download Challan
-        </a>
-        @endif
+       
         <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-primary">Edit Ticket</a>
     </div>
 </div>

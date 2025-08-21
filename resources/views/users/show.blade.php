@@ -86,6 +86,8 @@
                                     {{ $user->name ? $user->name . ' ' .$user->last_name : 'User Name'}}
                                 </h4>
                                 {!! $qrCode !!}
+                                <br>
+                                <br>
                                 <a href="{{ route('download-qr', $user->uuid) }}" class="btn btn-primary">Download QR</a>
                             </div>
                         </div>

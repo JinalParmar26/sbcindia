@@ -217,7 +217,7 @@
     <div style="display: flex; justify-content: flex-end; margin-top: 20px; text-align: right;">
         <div>
             <p style="margin: 0; font-weight: bold;">SBC Cooling Pvt. Ltd. Engineer Name &amp; Sign</p>
-            <p style="margin: 2px 0;">{{ $ticket->assignedTo->name ?? '-' }}</p>
+            <p style="margin: 2px 0;">{{ $service->assignedTo->name ?? '-' }}</p>
 
            
 

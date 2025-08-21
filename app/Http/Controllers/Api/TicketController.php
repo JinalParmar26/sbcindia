@@ -130,9 +130,10 @@ class TicketController extends Controller
             if ($type === 'service') {
                 // Remove items before inserting service record
                 unset($data['items']);
-
+                $user = auth()->user();
                 $service = Service::updateOrCreate(
                     ['ticket_id' => $ticket->id],
+                    ['user_id' => $user->id],
                     array_merge($data, ['ticket_id' => $ticket->id])
                 );
 
