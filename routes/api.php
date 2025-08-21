@@ -94,6 +94,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/locations/user/range', [LocationController::class, 'getUserLocationRange']);
         Route::get('/locations/user/stats', [LocationController::class, 'getLocationStats']);
 
+
+        Route::get('/services', [ServiceController::class, 'userServices']);
+
+
     });
 
 
