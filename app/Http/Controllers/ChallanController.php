@@ -36,6 +36,7 @@ class ChallanController extends Controller
     public function exportServiceChallan($id)
     {
         // {id} is the TICKET UUID
+        /*
         $ticket = \App\Models\Ticket::with([
             'customer',
             'contactPerson',
@@ -46,6 +47,13 @@ class ChallanController extends Controller
             'services.serviceItems', // include service items
         ])->where('uuid', $id)->firstOrFail();
         return $this->pdfExportService->generateServiceChallanPdf($ticket);
+        */
+        $service = Service::with('ticket')->where('uuid', $id)->firstOrFail();
+
+        // generate PDF
+        $pdf = app(PdfExportService::class)->generateServiceChallanPdf($service);
+
+        return $pdf->download("service-challan-{$service->uuid}.pdf");
     }
 
     public function previewServiceChallan()

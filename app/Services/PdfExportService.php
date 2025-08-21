@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\View;
 use PDF;
 use Illuminate\Support\Str;
 
+use App\Models\Service;
+
 class PdfExportService
 {
     /**
@@ -240,6 +242,7 @@ class PdfExportService
         return $this->generatePdf('pdf.single-user', $data, 'user-' . $user->id . '.pdf');
     }
 
+    /*
     public function generateServiceChallanPdf($ticket)
     {
         $data = [
@@ -249,6 +252,26 @@ class PdfExportService
         ];
         $randomId = Str::random(4);
         return $this->generatePdf('pdf.service-challan', $data, 'service-challan-' . $randomId . '.pdf');
+    }
+    */
+
+    public function generateServiceChallanPdf(Service $service)
+    {
+        $ticket = $service->ticket;
+
+         
+        $signPath = $ticket->assignedTo->sign_photo ?? null;
+        $signFull = $signPath ? public_path('storage/' . $signPath) : null;
+            
+
+        $data = [
+            'service' => $service,
+            'ticket' => $ticket,
+            'signFull' => $signFull
+        ];
+
+        return Pdf::loadView('pdf.service-challan', $data)
+            ->setPaper('A4');
     }
     /*
 

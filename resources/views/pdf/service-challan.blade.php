@@ -1,3 +1,5 @@
+<!-- resources/views/pdf/service-challan.blade.php -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +18,6 @@
 </style>
 </head>
 <body>
-@php($service = $ticket->services->first())
 
 <div class="challan">
 
@@ -50,6 +51,8 @@
         </div>
     </div>
 
+    @php($ticket = $ticket ?? ($service->ticket ?? null))
+
     <!-- Top details -->
     <div class="section">
         <table>
@@ -58,7 +61,7 @@
                 <td>
                     @if($service && $service->start_date_time)
                         {{ $service->start_date_time->format('d/m/y') }}
-                    @elseif($ticket->created_at)
+                    @elseif($ticket && $ticket->created_at)
                         {{ $ticket->created_at->format('d/m/y') }}
                     @else
                         -
@@ -69,7 +72,7 @@
                 <th>Time Out</th>
                 <td>{{ ($service && $service->end_date_time) ? $service->end_date_time->format('H:i') : '-' }}</td>
                 <th>Report Book No</th>
-                <td>{{ $ticket->id }}</td>
+                <td>{{ $ticket->id ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Customer Name</th>
@@ -106,7 +109,7 @@
         </table>
     </div>
 
-    <!-- Items -->
+    <!-- Items (only items for this service UUID) -->
     <div class="section">
         <table>
             <tr>
@@ -116,24 +119,20 @@
                 <th style="width: 15%;">Amount</th>
             </tr>
 
-            @php($itemsShown = false)
-            @foreach($ticket->services as $svc)
-                @foreach($svc->serviceItems as $it)
-                    @php($itemsShown = true)
-                    <tr>
-                        <td>{{ $it->item }}</td>
-                        <td>{{ $it->qty }}</td>
-                        <td>{{ $it->rate }}</td>
-                        <td>{{ $it->amount }}</td>
-                    </tr>
-                @endforeach
-            @endforeach
+            @php($items = $service->serviceItems ?? collect())
 
-            @if(!$itemsShown)
+            @forelse($items as $it)
+                <tr>
+                    <td>{{ $it->item }}</td>
+                    <td>{{ $it->qty }}</td>
+                    <td>{{ $it->rate }}</td>
+                    <td>{{ $it->amount }}</td>
+                </tr>
+            @empty
                 <tr>
                     <td colspan="4" style="text-align:center;">No items</td>
                 </tr>
-            @endif
+            @endforelse
         </table>
     </div>
 
@@ -215,16 +214,20 @@
         </table>
     </div>
 
-    <!-- Signature -->
     <div style="display: flex; justify-content: flex-end; margin-top: 20px; text-align: right;">
         <div>
             <p style="margin: 0; font-weight: bold;">SBC Cooling Pvt. Ltd. Engineer Name &amp; Sign</p>
-            <p style="margin: 2px 0;">{{ ($ticket->assignedTo->name ?? '-') }}</p>
-            <img src="{{ public_path('storage/'.$ticket->assignedTo->sign_photo) }}" alt="Engineer Sign" style="max-width: 160px; height: auto; margin-top: 5px;">
+            <p style="margin: 2px 0;">{{ $ticket->assignedTo->name ?? '-' }}</p>
+
+           
+
+            @if($signFull && file_exists($signFull))
+                <img src="{{ $signFull }}" alt="Engineer Sign" style="max-width: 160px; height: auto; margin-top: 5px;">
+            @else
+                <img src="{{ public_path('assets/img/logo/sbc-logo.webp') }}" alt="Engineer Sign" style="max-width: 160px; height: auto; margin-top: 5px;">
+            @endif
         </div>
     </div>
-
-
 
 </div>
 </body>
