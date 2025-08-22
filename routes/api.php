@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\MarketingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\LeadController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -102,7 +104,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/leads', [LeadController::class, 'storeLead']);
         Route::post('/lead-logs', [LeadController::class, 'storeLeadLog']);
         Route::post('/lead-log-images', [LeadController::class, 'storeLeadLogImage']);
-        
+        Route::get('/leads', [LeadController::class, 'getLeads']);
     });
 
 

@@ -160,4 +160,20 @@ class LeadController extends Controller
             'data' => $image
         ]);
     }
+
+
+    public function getLeads(Request $request)
+    {
+        $user = $request->user();
+
+        $leads = Lead::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Leads fetched successfully',
+            'data' => $leads
+        ]);
+    }
 }
