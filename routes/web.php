@@ -88,6 +88,8 @@ Route::get('/qr/{uuid}', [UserController::class, 'showQr'])->name('showQr');
 
 Route::get('/challan/{id}/pdf', [ChallanController::class, 'exportServiceChallan'])->name('challan.single.pdf');
 
+Route::get('/lead/{id}/pdf', [ChallanController::class, 'exportLeadPdf'])->name('lead.single.pdf');
+
 Route::get('/service-challan/preview', [ChallanController::class, 'previewServiceChallan'])->name('service-challan.preview');
 
 
@@ -221,7 +223,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/leads', Leads::class)->name('leads');
             Route::get('/leads/export/csv', [LeadController::class, 'exportCsv'])->name('leads.export.csv');
             // Parameterized routes MUST come after specific routes
-            Route::get('/leads/{id}', Leads::class)->name('leads.show');
+            Route::get('/leads/{uuid}', [LeadController::class, 'show'])->name('leads.show');
         });
         
         Route::middleware('permission:edit_leads|edit_marketing')->group(function () {

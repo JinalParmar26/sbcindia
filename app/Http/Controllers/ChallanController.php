@@ -17,7 +17,7 @@ use App\Models\Service;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\View;
-
+use App\Models\Lead;
 
 class ChallanController extends Controller
 {
@@ -35,19 +35,7 @@ class ChallanController extends Controller
      */
     public function exportServiceChallan($id)
     {
-        // {id} is the TICKET UUID
-        /*
-        $ticket = \App\Models\Ticket::with([
-            'customer',
-            'contactPerson',
-            'assignedTo',
-            'attendedBy',
-            'orderProduct.product',
-            'orderProduct.order',
-            'services.serviceItems', // include service items
-        ])->where('uuid', $id)->firstOrFail();
-        return $this->pdfExportService->generateServiceChallanPdf($ticket);
-        */
+        
         $service = Service::with('ticket')->where('uuid', $id)->firstOrFail();
 
         // generate PDF
@@ -100,6 +88,16 @@ class ChallanController extends Controller
 
         // ✅ Instead of PDF, just return the Blade view
         return view('pdf.service-challan', ['data' => $data]);
+    }
+
+    public function exportLeadPdf($id)
+    {
+        $lead = Lead::with(['user', 'visitLogs'])->where('uuid', $id)->firstOrFail();
+
+        // generate PDF
+        $pdf = app(PdfExportService::class)->generateLeadPdf($lead);
+
+        return $pdf->download("lead-{$lead->uuid}.pdf");
     }
    
 }

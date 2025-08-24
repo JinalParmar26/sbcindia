@@ -8,6 +8,7 @@ use PDF;
 use Illuminate\Support\Str;
 
 use App\Models\Service;
+use App\Models\Lead;
 
 class PdfExportService
 {
@@ -291,4 +292,14 @@ class PdfExportService
         }
     }
         */
+
+    public function generateLeadPdf(Lead $lead)
+    {
+        $data = [
+            'lead' => $lead,
+        ];
+
+        return Pdf::loadView('pdf.lead', $data)
+            ->setPaper('A4');
+    }
 }
