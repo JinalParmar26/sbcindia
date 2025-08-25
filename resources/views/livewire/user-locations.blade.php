@@ -55,6 +55,7 @@
                             <th>Staff Name & Email</th>
                             <th>Last Location</th>
                             <th>Today</th>
+                            <th>More</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,6 +81,11 @@
                                         -
                                     @endif
                                 </td>
+                                <td>
+                                    <a href="{{ route('user-location.show', $user->uuid) }}" class="dropdown-item text-danger">
+                                        View 
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -91,41 +97,54 @@
 
         {{-- Right Section: Map --}}
         <div class="col-lg-6 mb-4">
-            <div id="map" style="height: 500px; width: 100%;"></div>
+            <div id="map" style="height: 500px; width: 100%; border:1px solid #ccc;"></div>
         </div>
     </div>
 </div>
 
-@push('scripts')
-<script>
-window.initLivewireMap = function() {
-    if(document.getElementById('map')){
-        const map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 20.5937, lng: 78.9629 }, // Center on India
-            zoom: 5
-        });
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        // Livewire data
-        const todayLocations = @json($todayLocations);
+    @push('scripts')
+    <script>
+        document.addEventListener('livewire:load', function () {
+            // Make sure map container exists
+            if(!document.getElementById('map')) return;
 
-        Object.values(todayLocations).forEach(loc => {
-            if(loc.latitude && loc.longitude){
-                const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(loc.latitude), lng: parseFloat(loc.longitude) },
-                    map: map,
-                    title: loc.name || 'Unknown'
-                });
+            // Initialize Leaflet map (center on India)
+            var map = L.map('map').setView([20.5937, 78.9629], 5);
 
-                const infowindow = new google.maps.InfoWindow({
-                    content: `<b>${loc.name || 'Unknown'}</b><br>${loc.address || '-'}`,
-                });
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                });
+            // Today locations from Livewire
+            const todayLocations = @json($todayLocations);
+
+            const bounds = [];
+
+            Object.values(todayLocations).forEach(loc => {
+                if(loc.latitude && loc.longitude){
+                    const marker = L.marker([parseFloat(loc.latitude), parseFloat(loc.longitude)]).addTo(map);
+                    
+                    // Popup with name, address, timestamp
+                    marker.bindPopup(`
+                        <div style="font-size:14px;">
+                            <b>${loc.name || 'Unknown'}</b><br>
+                            ${loc.address || '-'}<br>
+                            <small>${loc.location_timestamp || ''}</small>
+                        </div>
+                    `);
+
+                    bounds.push([parseFloat(loc.latitude), parseFloat(loc.longitude)]);
+                }
+            });
+
+            // Adjust map to show all markers
+            if(bounds.length) {
+                map.fitBounds(bounds, {padding: [50, 50]});
             }
         });
-    }
-};
-</script>
-@endpush
+    </script>
+    @endpush

@@ -15,7 +15,7 @@
         'bootstrap-tables','transactions','buttons','forms','modals','notifications','typography','upgrade-to-pro',
         'location.index','location.live.tracking','location.live.data','location.user.show','location.user.trail',
         'location.user.data','location.user.summary','location.user.export','location.users.with.data','location.cleanup',
-        'staff_attendance.index','user.attendance.detail','user.locations.index'        
+        'staff_attendance.index','user.attendance.detail','user.locations.index','user-location.show'     
     ]))
 
     {{-- Nav --}}

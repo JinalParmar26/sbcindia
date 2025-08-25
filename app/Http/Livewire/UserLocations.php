@@ -33,10 +33,10 @@ class UserLocations extends Component
     public function render()
     {
         // Step 1: Fetch paginated users
-        $usersQuery = User::select('id', 'name', 'email', 'role')
+        $usersQuery = User::select('id', 'name', 'email', 'role', 'uuid')
             ->when($this->search, function($q) {
                 $q->where('name', 'like', '%'.$this->search.'%')
-                  ->orWhere('email', 'like', '%'.$this->search.'%');
+                ->orWhere('email', 'like', '%'.$this->search.'%');
             })
             ->paginate($this->perPage);
         $userIds = $usersQuery->pluck('id')->toArray();
@@ -55,7 +55,7 @@ class UserLocations extends Component
 
         // Step 3: Today's latest locations for map
         $today = Carbon::today();
-        $todayLocations = UserLocation::select('user_id', 'latitude', 'longitude', 'address')
+        $todayLocations = UserLocation::select('user_id', 'latitude', 'longitude', 'address', 'location_timestamp')
             ->whereIn('user_id', $userIds)
             ->whereDate('location_timestamp', $today)
             ->whereIn('id', function($query) use ($userIds, $today) {
@@ -72,6 +72,9 @@ class UserLocations extends Component
                     'longitude' => $loc->longitude,
                     'address' => $loc->address ?? '-',
                     'name' => $loc->user ? $loc->user->name : 'Unknown',
+                    'location_timestamp' => $loc->location_timestamp 
+                        ? Carbon::parse($loc->location_timestamp)->format('d M Y, h:i A') 
+                        : '',
                 ]];
             });
 

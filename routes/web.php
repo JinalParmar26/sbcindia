@@ -49,6 +49,7 @@ use App\Http\Controllers\PublicStaffController;
 use App\Http\Controllers\UserAttendanceController;
 
 use App\Http\Livewire\UserLocations;
+use App\Http\Livewire\UserLocationDetails;
 
 /*
 |--------------------------------------------------------------------------
@@ -276,6 +277,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/user-attendance/{uuid}', [UserAttendanceController::class, 'detail'])->name('user.attendance.detail');
 
         Route::get('/user-locations', UserLocations::class)->name('user.locations.index');
+        Route::get('/user-location/{uuid}', UserLocationDetails::class)->name('user-location.show');
 
 
 
