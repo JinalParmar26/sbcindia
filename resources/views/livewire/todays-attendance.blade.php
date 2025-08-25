@@ -168,13 +168,9 @@
                                 </td>
                                 <td><span class="time-display">{{ $workingHours }}</span></td>
                                 <td class="staff-actions">
-                                    @if($todayAttendance && !$todayAttendance->check_out)
-                                        <button class="btn btn-sm btn-primary checkout-btn" wire:click="checkOutUser({{ $staff->id }})">
-                                            Check Out
-                                        </button>
-                                    @else
-                                        <span class="text-muted">No action needed</span>
-                                    @endif
+                                    <a href="{{ route('user.attendance.detail', $staff->uuid) }}" class="dropdown-item text-danger">
+                                        View Attendance
+                                    </a>
                                 </td>
                             </tr>
                         @empty
