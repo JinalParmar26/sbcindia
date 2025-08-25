@@ -93,9 +93,7 @@
     };
 </script>
     
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXi6lk-Tey8r9YjTyxBPYgbXx44sqrhgU&callback=initLivewireMap">
-</script>
+   
     @stack('scripts')
     @livewireScripts
 

@@ -169,21 +169,21 @@
                   </a>
                 </li>
 
-                <li class="nav-item {{ Request::url() == url('/staff') ? 'active' : '' }}">
+                <!-- <li class="nav-item {{ Request::url() == url('/staff') ? 'active' : '' }}">
                   <a href="/staff" class="nav-link">
                     <span class="sidebar-text">Attendance testing</span>
                   </a>
-                </li>
+                </li> -->
                 <li class="nav-item {{ Request::segment(2) == 'tickets' ? 'active' : '' }}">
                   <a href="/staff/tickets" class="nav-link">
                     <span class="sidebar-text">Staff Tickets</span>
                   </a>
                 </li>
-                <li class="nav-item {{ Request::segment(2) == 'locations' ? 'active' : '' }}">
+                <!-- <li class="nav-item {{ Request::segment(2) == 'locations' ? 'active' : '' }}">
                   <a href="/staff/locations" class="nav-link">
                     <span class="sidebar-text">Live Tracking testing</span>
                   </a>
-                </li>
+                </li> -->
                 @endcan
                 @can('manage_attendance')
                 <li class="nav-item {{ Request::segment(2) == 'actions' ? 'active' : '' }}">

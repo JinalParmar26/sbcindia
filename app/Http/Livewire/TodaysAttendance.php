@@ -15,9 +15,8 @@ class TodaysAttendance extends Component
     public $perPage = 10;
     public $sortField = 'name';
     public $sortDirection = 'asc';
-    public $attendanceIdToDelete;
 
-    protected $listeners = ['deleteConfirmed' => 'deleteAttendance'];
+    protected $listeners = ['refreshData' => '$refresh'];
 
     public function updatingSearch()
     {
@@ -34,38 +33,47 @@ class TodaysAttendance extends Component
         }
     }
 
-    public function confirmDelete($id)
+    public function refreshData()
     {
-        $this->attendanceIdToDelete = $id;
-        $this->dispatchBrowserEvent('show-delete-modal');
-    }
-
-    public function deleteAttendance()
-    {
-        if ($this->attendanceIdToDelete) {
-            \App\Models\UserAttendance::find($this->attendanceIdToDelete)->delete();
-            $this->dispatchBrowserEvent('hide-delete-modal');
-            session()->flash('message', 'Attendance deleted successfully.');
-        }
+        $this->resetPage();
     }
 
     public function render()
     {
         $today = Carbon::today()->toDateString();
 
-        $usersQuery = User::where('role', 'staff')
+        // Query for stats (all staff)
+        $staffMembers = User::where('role', 'staff')
             ->with(['userAttendances' => function ($q) use ($today) {
                 $q->whereDate('check_in', $today);
             }])
             ->when($this->search, function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%');
             })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->get();
+
+        // Calculate stats
+        $checkedIn = $staffMembers->filter(fn($s) => $s->userAttendances->first() && !$s->userAttendances->first()->check_out)->count();
+        $checkedOut = $staffMembers->filter(fn($s) => $s->userAttendances->first() && $s->userAttendances->first()->check_out)->count();
+        $notCheckedIn = $staffMembers->filter(fn($s) => $s->userAttendances->isEmpty())->count();
+
+        // Paginated table
+        $attendancesQuery = User::where('role', 'staff')
+            ->with(['userAttendances' => function ($q) use ($today) {
+                $q->whereDate('check_in', $today);
+            }])
+            ->when($this->search, fn($q) => $q->where('name', 'like', '%' . $this->search . '%'))
             ->orderBy($this->sortField, $this->sortDirection);
 
-        $users = $usersQuery->paginate($this->perPage);
+        $attendances = $attendancesQuery->paginate($this->perPage);
 
         return view('livewire.todays-attendance', [
-            'attendances' => $users
+            'staffMembers' => $staffMembers, // for stats cards
+            'attendances' => $attendances,   // for table with pagination
+            'checkedIn' => $checkedIn,
+            'checkedOut' => $checkedOut,
+            'notCheckedIn' => $notCheckedIn,
         ]);
     }
 }
