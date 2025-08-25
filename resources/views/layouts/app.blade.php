@@ -13,7 +13,9 @@
         'users','users.create','users.edit',
         'roles','roles.index','roles.create','roles.show','roles.edit','role-permissions',
         'bootstrap-tables','transactions','buttons','forms','modals','notifications','typography','upgrade-to-pro',
-        'location.index','location.live.tracking','location.live.data','location.user.show','location.user.trail','location.user.data','location.user.summary','location.user.export','location.users.with.data','location.cleanup'
+        'location.index','location.live.tracking','location.live.data','location.user.show','location.user.trail',
+        'location.user.data','location.user.summary','location.user.export','location.users.with.data','location.cleanup',
+        'staff_attendance.index','user.attendance.detail','user.locations.index'        
     ]))
 
     {{-- Nav --}}

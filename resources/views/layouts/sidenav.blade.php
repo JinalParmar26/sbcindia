@@ -158,9 +158,20 @@
             <div class="multi-level collapse {{ Request::segment(1) == 'staff' ? 'show' : '' }}" role="list" id="submenu-staff" aria-expanded="false">
               <ul class="flex-column nav">
                 @can('view_staff')
+                <li class="nav-item {{ Request::url() == url('/staff-attendance') ? 'active' : '' }}">
+                  <a href="/staff-attendance" class="nav-link">
+                    <span class="sidebar-text">Attendance Overview</span>
+                  </a>
+                </li>
+                <li class="nav-item {{ Request::url() == url('/user-locations') ? 'active' : '' }}">
+                  <a href="/user-locations" class="nav-link">
+                    <span class="sidebar-text">Live Tracking</span>
+                  </a>
+                </li>
+
                 <li class="nav-item {{ Request::url() == url('/staff') ? 'active' : '' }}">
                   <a href="/staff" class="nav-link">
-                    <span class="sidebar-text">Attendance Overview</span>
+                    <span class="sidebar-text">Attendance testing</span>
                   </a>
                 </li>
                 <li class="nav-item {{ Request::segment(2) == 'tickets' ? 'active' : '' }}">
@@ -170,7 +181,7 @@
                 </li>
                 <li class="nav-item {{ Request::segment(2) == 'locations' ? 'active' : '' }}">
                   <a href="/staff/locations" class="nav-link">
-                    <span class="sidebar-text">Live Tracking</span>
+                    <span class="sidebar-text">Live Tracking testing</span>
                   </a>
                 </li>
                 @endcan

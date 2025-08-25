@@ -36,6 +36,7 @@ use App\Http\Livewire\Leads;
 use App\Http\Livewire\Staff;
 use App\Http\Livewire\StaffTickets;
 use App\Http\Livewire\StaffAttendanceActions;
+use App\Http\Livewire\TodaysAttendance;
 use App\Http\Livewire\StaffLocations;
 use App\Http\Controllers\ChallanController;
 use App\Http\Controllers\UserController;
@@ -45,6 +46,9 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\LocationManagementController;
 use App\Http\Controllers\PublicStaffController;
+use App\Http\Controllers\UserAttendanceController;
+
+use App\Http\Livewire\UserLocations;
 
 /*
 |--------------------------------------------------------------------------
@@ -266,6 +270,15 @@ Route::middleware('auth')->group(function () {
             Route::post('/location/cleanup', [LocationManagementController::class, 'cleanupOldLocations'])->name('location.cleanup');
         });
         
+
+        Route::get('/staff-attendance', TodaysAttendance::class)->name('staff_attendance.index');
+
+        Route::get('/user-attendance/{uuid}', [UserAttendanceController::class, 'detail'])->name('user.attendance.detail');
+
+        Route::get('/user-locations', UserLocations::class)->name('user.locations.index');
+
+
+
         Route::get('/transactions', Transactions::class)->name('transactions');
         Route::get('/upgrade-to-pro', UpgradeToPro::class)->name('upgrade-to-pro');
         Route::get('/lock', Lock::class)->name('lock');

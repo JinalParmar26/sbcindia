@@ -23,6 +23,11 @@ class UserAttendance extends Model
         'check_out_location_name',
     ];
 
+    protected $casts = [
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
+    ];
+
 
     public function user()
     {
