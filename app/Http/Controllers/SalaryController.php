@@ -93,4 +93,168 @@ class SalaryController extends Controller
         ]);
     }
 
+    public function monthlySummary(Request $request)
+    {
+        $month = $request->input('month', Carbon::now()->format('Y-m')); // default current month
+        $start = Carbon::parse($month . '-01')->startOfMonth();
+        $end   = Carbon::parse($month . '-01')->endOfMonth();
+
+        $users = User::where('calculate_salary', 1)->get();
+
+        $data = $users->map(function ($user) use ($start, $end) {
+            $presentDays = UserAttendance::where('user_id', $user->id)
+                ->whereBetween('check_in', [$start, $end])
+                ->whereNotNull('check_in')
+                ->count();
+
+            $totalDays = $start->daysInMonth;
+            $absentDays = $totalDays - $presentDays;
+
+            // Daily base salary
+            $dailySalary = $user->Salary ? $user->Salary / 30 : 0;
+
+            // Total main salary (only present days)
+            $mainSalary = $dailySalary * $presentDays;
+
+            // Calculate extra salary
+            $extraSalary = $this->calculateExtraSalary($user->id, $start, $end, $dailySalary);
+
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'role' => $user->role,
+                'present_days' => $presentDays,
+                'absent_days' => $absentDays,
+                'main_salary' => round($mainSalary),
+                'extra_salary' => round($extraSalary),
+                'final_salary' => round($mainSalary + $extraSalary),
+            ];
+        });
+
+        return view('salary.monthly_summary', compact('data', 'month'));
+    }
+
+    // ✅ 2. User Detail (day-wise breakdown)
+    public function monthlyDetail(User $user, $month)
+    {
+        $start = Carbon::parse($month . '-01')->startOfMonth();
+        $end   = Carbon::parse($month . '-01')->endOfMonth();
+
+        $dailySalary = $user->Salary ? $user->Salary / 30 : 0;
+        $workingStart = $user->working_hours_start;
+        $workingEnd   = $user->working_hours_end;
+
+        $dates = collect();
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $attendance = UserAttendance::where('user_id', $user->id)
+                ->whereDate('check_in', $date->toDateString())
+                ->first();
+
+            $present = $attendance && $attendance->check_in;
+
+            $mainHours = $extraHours = $serviceHours = 0;
+            $mainSalary = $extraSalary = $serviceSalary = 0;
+
+            if ($present) {
+                $checkIn = Carbon::parse($attendance->check_in);
+                $checkOut = $attendance->check_out ? Carbon::parse($attendance->check_out) : $checkIn;
+
+                $workedHours = $checkOut->diffInMinutes($checkIn) / 60;
+
+                // Main hours = within working hours
+                if ($workingStart && $workingEnd) {
+                    $scheduledStart = Carbon::parse($workingStart);
+                    $scheduledEnd   = Carbon::parse($workingEnd);
+                    $scheduledHours = $scheduledEnd->diffInMinutes($scheduledStart) / 60;
+
+                    $mainHours = min($workedHours, $scheduledHours);
+                    $extraHours = max(0, $workedHours - $scheduledHours);
+                } else {
+                    $mainHours = $workedHours;
+                }
+
+                // Service hours (double pay)
+                $serviceHours = Service::where('user_id', $user->id)
+                    ->whereDate('start_date_time', $date->toDateString())
+                    ->get()
+                    ->sum(function ($service) {
+                        if ($service->end_date_time && $service->start_date_time) {
+                            return Carbon::parse($service->end_date_time)
+                                ->diffInMinutes(Carbon::parse($service->start_date_time)) / 60;
+                        }
+                        return 0;
+                    });
+
+                // Salary calculations
+                $hourlyRate = $dailySalary / ($mainHours ?: 1); // crude calc, prevents div0
+                $mainSalary = $dailySalary; // base daily salary
+                $extraSalary = $extraHours * $hourlyRate * 1.5;
+                $serviceSalary = $serviceHours * $hourlyRate * 2;
+            }
+
+            $dates->push([
+                'date' => $date->toDateString(),
+                'present' => $present ? 'Present' : 'Absent',
+                'main_hours' => round($mainHours, 2),
+                'extra_hours' => round($extraHours, 2),
+                'service_hours' => round($serviceHours, 2),
+                'main_salary' => round($mainSalary),
+                'extra_salary' => round($extraSalary),
+                'service_salary' => round($serviceSalary),
+                'final_salary' => round($mainSalary + $extraSalary + $serviceSalary),
+            ]);
+        }
+
+        return view('salary.monthly_detail', compact('user', 'dates', 'month'));
+    }
+
+    // ✅ Helper to compute extra salary for summary
+    private function calculateExtraSalary($userId, $start, $end, $dailySalary)
+    {
+        $user = User::find($userId);
+        $workingStart = $user->working_hours_start;
+        $workingEnd   = $user->working_hours_end;
+
+        $attendances = UserAttendance::where('user_id', $userId)
+            ->whereBetween('check_in', [$start, $end])
+            ->get();
+
+        $total = 0;
+        foreach ($attendances as $attendance) {
+            if (!$attendance->check_in || !$attendance->check_out) continue;
+
+            $checkIn = Carbon::parse($attendance->check_in);
+            $checkOut = Carbon::parse($attendance->check_out);
+            $workedHours = $checkOut->diffInMinutes($checkIn) / 60;
+
+            $scheduledHours = 0;
+            if ($workingStart && $workingEnd) {
+                $scheduledStart = Carbon::parse($workingStart);
+                $scheduledEnd   = Carbon::parse($workingEnd);
+                $scheduledHours = $scheduledEnd->diffInMinutes($scheduledStart) / 60;
+            }
+
+            $extraHours = max(0, $workedHours - $scheduledHours);
+
+            $hourlyRate = $scheduledHours > 0 ? $dailySalary / $scheduledHours : 0;
+            $extraSalary = $extraHours * $hourlyRate * 1.5;
+
+            // Add service hours (double pay)
+            $serviceHours = Service::where('user_id', $userId)
+                ->whereDate('start_date_time', Carbon::parse($attendance->date)->toDateString())
+                ->get()
+                ->sum(function ($service) {
+                    if ($service->end_date_time && $service->start_date_time) {
+                        return Carbon::parse($service->end_date_time)
+                            ->diffInMinutes(Carbon::parse($service->start_date_time)) / 60;
+                    }
+                    return 0;
+                });
+
+            $serviceSalary = $serviceHours * $hourlyRate * 2;
+
+            $total += ($extraSalary + $serviceSalary);
+        }
+        return $total;
+    }
 }

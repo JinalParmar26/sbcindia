@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\LeadController;
+use App\Http\Controllers\Api\OrderController;
+
 
 /*
 |--------------------------------------------------------------------------

@@ -283,6 +283,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/user-locations', UserLocations::class)->name('user.locations.index');
         Route::get('/user-location/{uuid}', UserLocationDetails::class)->name('user-location.show');
 
+        
+
+        Route::get('/salary/monthly', [SalaryController::class, 'monthlySummary'])->name('salary.monthly');
+        Route::get('/salary/{user}/month/{month}', [SalaryController::class, 'monthlyDetail'])->name('salary.detail');
+
 
 
         Route::get('/transactions', Transactions::class)->name('transactions');
