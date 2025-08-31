@@ -155,7 +155,9 @@
                     clip-rule="evenodd"></path>
                 </svg></span>
             </span>
-            <div class="multi-level collapse {{ Request::segment(1) == 'staff' ? 'show' : '' }}" role="list" id="submenu-staff" aria-expanded="false">
+            <div 
+            class="multi-level collapse {{ Request::segment(1) == 'staff' || Request::segment(1) == 'user' || Request::segment(1) == 'salary' || Request::segment(1) == 'tickets' ? 'show' : '' }}" 
+            role="list" id="submenu-staff" aria-expanded="false">
               <ul class="flex-column nav">
                 @can('view_staff')
                 <li class="nav-item {{ Request::url() == url('/staff-attendance') ? 'active' : '' }}">
@@ -166,6 +168,11 @@
                 <li class="nav-item {{ Request::url() == url('/user-locations') ? 'active' : '' }}">
                   <a href="/user-locations" class="nav-link">
                     <span class="sidebar-text">Live Tracking</span>
+                  </a>
+                </li>
+                <li class="nav-item {{ Request::url() == url('/salary/monthly') ? 'active' : '' }}">
+                  <a href="/salary/monthly" class="nav-link">
+                    <span class="sidebar-text">Staff Salary</span>
                   </a>
                 </li>
 
