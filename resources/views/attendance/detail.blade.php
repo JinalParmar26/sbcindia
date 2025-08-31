@@ -117,32 +117,53 @@
   </div>
 </div>
 <script>
-$(document).on('click', '.calculate-salary-btn', function() {
-    let userId = $(this).data('user');
-    let date = $(this).data('date');
+document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("calculate-salary-btn")) {
+        let userId = e.target.getAttribute("data-user");
+        let date = e.target.getAttribute("data-date");
 
-    $.ajax({
-        url: "{{ url('/salary/calculate') }}",
-        type: "POST",
-        data: {
-            _token: "{{ csrf_token() }}",
-            user_id: userId,
-            date: date
-        },
-        success: function(response) {
-            // Expecting { hours: "8h 30m", salary: "₹500" }
-            $('#salaryModalBody').html(`
+        fetch("{{ url('/salary/calculate') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",   // 👈 tell Laravel we expect JSON
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                date: date
+            })
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text(); // capture HTML error
+                throw new Error(errorText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("salaryModalBody").innerHTML = `
                 <p><strong>Date:</strong> ${date}</p>
-                <p><strong>Total Hours:</strong> ${response.hours}</p>
-                <p><strong>Salary:</strong> ${response.salary}</p>
-            `);
-            $('#salaryModal').modal('show');
-        },
-        error: function(xhr) {
-            $('#salaryModalBody').html(`<p class="text-danger">Error: ${xhr.responseText}</p>`);
-            $('#salaryModal').modal('show');
-        }
-    });
+                <hr>
+                <p><strong>Main Hours:</strong> ${data.main_hours}</p>
+                <p><strong>Extra Hours (Service):</strong> ${data.extra_service_hours}</p>
+                <p><strong>Extra Hours:</strong> ${data.extra_hours}</p>
+                <p><strong>Total Hours:</strong> ${data.total_hours}</p>
+                <hr>
+                <p><strong>Main Salary:</strong> ${data.main_salary}</p>
+                <p><strong>Extra Hours Salary (Service):</strong> ${data.extra_service_salary}</p>
+                <p><strong>Extra Hours Salary:</strong> ${data.extra_salary}</p>
+                <p><strong>Total Salary:</strong> ${data.total_salary}</p>
+            `;
+            new bootstrap.Modal(document.getElementById('salaryModal')).show();
+        })
+        .catch(error => {
+            document.getElementById("salaryModalBody").innerHTML =
+                `<p class="text-danger">Error: ${error.message}</p>`;
+            new bootstrap.Modal(document.getElementById('salaryModal')).show();
+        });
+
+    }
 });
 </script>
 @endsection
