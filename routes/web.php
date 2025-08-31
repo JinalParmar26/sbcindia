@@ -48,8 +48,12 @@ use App\Http\Controllers\LocationManagementController;
 use App\Http\Controllers\PublicStaffController;
 use App\Http\Controllers\UserAttendanceController;
 
+use App\Http\Controllers\SalaryController;
+
 use App\Http\Livewire\UserLocations;
 use App\Http\Livewire\UserLocationDetails;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -293,6 +297,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('roles', App\Http\Controllers\RoleController::class);
         Route::get('/role-permissions/{roleId}', [App\Http\Controllers\RolePermissionController::class, 'show'])->name('role-permissions');
     });
+
+    Route::post('/salary/calculate', [SalaryController::class, 'calculateForDate']);
 });
 
 // Test routes for debugging

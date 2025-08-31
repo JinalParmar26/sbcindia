@@ -81,7 +81,16 @@
                                             <span class="text-danger">Missing</span>
                                         @endif
                                     </div>
+                                    <div class="mt-2">
+                                        <button 
+                                            class="btn btn-sm btn-primary calculate-salary-btn" 
+                                            data-user="{{ $user->id }}" 
+                                            data-date="{{ $date->format('Y-m-d') }}">
+                                            Calculate Salary
+                                        </button>
+                                    </div>
                                 @endif
+
                             </td>
                         @else
                             <td></td>
@@ -93,4 +102,47 @@
     </table>
 
 </div>
+<!-- Salary Result Modal -->
+<div class="modal fade" id="salaryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Salary Calculation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="salaryModalBody">
+        Loading...
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).on('click', '.calculate-salary-btn', function() {
+    let userId = $(this).data('user');
+    let date = $(this).data('date');
+
+    $.ajax({
+        url: "{{ url('/salary/calculate') }}",
+        type: "POST",
+        data: {
+            _token: "{{ csrf_token() }}",
+            user_id: userId,
+            date: date
+        },
+        success: function(response) {
+            // Expecting { hours: "8h 30m", salary: "₹500" }
+            $('#salaryModalBody').html(`
+                <p><strong>Date:</strong> ${date}</p>
+                <p><strong>Total Hours:</strong> ${response.hours}</p>
+                <p><strong>Salary:</strong> ${response.salary}</p>
+            `);
+            $('#salaryModal').modal('show');
+        },
+        error: function(xhr) {
+            $('#salaryModalBody').html(`<p class="text-danger">Error: ${xhr.responseText}</p>`);
+            $('#salaryModal').modal('show');
+        }
+    });
+});
+</script>
 @endsection
