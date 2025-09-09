@@ -17,7 +17,12 @@ class TicketController extends Controller
     public function assignedTickets(Request $request)
     {
 
-        $tickets = Ticket::with(['customer', 'orderProduct.product'])
+        $tickets = Ticket::with([
+                'customer', 
+                'orderProduct.product',
+                'assignedTo',
+                'attendedBy'
+            ])
             ->where('assigned_to', $request->user()->id)
             ->latest()
             ->get();

@@ -32,7 +32,6 @@ class OrderController extends Controller
         return view('orders.create', compact('customers', 'products'));
     }
 
-
     public function store(Request $request)
     {
         // Debug logging
@@ -164,11 +163,6 @@ class OrderController extends Controller
         return redirect()->route('orders.show', $order->uuid)->with('success', 'Order created successfully.');
     }
 
-
-
-
-
-
     public function show($uuid)
     {
         // Handle both UUID and ID parameters
@@ -237,7 +231,7 @@ class OrderController extends Controller
         return view('orders.upload-test', compact('order', 'customers', 'products'));
     }
 
-   public function update(Request $request, $uuid)
+    public function update(Request $request, $uuid)
     {
         // Handle both UUID and ID parameters
         if (is_numeric($uuid)) {

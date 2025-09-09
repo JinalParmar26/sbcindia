@@ -108,7 +108,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/lead-log-images', [LeadController::class, 'storeLeadLogImage']);
         Route::get('/leads', [LeadController::class, 'getLeads']);
 
-         Route::get('/orders/{uuid}', [OrderController::class, 'show']);
+         Route::get('/product_details/{uuid}', [OrderController::class, 'show']);
     });
 
 
