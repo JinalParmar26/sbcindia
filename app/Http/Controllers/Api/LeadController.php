@@ -176,4 +176,33 @@ class LeadController extends Controller
             'data' => $leads
         ]);
     }
+
+    public function getLeadWithLogs($uuid, Request $request)
+    {
+        $user = $request->user();
+
+        $lead = Lead::with([
+            'visitLogs' => function ($q) {
+                $q->orderBy('visit_date', 'desc');
+            },
+            'visitLogs.images'
+        ])
+        ->where('uuid', $uuid)
+        ->where('user_id', $user->id)
+        ->first();
+
+        if (!$lead) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lead not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lead with logs fetched successfully',
+            'data' => $lead
+        ]);
+    }
+
 }
