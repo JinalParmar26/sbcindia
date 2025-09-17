@@ -51,7 +51,7 @@ class AuthController extends Controller
         $response = [
             'token' => $token,
             'token_type' => 'Bearer',
-            'role' => $user->role,
+            'role' => $user->roles->pluck('name')->join(', '),
         ];
 
         // Only include approval_required in response if it's "yes"
@@ -73,6 +73,7 @@ class AuthController extends Controller
         // Create user data array with full URLs for photos
         $userData = $user->toArray();
         
+        $user->role=$userData->roles->pluck('name')->join(', ');
         // Add full URLs for profile photo and signature photo if they exist
         if ($user->profile_photo) {
             $userData['profile_photo_url'] = url('storage/' . $user->profile_photo);
