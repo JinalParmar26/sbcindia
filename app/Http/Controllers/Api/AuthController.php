@@ -51,6 +51,7 @@ class AuthController extends Controller
         $response = [
             'token' => $token,
             'token_type' => 'Bearer',
+            'role' => $user->role,
         ];
 
         // Only include approval_required in response if it's "yes"
